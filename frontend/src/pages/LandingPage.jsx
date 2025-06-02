@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BorderContainer from '../components/BorderContainer';
+import BorderContainerAnimated from '../components/BorderContainerAnimated';
 
 const bootLines = [
   '> Initializing core systems...',
@@ -27,6 +27,10 @@ function LandingPage() {
   const [bootComplete, setBootComplete] = useState(false);
   const [finalIndex, setFinalIndex] = useState(0);
   const [password, setPassword] = useState('');
+
+  // Animation states
+  const [step, setStep] = useState("main"); // "main", "fading", "welcome-in", "welcome-out"
+  const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -107,46 +111,70 @@ function LandingPage() {
     }
   }, [byline, currentBootIndex, finalIndex]);
 
+  // Handlers for password and animation sequencing
+  const handlePasswordEnter = (e) => {
+    if (e.key === 'Enter' && password.length > 0) {
+      setStep("fading");
+      setTimeout(() => {
+        setStep("welcome-in");
+        setExpanded(true); // Start the border grow at the same time
+        setTimeout(() => {
+          setStep("welcome-out"); // Start fading out WELCOME
+          setTimeout(() => {
+            navigate('/home');
+          }, 600); // Fade out WELCOME duration
+        }, 1200); // Show welcome+grow for 1.2s (should match border grow duration)
+      }, 500); // Fade out main content
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono flex justify-center items-center p-4">
-      <BorderContainer onAnimationEnd={() => setBorderDone(true)}>
-        <div className="flex flex-col justify-between h-full w-full">
-          <div className={`transition-opacity duration-300 ${borderDone ? 'opacity-100' : 'opacity-0'} h-full flex flex-col justify-start items-start`}>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl mb-2 text-glow">{title}</h1>
-            <p className="text-md md:text-lg lg:text-xl text-glow uppercase">{byline}</p>
-          </div>
-          <div className="text-left text-md text-glow whitespace-pre">
-            <div>
-              {bootLog.map((line, idx) => {
-                if (line.startsWith('> Enter password to continue')) {
-                  return (
-                    <p key={idx} className="flex items-center">
-                      <label htmlFor="boot-password">{line}</label>
-                      <input
-                        id="boot-password"
-                        type="password"
-                        className="ml-1 w-full bg-transparent border-none outline-none text-green-400 placeholder-green-600 caret-green-500 caret-[6px] caret-blink text-glow"
-                        placeholder=""
-                        autoFocus
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && password.length > 0) {
-                            navigate('/home');
-                          }
-                        }}
-                      />
-                    </p>
-                  );
-                } else {
-                  return <p key={idx}>{line}</p>;
-                }
-              })}
-              {!bootComplete && typedLine && <p>{typedLine}</p>}
+      <BorderContainerAnimated expanded={expanded} onAnimationEnd={() => setBorderDone(true)}>
+        {/* Boot content, fades out */}
+        {(step === "main" || step === "fading") && (
+          <div
+            className={`flex flex-col justify-between h-full w-full transition-opacity duration-500 ${step === "fading" ? "opacity-0" : "opacity-100"}`}
+          >
+            <div className={`transition-opacity duration-300 ${borderDone ? 'opacity-100' : 'opacity-0'} h-full flex flex-col justify-start items-start`}>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl mb-2 text-glow">{title}</h1>
+              <p className="text-md md:text-lg lg:text-xl text-glow uppercase">{byline}</p>
+            </div>
+            <div className="text-left text-md text-glow whitespace-pre">
+              <div>
+                {bootLog.map((line, idx) => {
+                  if (line.startsWith('> Enter password to continue')) {
+                    return (
+                      <p key={idx} className="flex items-center">
+                        <label htmlFor="boot-password">{line}</label>
+                        <input
+                          id="boot-password"
+                          type="password"
+                          className="ml-1 w-full bg-transparent border-none outline-none text-green-400 placeholder-green-600 caret-green-500 caret-[6px] caret-blink text-glow"
+                          placeholder=""
+                          autoFocus
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onKeyDown={handlePasswordEnter}
+                        />
+                      </p>
+                    );
+                  } else {
+                    return <p key={idx}>{line}</p>;
+                  }
+                })}
+                {!bootComplete && typedLine && <p>{typedLine}</p>}
+              </div>
             </div>
           </div>
-        </div>
-      </BorderContainer>
+        )}
+        {/* WELCOME message, fade in/out */}
+        {(step === "welcome-in" || step === "welcome-out") && (
+          <div className={`w-full h-full flex flex-col items-center justify-center transition-opacity duration-400 ${step === "welcome-in" ? "opacity-100" : "opacity-0"}`}>
+            <h2 className="text-5xl text-green-400 font-mono text-glow">WELCOME</h2>
+          </div>
+        )}
+      </BorderContainerAnimated>
     </div>
   );
 }
