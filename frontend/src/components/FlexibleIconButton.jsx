@@ -38,7 +38,7 @@ const FlexibleIconButton = ({
       </div>
       <div
         className={`font-mono glow-green text-sm block text-center ${labelClassName}`}
-        style={{ marginTop: "-0.6rem"  }}
+        style={{ marginTop: "-0.2rem"  }}
       >
         {label}
       </div>

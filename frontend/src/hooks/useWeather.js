@@ -9,7 +9,10 @@ function useWeather(defaultCity = "Sydney") {
     icon: null,
     desc: "",
     loaded: false,
-    city: defaultCity
+    city: defaultCity,
+    humidity: null,
+    wind: null,
+    rain: null,
   });
 
   useEffect(() => {
@@ -23,7 +26,10 @@ function useWeather(defaultCity = "Sydney") {
               icon: data.weather[0].icon,
               desc: data.weather[0].description,
               loaded: true,
-              city: data.name
+              city: data.name,
+              humidity: data.main.humidity,                       // %
+              wind: Math.round(data.wind.speed * 3.6),            // convert m/s to km/h
+              rain: data.rain ? Object.values(data.rain)[0] : 0,  // mm in last hour or 0
             });
           } else {
             setWeather(w => ({ ...w, loaded: true }));
@@ -40,9 +46,12 @@ function useWeather(defaultCity = "Sydney") {
             setWeather({
               temp: Math.round(data.main.temp),
               icon: data.weather[0].icon,
-              desc: data.weather[0].description,
+              desc: data.weather[0].description, // fill desc
               loaded: true,
-              city: data.name
+              city: data.name,
+              humidity: data.main.humidity,                       // %
+              wind: Math.round(data.wind.speed * 3.6),            // convert m/s to km/h
+              rain: data.rain ? Object.values(data.rain)[0] : 0,  // mm in last hour or 0
             });
           } else {
             setWeather(w => ({ ...w, loaded: true }));
