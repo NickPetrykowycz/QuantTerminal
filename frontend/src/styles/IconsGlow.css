@@ -1,0 +1,29 @@
+/* Default glow for icon and label */
+.glow-green {
+  color: #22c55e !important;
+  text-shadow:
+    0 0 2px #22c55e,
+    0 0 4px #22c55e,
+    0 0 8px #22c55e55;
+}
+
+.glow-green-icon {
+  color: #22c55e !important;
+  filter: drop-shadow(0 0 2px #22c55e) drop-shadow(0 0 4px #22c55e88);
+}
+
+/* Intensify both when parent hovered */
+.flexible-icon-btn:hover .glow-green,
+.flexible-icon-btn:focus-visible .glow-green {
+  color: #22c55e !important;
+  text-shadow:
+    0 0 4px #22c55e,
+    0 0 8px #22c55e,
+    0 0 16px #22c55e55;
+}
+
+.flexible-icon-btn:hover .glow-green-icon,
+.flexible-icon-btn:focus-visible .glow-green-icon {
+  color: #22c55e !important;
+  filter: drop-shadow(0 0 4px #22c55e) drop-shadow(0 0 8px #22c55e88);
+}

@@ -99,3 +99,54 @@
   transform-origin: right;
   animation: draw-horizontal 0.8s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
 }
+
+.resizable-animate {
+  transition:
+    width 1s ease-in-out,
+    height 1s ease-in-out,
+    max-width 1s ease-in-out,
+    max-height 1s ease-in-out;
+}
+.resizable-animate.expanded {
+  width: 90vw !important;
+  height: 90vh !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+}
+
+/* --- Static terminal border, no animation --- */
+.terminal-border-line {
+  position: absolute;
+  background-color: #22c55e;
+  display: block;
+  z-index: 1;
+  /* NO animation, NO transforms */
+}
+
+.terminal-border-top {
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+}
+
+.terminal-border-right {
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+}
+
+.terminal-border-bottom {
+  bottom: 0;
+  right: 0;
+  height: 2px;
+  width: 100%;
+}
+
+.terminal-border-left {
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+}
