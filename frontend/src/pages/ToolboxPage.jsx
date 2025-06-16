@@ -1,21 +1,14 @@
 import React from 'react';
 import BorderContainerStatic from '../components/BorderContainer';
-import ProfileCard from '../components/ProfileCard';
-import WeatherWidget from '../components/WeatherWidget';
-import ClockWidget from '../components/ClockWidget';
 import FlexibleIconButton from '../components/FlexibleIconButton';
-import { IoFolderOpenOutline } from "react-icons/io5";
-import { PiToolbox, PiVault, PiJoystick } from "react-icons/pi";
-import { ImFilePdf } from "react-icons/im";
-import { FiGithub } from "react-icons/fi";
-import { CiLinkedin } from "react-icons/ci";
-import { MdOutlineEmail } from "react-icons/md";
+import { PiToolbox } from "react-icons/pi";
+
 
 const navApps = [
   { icon: <PiToolbox />, label: "OptiPrice", to: "/toolbox/optiprice" },
 ];
 
-function HomePage() {
+function ToolBoxPage() {
   return (
     <div className="bg-black text-green-400 font-mono min-h-screen flex flex-col items-center justify-center">
       <BorderContainerStatic className="shadow-[0_0_60px_8px_#22c55e99] border-4 border-green-400 rounded-3xl transition-all duration-300">
@@ -65,4 +58,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;
+export default ToolBoxPage;
