@@ -10,6 +10,7 @@ import { ImFilePdf } from "react-icons/im";
 import { FiGithub } from "react-icons/fi";
 import { CiLinkedin } from "react-icons/ci";
 import { MdOutlineEmail } from "react-icons/md";
+import InfoPanel from '../components/InfoPanel';
 
 const navApps = [
   { icon: <PiToolbox />, label: "The Toolbox", to: "/toolbox" },
@@ -29,17 +30,7 @@ function HomePage() {
         <div className="flex flex-row-reverse w-full h-full">
           {/* Right-side Info Panel with subtle border and reduced glow */}
           <div className="w-1/3 flex flex-col items-center justify-center h-full">
-            <div className="w-full h-full flex flex-col items-center justify-center border-2 border-green-400 rounded-2xl bg-black/90 px-10 py-12">
-              <ProfileCard
-                className=""
-                imageSize="w-70 h-70"
-                nameSize="text-4xl"
-                locationSize="text-xl"
-                creatorSize="text-xl"
-              />
-              <ClockWidget timeSize="text-4xl" dateSize="text-lg"/>
-              <WeatherWidget iconSize="w-16 h-16" tempSize="text-2xl" descSize="text-lg" />
-            </div>
+            <InfoPanel />
           </div>
           {/* Left-side Navigation: Grid layout, evenly spaced icons */}
           <div className="w-2/3 flex flex-col items-center justify-center">

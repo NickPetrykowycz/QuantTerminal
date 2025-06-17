@@ -118,7 +118,7 @@ def callOptionPrice(S0, K, T, r, sigma, q=None):
 
     # Spot Price Adjustment
     spa = 1
-    if q != None:
+    if q is not None:
         spa = np.exp(-q*T)
 
     # Present Value Factor
@@ -134,7 +134,7 @@ def putOptionPrice(S0, K, T, r, sigma, q=None):
 
     # Spot Price Adjustment
     spa = 1
-    if q != None:
+    if q is not None:
         spa = np.exp(-q*T)
 
     # Present Value Factor
@@ -145,22 +145,22 @@ def putOptionPrice(S0, K, T, r, sigma, q=None):
 
 # === Main Execution ===
 
-def main():
+# def main():
 
-    # Values
-    S0 = 120
-    K = 100
-    T = 0.5
-    r = 0.04
-    sigma = 0.25
-    q = 0.03
+#     # Values
+#     S0 = 120
+#     K = 100
+#     T = 0.5
+#     r = 0.04
+#     sigma = 0.25
+#     q = 0.03
 
-    C = callOptionPrice(S0, K, T, r, sigma, q)
-    P = putOptionPrice(S0, K, T, r, sigma, q)
+#     C = callOptionPrice(S0, K, T, r, sigma, q)
+#     P = putOptionPrice(S0, K, T, r, sigma, q)
 
-    print(f"Price of Call Option: {C:.2f}")
-    print(f"Price of Put Option:  {P:.2f}")
+#     print(f"Price of Call Option: {C:.2f}")
+#     print(f"Price of Put Option:  {P:.2f}")
 
-# === Script Entry Point ===
-if __name__ == "__main__":
-    main()
+# # === Script Entry Point ===
+# if __name__ == "__main__":
+#     main()

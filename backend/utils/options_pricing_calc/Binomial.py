@@ -115,32 +115,32 @@ def binomial_option_price(S0, K, T, r, sigma, N, option_type='call', american=Fa
     return option_values[0]
 
 # === Main Execution ===
-def main():
-    S0 = 100
-    K = 105
-    T = 1
-    r = 0.05
-    sigma = 0.2
-    N = 150
+# def main():
+#     # S0 = 100
+#     # K = 105
+#     # T = 1
+#     # r = 0.05
+#     # sigma = 0.2
+#     # N = 150
 
-    discrete_schedule = [(43, 1.0), (64, 1.5)]
-    freq_days = 30
-    first_day = 43
-    dividend_amt = 1.0
-    q = 0.03
+#     # discrete_schedule = [(43, 1.0), (64, 1.5)]
+#     # freq_days = 30
+#     # first_day = 43
+#     # dividend_amt = 1.0
+#     # q = 0.03
 
-    american_call_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='call', american=True, q=q)
+#     # american_call_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='call', american=True, q=q)
 
-    american_put_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='put', american=True, q=q)
+#     # american_put_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='put', american=True, q=q)
 
-    european_call_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='call', american=False, q=q)
-    european_put_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='put', american=False, q=q)
+#     # european_call_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='call', american=False, q=q)
+#     # european_put_yield = binomial_option_price(S0, K, T, r, sigma, N, option_type='put', american=False, q=q)
 
-    print(f"American Call (Yield):        {american_call_yield:.4f}")
-    print(f"American Put  (Yield):        {american_put_yield:.4f}")
-    print(f"European Call (Yield):        {european_call_yield:.4f}")
-    print(f"European Put  (Yield):        {european_put_yield:.4f}")
+#     # print(f"American Call (Yield):        {american_call_yield:.4f}")
+#     # print(f"American Put  (Yield):        {american_put_yield:.4f}")
+#     # print(f"European Call (Yield):        {european_call_yield:.4f}")
+#     # print(f"European Put  (Yield):        {european_put_yield:.4f}")
 
-# === Script Entry Point ===
-if __name__ == "__main__":
-    main()
+# # === Script Entry Point ===
+# if __name__ == "__main__":
+#     main()
