@@ -124,3 +124,34 @@ button:focus-visible {
 .animate-border-draw {
   animation: borderDraw 1.5s ease-out forwards;
 }
+
+/* Force transparent background and inherit color */
+.MathJax, .MathJax_Display, .mjx-chtml {
+  background: transparent !important;
+  color: #22c55e !important; /* Tailwind green-400 */
+}
+
+/* Optional: Tweak font for better terminal-style appearance */
+.mjx-chtml {
+  font-family: 'Fira Mono', monospace !important;
+}
+
+.MathJax span {
+  background-color: transparent !important;
+}
+
+/* Also target common internal containers */
+.MathJax, .MathJax_Display, .mjx-chtml, .mjx-mrow, .mjx-box, .mjx-chtml span {
+  background: transparent !important;
+  color: #22c55e !important; /* Tailwind green-400 */
+}
+
+.box-border .MathJax span {
+  background: transparent !important;
+  color: #22c55e !important;
+}
+
+.mathjax-wrapper span {
+  background: transparent !important;
+  color: #22c55e !important;
+}
