@@ -9,7 +9,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value === '' ? '' : parseFloat(value) });
+    setForm({ ...form, [name]: value });
   };
 
   const activeBtn = 'bg-green-400 text-black font-bold px-4 py-2 rounded-lg shadow-md';
