@@ -33,8 +33,13 @@ function OptiPrice() {
             <div className="w-1/2 p-6 border-r border-green-600 overflow-y-auto">
               <h1 className="text-4xl font-bold mb-4">OptiPrice</h1>
               <p className="text-lg mb-6">Options made simple. Pricing made powerful.</p>
-              <OptionSelector model={model} setModel={setModel} />
-              <InputPanel model={model} form={form} setForm={setForm} setResult={setResult} />
+              <InputPanel
+                model={model}
+                setModel={setModel}
+                form={form}
+                setForm={setForm}
+                setResult={setResult}
+              />
             </div>
 
             {/* Right Panel */}
@@ -52,7 +57,6 @@ function OptiPrice() {
           </MathJaxContext>
         </BorderContainerStatic>
       </div>
-    
   );
 }
 

@@ -1,180 +1,114 @@
 import React from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-function InputPanel({ model, form, setForm, setResult }) {
+function InputPanel({ model, setModel, form, setForm, setResult }) {
+  const navigate = useNavigate();
+
+  const models = ['black-scholes', 'binomial', 'monte-carlo'];
+  const optionTypes = ['call', 'put'];
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    let newValue;
-    if (type === 'checkbox') {
-      newValue = checked;
-    } else if (name === 'option_type') {
-      newValue = value;
-    } else {
-      newValue = value === '' ? '' : parseFloat(value);
-    }
-
-    setForm((prev) => ({ ...prev, [name]: newValue }));
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value === '' ? '' : parseFloat(value) });
   };
 
-  const getPlaceholder = (field) => {
-    const symbolMap = {
-      S0: 'S₀',
-      K: 'K',
-      T: 'T',
-      r: 'r',
-      sigma: 'σ',
-    };
-    return symbolMap[field] || '';
-  };
-
-  const getLabel = (field) => {
-    const labelMap = {
-      S0: 'Initial Stock Price',
-      K: 'Strike Price',
-      T: 'Time to Expiry (years)',
-      r: 'Risk-Free Rate',
-      sigma: 'Volatility',
-    };
-    return labelMap[field] || field;
-  };
-
-  const handleSubmit = async () => {
-    if (model === 'black-scholes') return;
-
-    try {
-      const endpoint =
-        model === 'binomial'
-          ? 'http://localhost:8000/api/binomial'
-          : null;
-
-      if (!endpoint) {
-        alert('Monte Carlo not implemented yet');
-        return;
-      }
-
-      const payload = {
-        S0: form.S0,
-        K: form.K,
-        T: form.T,
-        r: form.r,
-        sigma: form.sigma,
-        N: form.N,
-        option_type: form.option_type,
-        american: form.american,
-        q: form.includeDividend ? form.q : 0,
-      };
-
-      const res = await axios.post(endpoint, payload);
-      setResult(res.data.price);
-    } catch (error) {
-      console.error('Pricing error:', error);
-      setResult('Error');
-    }
-  };
+  const activeBtn = 'bg-green-400 text-black font-bold px-4 py-2 rounded-lg shadow-md';
+  const inactiveBtn = 'bg-transparent border border-green-400 text-green-300 px-4 py-2 rounded-lg hover:bg-green-800';
 
   return (
-    <>
-      <div className="grid grid-cols-2 gap-4 mb-4 w-full">
-        {['S0', 'K', 'T', 'r', 'sigma'].map((field) => (
-          <div key={field} className="flex flex-col">
-            <label className="text-sm mb-1">{getLabel(field)}</label>
-            <input
-              className="bg-black border border-green-500 px-2 py-1 rounded text-green-300"
-              type="number"
-              step="any"
-              name={field}
-              placeholder={getPlaceholder(field)}
-              value={form[field]}
-              onChange={handleChange}
-            />
-          </div>
-        ))}
+    <div className="space-y-8">
+      {/* Step 1 */}
+      <div>
+        <p className="text-xl font-bold text-green-300 mb-2">🟩 Step 1 — Pick Your Weapon:</p>
+        <div className="flex gap-4">
+          {models.map((m) => (
+            <button
+              key={m}
+              onClick={() => setModel(m)}
+              className={model === m ? activeBtn : inactiveBtn}
+            >
+              {m.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* Dividend yield as part of the grid */}
-        <div className="flex flex-col">
-          <label className="text-sm mb-1 flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="includeDividend"
-              checked={form.includeDividend}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  includeDividend: e.target.checked,
-                }))
-              }
-              className="w-4 h-4"
-            />
-            Dividend Yield
-          </label>
+      {/* Step 2 */}
+      <div>
+        <p className="text-xl font-bold text-green-300 mb-2">🟩 Step 2 — What’s Your Move?</p>
+        <div className="flex gap-4">
+          {optionTypes.map((type) => (
+            <button
+              key={type}
+              onClick={() => setForm({ ...form, option_type: type })}
+              className={form.option_type === type ? activeBtn : inactiveBtn}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Step 3 */}
+      <div>
+        <p className="text-xl font-bold text-green-300 mb-2">🟩 Step 3 — Load Your Ammo:</p>
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { label: 'Initial Stock Price', name: 'S0' },
+            { label: 'Strike Price', name: 'K' },
+            { label: 'Time to Expiry (T)', name: 'T' },
+            { label: 'Risk-Free Rate (r)', name: 'r' },
+            { label: 'Volatility (σ)', name: 'sigma' },
+          ].map(({ label, name }) => (
+            <div key={name}>
+              <label className="block text-sm mb-1">{label}</label>
+              <input
+                type="number"
+                step="any"
+                name={name}
+                value={form[name] || ''}
+                onChange={handleChange}
+                placeholder={label}
+                className="w-full px-3 py-2 bg-black border border-green-400 rounded text-green-300 placeholder-green-600"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Step 4 */}
+      <div>
+        <p className="text-xl font-bold text-green-300 mb-2">🟩 Step 4 — Are You Feeling Dividendy?</p>
+        <div className="flex items-center gap-4">
           <input
-            className="bg-black border border-green-500 px-2 py-1 rounded text-green-300 disabled:opacity-40 disabled:cursor-not-allowed"
+            type="checkbox"
+            checked={form.includeDividend}
+            onChange={(e) => setForm({ ...form, includeDividend: e.target.checked })}
+          />
+          <label>Include Dividend Yield</label>
+          <input
             type="number"
             step="any"
             name="q"
-            placeholder="q"
-            value={form.q}
+            value={form.q || ''}
             onChange={handleChange}
+            placeholder="Dividend Yield (q)"
             disabled={!form.includeDividend}
+            className={`w-40 px-3 py-2 rounded text-green-300 border ${form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'}`}
           />
         </div>
-
-        <div className="col-span-2 flex flex-col">
-          <label className="text-sm mb-1">Option Type</label>
-          <select
-            name="option_type"
-            className="bg-black border border-green-500 px-2 py-1 rounded text-green-300"
-            value={form.option_type}
-            onChange={handleChange}
-          >
-            <option value="call">Call</option>
-            <option value="put">Put</option>
-          </select>
-        </div>
-
-        {model === 'binomial' && (
-          <>
-            <div className="flex flex-col col-span-1">
-              <label className="text-sm mb-1">Steps (N)</label>
-              <input
-                className="bg-black border border-green-500 px-2 py-1 rounded text-green-300"
-                type="number"
-                name="N"
-                value={form.N}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex flex-col col-span-1">
-              <label className="text-sm mb-1">Option Style</label>
-              <select
-                name="american"
-                className="bg-black border border-green-500 px-2 py-1 rounded text-green-300"
-                value={form.american ? 'american' : 'european'}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    american: e.target.value === 'american',
-                  }))
-                }
-              >
-                <option value="european">European</option>
-                <option value="american">American</option>
-              </select>
-            </div>
-          </>
-        )}
       </div>
 
-      {model !== 'black-scholes' && (
+      {/* Learn More */}
+      <div className="text-center">
         <button
-          className="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-400 transition"
-          onClick={handleSubmit}
+          className="text-green-400 underline hover:text-green-200"
+          onClick={() => navigate(`/learn/${model}`)}
         >
-          Calculate Price
+          📘 Learn More
         </button>
-      )}
-    </>
+      </div>
+    </div>
   );
 }
 
