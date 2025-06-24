@@ -53,7 +53,7 @@ function BlackScholesChart({ form }) {
         Price vs Time to Expiry (T)
       </h3>
 
-      <ResponsiveContainer width="100%" height={260}>
+      <ResponsiveContainer width="100%" height={272}>
         <LineChart data={data} margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
         <XAxis
         dataKey="t"
