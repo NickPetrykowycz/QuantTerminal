@@ -23,6 +23,57 @@ function OptiPrice() {
     american: false,
   });
 
+  const [binomial, setBinomial] = useState({
+    convergence: [],
+    price: null,
+    precision: 'simple',
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function fetchBinomialPrice(form, precision = 'simple') {
+    const payload = {
+      S0: Number(form.S0),
+      K: Number(form.K),
+      T: Number(form.T),
+      r: Number(form.r),
+      sigma: Number(form.sigma),
+      N:512,
+      option_type: form.option_type,
+      style: form.style ? form.style : (form.american ? 'american' : 'european'),
+      dividend_mode: form.dividend_mode ? form.dividend_mode : (form.includeDividend ? (form.q ? 'yield' : 'discrete') : 'none'),
+      precision,
+      q: form.includeDividend && form.dividend_mode === 'yield' ? Number(form.q) : null,
+      dividend_freq: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_freq) : null,
+      dividend_amt: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_amt) : null,
+      dividend_first_day: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_first_day) : null,
+    };
+    const res = await fetch('http://localhost:8000/api/binomial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('API error');
+    return await res.json();
+  }
+
+const handleBinomialPrecisionChange = (precision) => {
+  setBinomial(s => ({ ...s, precision }));
+};
+
+const handleBinomialGenerate = async () => {
+  setLoading(true);
+  try {
+    const result = await fetchBinomialPrice(form, binomial.precision);
+    setBinomial(s => ({
+      ...s,
+      convergence: result.convergence,
+      price: result.price,
+    }));
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <div className="bg-black text-green-400 font-mono min-h-screen flex items-center justify-center">
       <BorderContainerStatic className="w-11/12 h-[85vh] shadow-[0_0_60px_8px_#22c55e99] border-4 border-green-400 rounded-3xl transition-all duration-300">
@@ -46,7 +97,17 @@ function OptiPrice() {
             {/* Right Panel */}
             <div className="w-[60%] h-full p-6 overflow-y-auto bg-black/95 border-l border-green-700">
               {model === 'black-scholes' && <BlackScholesVisual form={form} />}
-              {model === 'binomial' && <BinomialVisual form={form} />}
+              {model === 'binomial' && (
+                <BinomialVisual
+                  form={form}
+                  convergence={binomial.convergence}
+                  precision={binomial.precision}
+                  onPrecisionChange={handleBinomialPrecisionChange}
+                  onGenerate={handleBinomialGenerate}
+                  price={binomial.price}
+                  loading={loading}
+                />
+              )}
               {model === 'monte-carlo' && <MonteCarloVisual form={form} />}
               {result !== null && (
                 <div className="mt-6 text-xl">
