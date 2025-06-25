@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import BorderContainerStatic from '../components/BorderContainer';
-import OptionSelector from '../components/OptiPrice/OptionSelector';
 import InputPanel from '../components/OptiPrice/InputPanel';
-import BlackScholesVisual from '../components/OptiPrice/BlackScholesVisual';
-import BinomialVisual from '../components/OptiPrice/BinomialVisual';
-import MonteCarloVisual from '../components/OptiPrice/MonteCarloVisual';
+import BlackScholesVisual from '../components/OptiPrice/BlackScholes/BlackScholesVisual';
+import BinomialVisual from '../components/OptiPrice/Binomial/BinomialVisual';
+import MonteCarloVisual from '../components/OptiPrice/MonteCarlo/MonteCarloVisual';
 import { MathJaxContext } from 'better-react-mathjax';
 
 function OptiPrice() {

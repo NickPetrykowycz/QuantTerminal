@@ -93,8 +93,7 @@ function generateTicks(max, count) {
   const step = max / (count - 1);
   const ticks = [];
   for (let i = 0; i < count; i++) {
-    const value = +(i * step).toFixed(4); // prevent float precision issues
-    ticks.push(value);
+    const value = +(i * step).toFixed(4);
   }
   return ticks;
 }
