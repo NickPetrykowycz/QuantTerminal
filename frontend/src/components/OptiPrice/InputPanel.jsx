@@ -1,43 +1,76 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function InputPanel({ model, setModel, form, setForm }) {
   const navigate = useNavigate();
   const models = ['black-scholes', 'binomial', 'monte-carlo'];
   const optionTypes = ['call', 'put'];
+  const styles = ['european', 'american'];
+
+  // Default style to European on initial mount
+  useEffect(() => {
+    if (!form.style) {
+      setForm(prev => ({ ...prev, style: 'european' }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
   };
 
+  const displayModel = model
+  .replace('-', ' ')
+  .replace(/\b\w/g, l => l.toUpperCase());
+
   return (
-    <div className="flex flex-col justify-between h-full mb-10">
-      {/* Step 1 */}
+    <div className="flex flex-col space-y-6 h-full mb-8">
+
+      {/* Step 1 — Choose Model */}
       <div>
-        <p className="text-xl font-bold text-green-300 mb-2">Step 1 — Choose a Model</p>
-        <div className="flex gap-4 flex-wrap">
-          {models.map((m) => (
+        <p className="text-lg font-semibold text-green-300 mb-1">Step 1 — Choose Model</p>
+        <div className="flex gap-2">
+          {models.map(m => (
             <button
               key={m}
               onClick={() => setModel(m)}
-              className={`btn-option flex-1 ${model === m ? 'active' : ''}`}
+              className={`btn-option flex-1 h-8 px-2 text-sm flex items-center justify-center ${model === m ? 'active' : ''}`}
             >
-              {m.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+              {m.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Step 2 */}
+      {/* Step 2 — Exercise Style */}
       <div>
-        <p className="text-xl font-bold text-green-300 mb-2">Step 2 — Select Option Type</p>
-        <div className="flex gap-4">
-          {optionTypes.map((type) => (
+        <p className="text-lg font-semibold text-green-300 mb-1">Step 2 — Exercise Style</p>
+        <div className="flex gap-2">
+          {styles.map(s => {
+            const disabled = model === 'black-scholes' && s === 'american';
+            return (
+              <button
+                key={s}
+                onClick={() => !disabled && setForm({ ...form, style: s })}
+                disabled={disabled}
+                className={`btn-option dividend-option flex-1 h-8 px-2 text-sm flex items-center justify-center ${form.style === s ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+              >
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Step 3 — Option Type */}
+      <div>
+        <p className="text-lg font-semibold text-green-300 mb-1">Step 3 — Option Type</p>
+        <div className="flex gap-2">
+          {optionTypes.map(type => (
             <button
               key={type}
               onClick={() => setForm({ ...form, option_type: type })}
-              className={`btn-option flex-1 ${form.option_type === type ? 'active' : ''}`}
+              className={`btn-option flex-1 h-8 px-2 text-sm flex items-center justify-center ${form.option_type === type ? 'active' : ''}`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
@@ -45,64 +78,106 @@ function InputPanel({ model, setModel, form, setForm }) {
         </div>
       </div>
 
-      {/* Step 3 */}
+      {/* Step 4 — Inputs */}
       <div>
-        <p className="text-xl font-bold text-green-300 mb-2">Step 3 — Enter Input Values</p>
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { label: 'Initial Stock Price', name: 'S0', placeholder: 'S₀' },
-            { label: 'Strike Price',        name: 'K', placeholder: 'K'  },
-            { label: 'Time to Expiry',      name: 'T', placeholder: 'T'  },
-            { label: 'Risk-Free Rate',      name: 'r', placeholder: 'r'  },
-            { label: 'Volatility',          name: 'sigma', placeholder: 'σ' },
-          ].map(({ label, name, placeholder }) => (
-            <div key={name}>
-              <label className="block text-sm mb-1">{label}</label>
+        <p className="text-lg font-semibold text-green-300 mb-1">Step 4 — Inputs</p>
+        <div className="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label className="block text-xs mb-1">Current Price ($)</label>
+            <input
+              type="number"
+              step="any"
+              name="S0"
+              value={form.S0 || ''}
+              onChange={handleChange}
+              placeholder="S₀"
+              className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
+            />
+          </div>
+          <div>
+            <label className="block text-xs mb-1">Strike Price ($)</label>
+            <input
+              type="number"
+              step="any"
+              name="K"
+              value={form.K || ''}
+              onChange={handleChange}
+              placeholder="K"
+              className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div>
+            <label className="block text-xs mb-1">Time to Expiry (Years)</label>
+            <input
+              type="number"
+              step="any"
+              name="T"
+              value={form.T || ''}
+              onChange={handleChange}
+              placeholder="T"
+              className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
+            />
+          </div>
+          <div>
+            <label className="block text-xs mb-1">Risk-Free Rate (Decimal)</label>
+            <input
+              type="number"
+              step="any"
+              name="r"
+              value={form.r || ''}
+              onChange={handleChange}
+              placeholder="r"
+              className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
+            />
+          </div>
+          <div>
+            <label className="block text-xs mb-1">Volatility (Decimal)</label>
+            <input
+              type="number"
+              step="any"
+              name="sigma"
+              value={form.sigma || ''}
+              onChange={handleChange}
+              placeholder="σ"
+              className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
+            />
+          </div>
+        </div>
+        {model === 'monte-carlo' && (
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div>
+              <label className="block text-xs mb-1">Simulations</label>
               <input
                 type="number"
-                step="any"
-                name={name}
-                value={form[name] || ''}
+                name="simulations"
+                value={form.simulations || ''}
                 onChange={handleChange}
-                placeholder={placeholder}
-                className="w-full px-3 py-2 bg-black border border-green-400 rounded text-green-300 placeholder-green-600"
+                placeholder="10000"
+                className="w-full h-8 px-2 text-sm bg-black border border-green-400 rounded text-green-300"
               />
             </div>
-          ))}
-          {model === 'monte-carlo' && (
-            <>
-              <div>
-                <label className="block text-sm mb-1">Simulations</label>
-                <input
-                  type="number"
-                  name="simulations"
-                  value={form.simulations || ''}
-                  onChange={handleChange}
-                  placeholder="e.g. 10000"
-                  className="w-full px-3 py-2 bg-black border border-green-400 rounded text-green-300"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Time Steps</label>
-                <input
-                  type="number"
-                  name="mcTimeSteps"
-                  value={form.mcTimeSteps || ''}
-                  onChange={handleChange}
-                  placeholder="e.g. 100"
-                  className="w-full px-3 py-2 bg-black border border-green-400 rounded text-green-300"
-                />
-              </div>
-            </>
-          )}
-        </div>
+            <div>
+              <label className="block text-xs mb-1">Time Steps</label>
+              <input
+                type="number"
+                name="mcTimeSteps"
+                value={form.mcTimeSteps || ''}
+                onChange={handleChange}
+                placeholder="100"
+                className="w-full h-8 px-2 text-sm bg-black	border border-green-400 rounded text-green-300"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Step 4 — Dividend Section */}
+      {/* Step 5 — Dividend Section */}
       {(model === 'black-scholes' || model === 'binomial') && (
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xl font-bold text-green-300">Step 4 — Add Dividend?</p>
+          <div className="flex justify-between items-center mb-1">
+            <p className="text-lg font-semibold text-green-300">Step 5 — Add Dividend?</p>
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -111,93 +186,103 @@ function InputPanel({ model, setModel, form, setForm }) {
                 onChange={handleChange}
                 className="form-checkbox h-4 w-4 text-green-500"
               />
-              <label className="text-green-300">Include</label>
+              <label className="text-green-300 text-sm">Include</label>
             </div>
           </div>
-
-          {/* Black-Scholes Dividend Input */}
           {model === 'black-scholes' && (
-            <input
-              type="number"
-              step="any"
-              name="q"
-              value={form.q || ''}
-              onChange={handleChange}
-              placeholder="Dividend Yield (q)"
-              disabled={!form.includeDividend}
-              className={`w-full px-3 py-2 rounded text-green-300 border ${
-                form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
-              }`}
-            />
+            <>
+              <label className="block text-xs mb-1 text-green-300">Dividend Yield (Decimal)</label>
+              <input
+                type="number"
+                step="any"
+                name="q"
+                value={form.q || ''}
+                onChange={handleChange}
+                placeholder="q"
+                disabled={!form.includeDividend}
+                className={`w-full h-8 px-2 text-sm rounded text-green-300 border ${
+                  form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
+                }`}
+              />
+            </>
           )}
-
-          {/* Binomial Dividend Mode Buttons */}
           {model === 'binomial' && (
             <>
-              <div className="flex gap-4 mb-4">
-                {['yield', 'discrete'].map((mode) => {
-                  const disabled = !form.includeDividend;
-                  const classes = ['btn-option', 'flex-1', 'dividend-option'];
-                  if (disabled) classes.push('disabled');
-                  else if (form.dividend_mode === mode) classes.push('active');
+              <div className="flex gap-2 mb-2">
+                {['yield','discrete'].map(m => {
+                  const dis = !form.includeDividend;
+                  const cls = ['btn-option','flex-1','h-8','px-2','text-sm','flex','items-center','justify-center','dividend-option'];
+                  if (dis) cls.push('disabled');
+                  else if (form.dividend_mode === m) cls.push('active');
                   return (
                     <button
-                      key={mode}
-                      onClick={() => !disabled && setForm({ ...form, dividend_mode: mode })}
-                      disabled={disabled}
-                      className={classes.join(' ')}
+                      key={m}
+                      onClick={() => !dis && setForm({ ...form, dividend_mode: m })}
+                      disabled={dis}
+                      className={cls.join(' ')}
                     >
-                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                      {m.charAt(0).toUpperCase() + m.slice(1)}
                     </button>
                   );
                 })}
               </div>
-
-              {/* Only the selected input set */}
               {form.dividend_mode === 'yield' && (
-                <input
-                  type="number"
-                  step="any"
-                  name="q"
-                  value={form.q || ''}
-                  onChange={handleChange}
-                  placeholder="e.g. 0.02"
-                  disabled={!form.includeDividend}
-                  className={`w-full px-3 py-2 rounded text-green-300 border ${
-                    form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
-                  }`}
-                />
+                <>
+                  <label className="block text-xs mb-1 text-green-400">Dividend Yield (Decimal)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    name="q"
+                    value={form.q || ''}
+                    onChange={handleChange}
+                    placeholder="q"
+                    disabled={!form.includeDividend}
+                    className={`w-full h-8 px-2 text-sm rounded text-green-400 border ${
+                      form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
+                    }`}
+                  />
+                </>
               )}
-
               {form.dividend_mode === 'discrete' && (
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { label: 'Frequency (days)', name: 'dividend_freq', placeholder: 'e.g. 90' },
-                    { label: 'Amount per Payment', name: 'dividend_amt', placeholder: 'e.g. 1.00' },
-                    { label: 'First Payment Day', name: 'dividend_first_day', placeholder: 'Days from t=0' },
-                  ].map(({ label, name, placeholder }) => {
-                    return (
-                      <input
-                        key={name}
-                        type="number"
-                        step={name === 'dividend_amt' ? 'any' : undefined}
-                        name={name}
-                        value={form[name] || ''}
-                        onChange={handleChange}
-                        placeholder={placeholder}
-                        disabled={!form.includeDividend}
-                        className={`w-full px-3 py-2 rounded text-green-300 border ${
-                          form.includeDividend ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
+                <>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[{ label: 'Frequency (Days)', name: 'dividend_freq', placeholder: 'Days' },{ label: 'Amount per Payment ($)', name: 'dividend_amt', placeholder: 'Dollar Amount' },{ label: 'First Payment Day (Days)', name: 'dividend_first_day', placeholder: 'Days from T=0' }].map(({ label, name, placeholder }) => {
+                      const enabled = form.includeDividend;
+                      return (
+                        <div key={name}>
+                          <label className="block text-xs mb-1 text-green-400">{label}</label>
+                          <input
+                            type="number"
+                            step={name === 'dividend_amt' ? 'any' : undefined}
+                            name={name}
+                            value={form[name] || ''}
+                            onChange={handleChange}
+                            placeholder={placeholder}
+                            disabled={!enabled}
+                            className={`w-full h-8 px-2 text-sm rounded text-green-400 border ${
+                              enabled ? 'bg-black border-green-400' : 'bg-gray-700 border-gray-500'
+                            }`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </>
           )}
         </div>
       )}
+
+      <div className="mt-4">
+        <button
+          className="btn-option flex-1 h-8 px-2 text-sm flex items-center justify-center w-full"
+          onClick={() => navigate(`/${model}-info`)}
+        >
+          {`Learn more about the ${displayModel} model`}
+        </button>
+      </div>
+
     </div>
   );
 }
