@@ -1,6 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "./backend/utils/Options Pricing Calc",
-        "./backend/utils/options_pricing_calc"
-    ]
-}
