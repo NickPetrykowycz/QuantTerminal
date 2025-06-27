@@ -233,15 +233,16 @@ credentials.json
 # EDITOR & IDE
 # ============================================================================
 
-# VSCode
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/extensions.json
+# VSCode - ignore personal settings but keep shared configs
+.vscode/settings.json.user
 .vscode/workspace.json
+.vscode/.ropeproject
 
-# Keep some VSCode config but ignore personal settings
-!.vscode/recommended-extensions.json
+# Keep these VSCode files for team sharing:
+# .vscode/settings.json (shared project settings)
+# .vscode/launch.json (debug configurations)  
+# .vscode/tasks.json (build tasks)
+# .vscode/extensions.json (recommended extensions)
 
 # PyCharm
 .idea/

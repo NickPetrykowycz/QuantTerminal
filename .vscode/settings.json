@@ -1,0 +1,7 @@
+{
+    "python.defaultInterpreterPath": "./backend/fresh_env/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "./backend/utils/Options Pricing Calc",
+        "./backend/utils/options_pricing_calc"
+    ]
+}
