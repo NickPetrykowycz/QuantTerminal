@@ -1,9 +1,19 @@
 // frontend/src/pages/LandingPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const LandingPage = () => {
+  const { user, loading } = useAuth(); // Add user and loading from useAuth
+  const navigate = useNavigate();
+
+  // Auto-redirect if already authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/home", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
@@ -16,7 +26,6 @@ const LandingPage = () => {
   const [error, setError] = useState("");
 
   const { login, register } = useAuth();
-  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setFormData({

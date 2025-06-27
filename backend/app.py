@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import routers
-from routers import binomial, monte_carlo
+from routers import binomial, monte_carlo, market_data
 
 app = FastAPI(
     title="OptiPrice API",
@@ -24,6 +24,7 @@ app.add_middleware(
 # Include routers with prefixes
 app.include_router(binomial.router, prefix="/api", tags=["Binomial"])
 app.include_router(monte_carlo.router, prefix="/api", tags=["Monte Carlo"])
+app.include_router(market_data.router, prefix="/api", tags=["Market Data"])
 
 
 @app.get("/")
