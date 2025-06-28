@@ -20,9 +20,6 @@ const HomePage = () => {
   const [loadingMarket, setLoadingMarket] = useState(true);
   const [marketError, setMarketError] = useState(null);
 
-  // Recent calculations state (will be loaded from auth context)
-  const [recentCalculations, setRecentCalculations] = useState([]);
-
   // UI state
   const [showConfigPopup, setShowConfigPopup] = useState(false);
   const [guestConfigMessage, setGuestConfigMessage] = useState(false);
@@ -80,76 +77,46 @@ const HomePage = () => {
   ];
 
   // Fetch market data
-useEffect(() => {
-  const fetchMarketData = async () => {
-    setLoadingMarket(true);
-    setMarketError(null);
-
-    const symbols = marketSymbols;
-    console.log('Fetching market data for symbols:', symbols); // Debug log
-
-    const result = await marketDataService.getMarketData(symbols);
-
-    if (result.success) {
-      setMarketData(result.data);
-    } else {
-      setMarketError(result.error);
-      // Use fallback data if API fails
-      setMarketData(result.data);
-    }
-
-    setLoadingMarket(false);
-  };
-
-  fetchMarketData();
-
-  // Refresh market data every 30 seconds
-  const interval = setInterval(fetchMarketData, 30000);
-  return () => clearInterval(interval);
-  }, [marketSymbols]);;
-
-  // Load recent calculations if user is authenticated
   useEffect(() => {
-    const loadRecentCalculations = async () => {
-      if (user) {
-        // This would typically load from your auth context's getMyCalculations method
-        // For now, using mock data but you can replace this
-        setRecentCalculations([
-          {
-            name: "AAPL Call Option Analysis",
-            model_type: "black-scholes",
-            created_at: "2024-01-27T10:30:00Z",
-          },
-          {
-            name: "SPY Put Protection",
-            model_type: "binomial",
-            created_at: "2024-01-26T15:45:00Z",
-          },
-          {
-            name: "TSLA Volatility Study",
-            model_type: "monte-carlo",
-            created_at: "2024-01-25T09:15:00Z",
-          },
-        ]);
+    const fetchMarketData = async () => {
+      setLoadingMarket(true);
+      setMarketError(null);
+
+      // Use preferences?.market_symbols if available, otherwise fall back to default
+      const symbols = preferences?.market_symbols ||
+        marketSymbols || ["SPY", "AAPL", "MSFT", "TSLA"];
+      console.log("Fetching market data for symbols:", symbols); // Debug log
+
+      const result = await marketDataService.getMarketData(symbols);
+
+      if (result.success) {
+        setMarketData(result.data);
+      } else {
+        setMarketError(result.error);
+        // Use fallback data if API fails
+        setMarketData(result.data);
       }
+
+      setLoadingMarket(false);
     };
 
-    loadRecentCalculations();
-  }, [user]);
+    // Only fetch if we have preferences loaded or if user is not authenticated
+    if (preferences !== null || !user) {
+      fetchMarketData();
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+      // Refresh market data every 30 seconds
+      const interval = setInterval(fetchMarketData, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [preferences?.market_symbols, user]); // Depend on preferences.market_symbols directly
 
   const handleConfigureMarket = () => {
     if (user) {
       setShowConfigPopup(true);
-      setSelectedSymbols([...marketSymbols]); // Copy current symbols
+      // Use preferences.market_symbols if available, otherwise fall back to marketSymbols
+      const currentSymbols = preferences?.market_symbols ||
+        marketSymbols || ["SPY", "AAPL", "MSFT", "TSLA"];
+      setSelectedSymbols([...currentSymbols]); // Copy current symbols
     } else {
       setGuestConfigMessage(true);
       setTimeout(() => setGuestConfigMessage(false), 3000);
@@ -163,18 +130,16 @@ useEffect(() => {
       selectedSymbols.length < 4 &&
       !selectedSymbols.includes(symbol)
     ) {
-      // For now, skip validation and add directly (you can add validation back later)
-      setSelectedSymbols([...selectedSymbols, symbol]);
-      setSymbolInput("");
-
-      // Optional: Add validation with better error handling
       try {
         const validation = await marketDataService.validateSymbol(symbol);
         if (validation.success && validation.data?.valid) {
           setSelectedSymbols([...selectedSymbols, symbol]);
           setSymbolInput("");
         } else {
-          alert(`Invalid symbol: ${symbol}`);
+          // For demo purposes, add anyway but show warning
+          console.warn(`Could not validate symbol: ${symbol}, adding anyway`);
+          setSelectedSymbols([...selectedSymbols, symbol]);
+          setSymbolInput("");
         }
       } catch (error) {
         console.error("Validation error:", error);
@@ -553,7 +518,7 @@ useEffect(() => {
                     disabled={
                       selectedSymbols.length >= 4 || !symbolInput.trim()
                     }
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all shadow-sm"
                   >
                     Add
                   </button>

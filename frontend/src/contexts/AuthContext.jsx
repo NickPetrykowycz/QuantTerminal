@@ -19,104 +19,126 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
-   const initializeAuth = async () => {
-    try {
+    const initializeAuth = async () => {
+      try {
         // Set a shorter timeout and ensure we always finish loading
         const timeout = setTimeout(() => {
-        console.warn("Auth initialization timeout - proceeding without auth");
-        setUser(null);
-        setLoading(false);
+          console.warn("Auth initialization timeout - proceeding without auth");
+          setUser(null);
+          setLoading(false);
         }, 3000);
 
         // Get initial session with error handling
-        const { data: { session }, error } = await authHelpers.getSession();
+        const {
+          data: { session },
+          error,
+        } = await authHelpers.getSession();
 
         clearTimeout(timeout);
 
         if (error) {
-        console.error("Session error:", error);
-        setAuthError(error.message);
-        setUser(null);
+          console.error("Session error:", error);
+          setAuthError(error.message);
+          setUser(null);
         } else if (session?.user) {
-        // Only set user if we have a valid session
-        setUser(session.user);
-        await loadUserPreferences().catch(console.error);
+          // Only set user if we have a valid session
+          setUser(session.user);
+          await loadUserPreferences().catch(console.error);
         } else {
-        setUser(null);
+          setUser(null);
         }
-    } catch (error) {
+      } catch (error) {
         console.error("Auth initialization failed:", error);
         setAuthError(error.message);
         setUser(null);
-    } finally {
+      } finally {
         setLoading(false);
-    }
+      }
     };
 
     initializeAuth();
 
     // Listen for auth changes
+
     const {
-        data: { subscription },
+      data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.email);
+      console.log("Auth state changed:", event, session?.user?.email);
 
-        setUser(session?.user ?? null);
+      setUser(session?.user ?? null);
 
-        if (session?.user) {
+      if (session?.user) {
         await loadUserPreferences();
-        } else {
+      } else {
         setPreferences(null);
-        }
+      }
 
-        // Make sure loading is set to false after auth state change
-        setLoading(false);
+      // IMPORTANT: Always set loading to false after auth state change
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-    }, []);
+  }, []);
 
   const loadUserPreferences = async () => {
     try {
+      console.log("Loading user preferences...");
+
+      // Add timeout to prevent hanging
+      const prefsPromise = dbHelpers.getPreferences();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Preferences timeout")), 3000),
+      );
+
       const { data, error } = await Promise.race([
-        dbHelpers.getPreferences(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Preferences timeout")), 2000),
-        ),
+        prefsPromise,
+        timeoutPromise,
       ]);
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading preferences:", error);
-        // Set default preferences if loading fails
-        setPreferences({ market_symbols: ["SPY", "AAPL", "MSFT", "XAU"] });
+      if (error) {
+        if (error.code === "PGRST116") {
+          console.log("No preferences found, using defaults");
+          setPreferences({ market_symbols: ["SPY", "AAPL", "MSFT", "TSLA"] });
+        } else {
+          console.error("Error loading preferences:", error);
+          setPreferences({ market_symbols: ["SPY", "AAPL", "MSFT", "TSLA"] });
+        }
       } else {
-        setPreferences(
-          data || { market_symbols: ["SPY", "AAPL", "MSFT", "XAU"] },
-        );
+        console.log("Loaded preferences:", data);
+        setPreferences(data);
       }
     } catch (error) {
       console.error("Error loading preferences:", error);
-      // Set default preferences on timeout
-      setPreferences({ market_symbols: ["SPY", "AAPL", "MSFT", "XAU"] });
+      setPreferences({ market_symbols: ["SPY", "AAPL", "MSFT", "TSLA"] });
     }
   };
 
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const { data, error } = await authHelpers.signIn(email, password);
+      setAuthError(null);
+
+      // Add timeout protection
+      const loginPromise = authHelpers.signIn(email, password);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Login timeout")), 10000),
+      );
+
+      const { data, error } = await Promise.race([
+        loginPromise,
+        timeoutPromise,
+      ]);
 
       if (error) throw error;
 
       return { success: true, user: data.user };
     } catch (error) {
       console.error("Login failed:", error);
+      setLoading(false);
       return {
         success: false,
         error: error.message,
       };
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -153,69 +175,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const saveCalculation = async (calculationData) => {
-    if (!user) return { success: false, error: "Not authenticated" };
-
-    try {
-      const dataToSave = {
-        user_id: user.id,
-        name:
-          calculationData.name || `${calculationData.model_type} calculation`,
-        model_type: calculationData.model_type,
-        parameters: calculationData.parameters,
-        results: calculationData.results,
-      };
-
-      const { data, error } = await dbHelpers.saveCalculation(dataToSave);
-
-      if (error) throw error;
-
-      return { success: true, data: data[0] };
-    } catch (error) {
-      console.error("Save calculation failed:", error);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  };
-
-  const getMyCalculations = async () => {
-    if (!user) return { success: false, error: "Not authenticated" };
-
-    try {
-      const { data, error } = await dbHelpers.getCalculations();
-
-      if (error) throw error;
-
-      return { success: true, data };
-    } catch (error) {
-      console.error("Get calculations failed:", error);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  };
-
-  const deleteCalculation = async (id) => {
-    if (!user) return { success: false, error: "Not authenticated" };
-
-    try {
-      const { error } = await dbHelpers.deleteCalculation(id);
-
-      if (error) throw error;
-
-      return { success: true };
-    } catch (error) {
-      console.error("Delete calculation failed:", error);
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  };
-
   const updatePreferences = async (newPreferences) => {
     if (!user) return { success: false, error: "Not authenticated" };
 
@@ -240,39 +199,71 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-    const updateMarketPreferences = async (symbols) => {
-        // Always update local state first for immediate UI response
-        setPreferences(prev => ({ ...prev, market_symbols: symbols }));
+  const updateMarketPreferences = async (symbols) => {
+    // Validate and clean symbols
+    const cleanSymbols = symbols
+      .filter((s) => s && s.trim())
+      .map((s) => s.toUpperCase());
 
-        if (!user) {
-            // For guest users, just keep local state
-            console.log('Guest user - saving preferences locally');
-            return { success: true, data: { market_symbols: symbols } };
-        }
+    console.log("Attempting to update symbols to:", cleanSymbols);
 
-        try {
-            const preferencesUpdate = {
-            user_id: user.id,
-            market_symbols: symbols,
-            updated_at: new Date().toISOString(),
-            };
+    // Always update local state first for immediate UI response
+    setPreferences((prev) => ({ ...prev, market_symbols: cleanSymbols }));
 
-            const { data, error } = await dbHelpers.updatePreferences(preferencesUpdate);
+    if (!user) {
+      // For guest users, just keep local state
+      console.log("Guest user - saving preferences locally");
+      return { success: true, data: { market_symbols: cleanSymbols } };
+    }
 
-            if (error) throw error;
+    try {
+      // First, get current preferences to get the ID
+      const { data: currentPrefs, error: getError } =
+        await dbHelpers.getPreferences();
 
-            // Update with server response to ensure consistency
-            setPreferences(data[0]);
-            return { success: true, data: data[0] };
-        } catch (error) {
-            console.error("Update market preferences failed:", error);
-            // Local state already updated above, so no need to change it
-            return {
-            success: false,
-            error: error.message,
-            };
-        }
-    };
+      if (getError && getError.code !== "PGRST116") {
+        throw getError;
+      }
+
+      const preferencesUpdate = {
+        user_id: user.id,
+        market_symbols: cleanSymbols,
+        updated_at: new Date().toISOString(),
+      };
+
+      // If preferences exist, add the ID for proper upsert
+      if (currentPrefs?.id) {
+        preferencesUpdate.id = currentPrefs.id;
+      }
+
+      console.log("Sending update to database:", preferencesUpdate);
+
+      const { data, error } =
+        await dbHelpers.updatePreferences(preferencesUpdate);
+
+      if (error) {
+        console.error("Database update error:", error);
+        throw error;
+      }
+
+      console.log("Database update successful:", data);
+
+      // Update with server response to ensure consistency
+      setPreferences(data[0]);
+      return { success: true, data: data[0] };
+    } catch (error) {
+      console.error("Update market preferences failed:", error);
+      // Revert local state on error
+      setPreferences((prev) => ({
+        ...prev,
+        market_symbols: ["SPY", "AAPL", "MSFT", "XAU"],
+      }));
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  };
 
   const value = {
     user,
@@ -282,9 +273,6 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    saveCalculation,
-    getMyCalculations,
-    deleteCalculation,
     updatePreferences,
     isAuthenticated: !!user,
     updateMarketPreferences,
@@ -292,7 +280,7 @@ export const AuthProvider = ({ children }) => {
       "SPY",
       "AAPL",
       "MSFT",
-      "XAU",
+      "TSLA",
     ],
   };
 
