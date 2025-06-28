@@ -1,71 +1,158 @@
-import React from 'react';
-import BinomialChart from './BinomialChart';
+import React from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
-function BinomialVisual({
-  convergence = [],
-  precision = 'advanced',
-  onPrecisionChange,
-  onGenerate,
-  price,
-  form,
-  loading
-}) {
-  const precisionOptions = [
-    { label: 'Low (Log steps)', value: 'simple' },
-    { label: 'Medium (Linear+Log steps)', value: 'advanced' },
-    { label: 'High (All steps)', value: 'precise' },
-  ];
-  const isCall = form?.option_type === 'call';
-  const optionTypeText = isCall ? 'Call Option' : 'Put Option';
-
-  const isAmerican = form?.style === 'american' || form?.american === true;
-  const styleText = isAmerican ? 'American' : 'European';
-
-  return (
-    <div className="bg-black rounded-lg shadow-lg p-6 h-full flex flex-col">
-      <h1 className="text-4xl font-bold text-green-400 text-center mb-2">
-        Binomial Model
-      </h1>
-
-      {/* Always show Option Price ≈ */}
-      <div className="flex justify-center mb-6">
-        <div className=" bg-opacity-60 rounded px-4 py-2 text-green-300 text-2xl font-mono">
-        {styleText}  {optionTypeText}  Price ≈ {typeof price === 'number' ? price.toFixed(4) : '—'}
+function CustomTooltip({ active, payload }) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white/90 backdrop-blur-sm border border-gray-200 p-3 rounded-lg shadow-lg">
+        <div className="text-sm text-gray-600">Steps (N)</div>
+        <div className="font-medium text-gray-900">{payload[0].payload.N}</div>
+        <div className="text-sm text-gray-600 mt-1">Option Price</div>
+        <div className="font-semibold text-blue-600">
+          ${payload[0].payload.price}
         </div>
       </div>
-      <div className="text-xs text-green-500 block mb-2 text-center">
-        All modes calculate the price at N = <b>512</b>. Precision only changes the number of convergence points shown.
+    );
+  }
+  return null;
+}
+
+// Simplified smart ticks (powers of 2 + min/max)
+function getSmartTicks(data) {
+  if (!data || !data.length) return [];
+  const minN = data[0].N;
+  const maxN = data[data.length - 1].N;
+  if (data.length <= 20) return data.map((d) => d.N);
+  const ticks = [minN];
+  let pow = 1;
+  while (pow < maxN) {
+    if (pow > minN) ticks.push(pow);
+    pow *= 2;
+  }
+  if (!ticks.includes(maxN)) ticks.push(maxN);
+  return Array.from(new Set(ticks)).sort((a, b) => a - b);
+}
+
+function BinomialChart({ data, isCall }) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900">
+          Convergence Analysis
+        </h3>
+        <div className="h-64 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
+          <p className="text-gray-500">
+            Click "Generate Convergence Analysis" to see the chart
+          </p>
+        </div>
       </div>
-      {/* Picker row */}
-      <div className="flex gap-2 mb-3">
-        {precisionOptions.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => onPrecisionChange(opt.value)}
-            className={`btn-option flex-1 h-10 px-2 text-sm flex items-center justify-center ${precision === opt.value ? 'active' : ''}`}
-            title={opt.label}
-            disabled={loading}
+    );
+  }
+
+  const lastN = data[data.length - 1]?.N;
+  const ticks = getSmartTicks(data);
+
+  return (
+    <div className="space-y-4">
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+          Binomial Tree Convergence
+        </h3>
+        <p className="text-sm text-gray-600">
+          How option price converges as tree steps increase
+        </p>
+      </div>
+
+      <div className="h-80 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
-            {opt.label}
-          </button>
-        ))}
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#e5e7eb"
+              opacity={0.5}
+            />
+            <XAxis
+              dataKey="N"
+              label={{
+                value: "Steps (N)",
+                position: "insideBottom",
+                offset: -40,
+                style: { textAnchor: "middle", fill: "#6b7280" },
+              }}
+              stroke="#6b7280"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tickLine={{ stroke: "#6b7280" }}
+              type="number"
+              domain={[data[0].N, data[data.length - 1].N]}
+              ticks={ticks}
+              allowDecimals={false}
+            />
+            <YAxis
+              label={{
+                value: "Option Price ($)",
+                angle: -90,
+                position: "insideLeft",
+                style: { textAnchor: "middle", fill: "#6b7280" },
+              }}
+              stroke="#6b7280"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tickLine={{ stroke: "#6b7280" }}
+              type="number"
+              domain={["auto", "auto"]}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line
+              type="monotone"
+              dataKey="price"
+              stroke={isCall ? "#3b82f6" : "#ef4444"}
+              strokeWidth={2}
+              dot={false}
+              name="Option Price"
+              strokeLinecap="round"
+            />
+            {/* Highlight the final N as a special dot */}
+            <Line
+              type="monotone"
+              dataKey="price"
+              stroke="#f59e0b"
+              strokeWidth={0}
+              dot={({ cx, cy, payload }) =>
+                payload.N === lastN ? (
+                  <circle
+                    key={payload.N}
+                    cx={cx}
+                    cy={cy}
+                    r={6}
+                    fill="#f59e0b"
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  />
+                ) : null
+              }
+              legendType="none"
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* Big generate button */}
-      <button
-        className="btn-option w-full h-12 mb-6 mt-1 text-base flex items-center justify-center"
-        onClick={onGenerate}
-        disabled={loading}
-      >
-        {loading ? 'Generating...' : 'Generate'}
-      </button>
-
-      {/* Chart */}
-      <div className="flex-1 min-h-[260px]">
-        <BinomialChart data={convergence} />
+      <div className="text-center">
+        <p className="text-xs text-gray-500">
+          Golden dot shows final convergence point at N = {lastN}
+        </p>
       </div>
     </div>
   );
 }
 
-export default BinomialVisual;
+export default BinomialChart;

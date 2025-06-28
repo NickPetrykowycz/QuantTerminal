@@ -1,102 +1,105 @@
-import React from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import React from "react";
+import BinomialChart from "./BinomialChart";
 
-function CustomTooltip({ active, payload }) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-black border border-green-500 p-2 rounded text-green-300 text-sm font-mono">
-        <div>Steps (N): {payload[0].payload.N}</div>
-        <div>Price: ${payload[0].payload.price}</div>
-      </div>
-    );
-  }
-  return null;
-}
+function BinomialVisual({
+  convergence = [],
+  precision = "advanced",
+  onPrecisionChange,
+  onGenerate,
+  price,
+  form,
+  loading,
+}) {
+  const precisionOptions = [
+    { label: "Low Precision", value: "simple", desc: "Logarithmic steps" },
+    {
+      label: "Medium Precision",
+      value: "advanced",
+      desc: "Linear + Log steps",
+    },
+    { label: "High Precision", value: "precise", desc: "All steps" },
+  ];
 
-// Simplified smart ticks (powers of 2 + min/max)
-function getSmartTicks(data) {
-  if (!data || !data.length) return [];
-  const minN = data[0].N;
-  const maxN = data[data.length - 1].N;
-  if (data.length <= 20) return data.map(d => d.N);
-  const ticks = [minN];
-  let pow = 1;
-  while (pow < maxN) {
-    if (pow > minN) ticks.push(pow);
-    pow *= 2;
-  }
-  if (!ticks.includes(maxN)) ticks.push(maxN);
-  return Array.from(new Set(ticks)).sort((a, b) => a - b);
-}
-
-function BinomialChart({ data }) {
-  if (!data || data.length === 0) {
-    return (
-      <div className="text-center text-green-500 p-12">No chart data. Click Generate.</div>
-    );
-  }
-  const lastN = data[data.length - 1]?.N;
-  const ticks = getSmartTicks(data);
+  const isCall = form?.option_type === "call";
+  const optionTypeText = isCall ? "Call Option" : "Put Option";
+  const isAmerican = form?.style === "american" || form?.american === true;
+  const styleText = isAmerican ? "American" : "European";
 
   return (
-    <ResponsiveContainer width="100%" height={272}>
-      <LineChart data={data} margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
-        <XAxis
-          dataKey="N"
-          label={{
-            value: 'Steps (N)',
-            position: 'insideBottom',
-            offset: -20,
-            fill: '#22c55e',
-          }}
-          stroke="#22c55e"
-          tick={{ fill: '#22c55e' }}
-          type="number"
-          domain={[
-            data[0].N,
-            data[data.length - 1].N
-          ]}
-          ticks={ticks}
-          allowDecimals={false}
-        />
-        <YAxis
-          label={{
-            value: 'Option Price',
-            angle: -90,
-            position: 'insideLeft',
-            offset: -5,
-            fill: '#22c55e',
-          }}
-          stroke="#22c55e"
-          tick={{ fill: '#22c55e' }}
-          type="number"
-          domain={['auto', 'auto']}
-        />
-        <Tooltip content={<CustomTooltip />} />
-        <Line
-          type="monotone"
-          dataKey="price"
-          stroke="#22c55e"
-          strokeWidth={2}
-          dot={false}
-          name="Option Price"
-        />
-        {/* Highlight the final N as a gold dot */}
-        <Line
-          type="monotone"
-          dataKey="price"
-          stroke="#facc15"
-          strokeWidth={0}
-          dot={({ cx, cy, payload }) =>
-            payload.N === lastN ? (
-              <circle key={payload.N} cx={cx} cy={cy} r={5} fill="#facc15" />
-            ) : null
-          }
-          legendType="none"
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Binomial Model
+        </h2>
+        <p className="text-gray-600">
+          Lattice-based approach for {styleText.toLowerCase()} option pricing
+        </p>
+      </div>
+
+      {/* Price Display */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+        <div className="text-center">
+          <p className="text-sm font-medium text-blue-600 mb-1">
+            {styleText} {optionTypeText} Price
+          </p>
+          <p className="text-3xl font-bold text-blue-900">
+            {typeof price === "number" ? `$${price.toFixed(4)}` : "—"}
+          </p>
+          <p className="text-xs text-blue-600 mt-2">
+            Calculated at N = 512 steps
+          </p>
+        </div>
+      </div>
+
+      {/* Precision Settings */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Convergence Analysis Settings
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Choose precision level for convergence visualization. Higher precision
+          shows more data points.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {precisionOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onPrecisionChange(option.value)}
+              disabled={loading}
+              className={`p-4 rounded-xl border text-left transition-all duration-200 ${
+                precision === option.value
+                  ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 ring-2 ring-blue-500/20"
+                  : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <div className="font-medium text-gray-900">{option.label}</div>
+              <div className="text-sm text-gray-600 mt-1">{option.desc}</div>
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={onGenerate}
+          disabled={loading}
+          className={`w-full mt-6 py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
+            loading
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
+          }`}
+        >
+          {loading
+            ? "Generating Convergence Data..."
+            : "Generate Convergence Analysis"}
+        </button>
+      </div>
+
+      {/* Chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <BinomialChart data={convergence} isCall={isCall} />
+      </div>
+    </div>
   );
 }
 
-export default BinomialChart;
+export default BinomialVisual;

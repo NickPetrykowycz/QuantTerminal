@@ -1,92 +1,149 @@
-import React from 'react';
-import { erf } from 'mathjs';
-import { MathJax } from 'better-react-mathjax';
+import React from "react";
+import { InlineMath, BlockMath } from "react-katex";
+import "katex/dist/katex.min.css";
 
-function normcdf(x) {
-  return 0.5 * (1 + erf(x / Math.sqrt(2)));
-}
+function BlackScholesFormula({
+  S0,
+  K,
+  T,
+  r,
+  sigma,
+  q,
+  includeDividend,
+  option_type,
+}) {
+  const isCall = option_type === "call";
 
-function getValOrSymbol(val, symbol) {
-  return val !== '' && val !== null && !isNaN(val) ? val : symbol;
-}
+  // Calculate price if all values are provided
+  let price = null;
+  if (S0 && K && T && r && sigma) {
+    const adjQ = includeDividend ? q || 0 : 0;
+    const d1 =
+      (Math.log(S0 / K) + (r - adjQ + 0.5 * sigma ** 2) * T) /
+      (sigma * Math.sqrt(T));
+    const d2 = d1 - sigma * Math.sqrt(T);
 
-function allFilled(...args) {
-  return args.every((v) => v !== '' && v !== null && !isNaN(v));
-}
-
-function BlackScholesFormula({ S0, K, T, r, sigma, q, includeDividend, option_type }) {
-  const isCall = option_type === 'call';
-  const displayPrice = isCall ? 'C' : 'P';
-
-  const s = getValOrSymbol(S0, 'S₀');
-  const k = getValOrSymbol(K, 'K');
-  const t = getValOrSymbol(T, 'T');
-  const rf = getValOrSymbol(r, 'r');
-  const vol = getValOrSymbol(sigma, 'σ');
-  const div = getValOrSymbol(q, 'q');
-
-  let d1, d2, price = null;
-
-  if (allFilled(S0, K, T, r, sigma) && (!includeDividend || q !== '')) {
-    const adjQ = includeDividend ? q : 0;
-    d1 = (Math.log(S0 / K) + (r - adjQ + 0.5 * sigma ** 2) * T) / (sigma * Math.sqrt(T));
-    d2 = d1 - sigma * Math.sqrt(T);
+    // Cumulative normal distribution approximation
+    const normcdf = (x) =>
+      0.5 *
+      (1 + Math.sign(x) * Math.sqrt(1 - Math.exp((-2 * x * x) / Math.PI)));
 
     if (isCall) {
-      const Nd1 = normcdf(d1);
-      const Nd2 = normcdf(d2);
-      price = S0 * Math.exp(-adjQ * T) * Nd1 - K * Math.exp(-r * T) * Nd2;
+      price =
+        S0 * Math.exp(-adjQ * T) * normcdf(d1) -
+        K * Math.exp(-r * T) * normcdf(d2);
     } else {
-      const N_neg_d1 = normcdf(-d1);
-      const N_neg_d2 = normcdf(-d2);
-      price = K * Math.exp(-r * T) * N_neg_d2 - S0 * Math.exp(-adjQ * T) * N_neg_d1;
+      price =
+        K * Math.exp(-r * T) * normcdf(-d2) -
+        S0 * Math.exp(-adjQ * T) * normcdf(-d1);
     }
   }
 
-  const d1Latex = includeDividend
-    ? `\\frac{\\ln\\left(\\frac{${s}}{${k}}\\right) + \\left(${rf} - ${div} + \\frac{${vol}^2}{2}\\right)${t}}{${vol}\\sqrt{${t}}}`
-    : `\\frac{\\ln\\left(\\frac{${s}}{${k}}\\right) + \\left(${rf} + \\frac{${vol}^2}{2}\\right)${t}}{${vol}\\sqrt{${t}}}`;
+  // LaTeX formatting for KaTeX
+  const s = S0 || "S_0";
+  const k = K || "K";
+  const t = T || "T";
+  const rf = r || "r";
+  const vol = sigma || "\\sigma";
+  const div = q || "q";
+  const displayPrice = isCall ? "C" : "P";
 
-  const d2Latex = `d_1 - ${vol}\\sqrt{${t}}`;
+  // KaTeX formulas
+  const d1Latex = `d_1 = \\frac{\\ln\\left(\\frac{${s}}{${k}}\\right) + \\left(${rf}${includeDividend ? ` - ${div}` : ""} + \\frac{${vol}^2}{2}\\right)${t}}{${vol}\\sqrt{${t}}}`;
+  const d2Latex = `d_2 = d_1 - ${vol}\\sqrt{${t}}`;
 
+  // Main pricing formula
   const priceLatex = isCall
-    ? `${displayPrice} = ${s}${includeDividend ? `e^{- ${div}${t}}` : ''}N(d_1) - ${k}e^{- ${rf}${t}}N(d_2)`
-    : `${displayPrice} = ${k}e^{- ${rf}${t}}N(-d_2) - ${s}${includeDividend ? `e^{- ${div}${t}}` : ''}N(-d_1)`;
+    ? `${displayPrice} = ${s}${includeDividend ? `e^{-${div}${t}}` : ""}N(d_1) - ${k}e^{-${rf}${t}}N(d_2)`
+    : `${displayPrice} = ${k}e^{-${rf}${t}}N(-d_2) - ${s}${includeDividend ? `e^{-${div}${t}}` : ""}N(-d_1)`;
 
-  const resultLatex = price !== null ? `${displayPrice} \\approx ${price.toFixed(4)}` : `${displayPrice} =`;
+  const resultLatex =
+    price !== null
+      ? `${displayPrice} \\approx ${price.toFixed(4)}`
+      : `${displayPrice} = ?`;
 
-return (
-  <div className="text-green-300 font-mono px-4">
-    <h1 className="text-4xl md:text-4xl font-bold text-green-400 text-center mb-2">
-      Black-Scholes Formula
-    </h1>
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          {isCall ? "Call Option" : "Put Option"} Formula
+        </h3>
+        {includeDividend && (
+          <p className="text-sm text-blue-600">Including dividend yield</p>
+        )}
+      </div>
 
-    <p className="text-center text-green-300 text-xl mb-8">
-      {isCall ? 'Call Option' : 'Put Option'}
-    </p>
-
-      <div className="grid [grid-template-columns:2fr_1fr] grid-rows-2 gap-6 ml-6">
-
-        <div className="flex items-center justify-left text-center text-2xl p-4 min-h-[120px] mathjax-wrapper">
-          <MathJax dynamic>{`\\[ ${priceLatex} \\]`}</MathJax>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Main Formula */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+          <div className="text-center" style={{ color: "#1e40af" }}>
+            <div className="text-xl">
+              <InlineMath math={priceLatex} />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-left text-center text-green-500 text-2xl p-4 min-h-[120px] mathjax-wrapper">
-          <MathJax dynamic>{`\\[ ${resultLatex} \\]`}</MathJax>
+        {/* Result */}
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+          <div className="text-center" style={{ color: "#166534" }}>
+            <div className="text-2xl font-bold">
+              <InlineMath math={resultLatex} />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-left text-center text-2xl p-4 min-h-[120px] mathjax-wrapper">
-          <MathJax dynamic>{`\\[ d_1 = ${d1Latex} \\]`}</MathJax>
+        {/* d1 Formula */}
+        <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200">
+          <div className="text-center" style={{ color: "#6b21a8" }}>
+            <div className="text-lg">
+              <InlineMath math={d1Latex} />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-left text-center text-2xl p-4 min-h-[120px] mathjax-wrapper">
-          <MathJax dynamic>{`\\[ d_2 = ${d2Latex} \\]`}</MathJax>
+        {/* d2 Formula */}
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
+          <div className="text-center" style={{ color: "#c2410c" }}>
+            <div className="text-lg">
+              <InlineMath math={d2Latex} />
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Parameter Explanations */}
+      <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+        <h4 className="text-sm font-medium text-gray-800 mb-4">
+          Parameter Definitions
+        </h4>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="font-medium">S₀:</span> Current stock price
+          </div>
+          <div>
+            <span className="font-medium">K:</span> Strike price
+          </div>
+          <div>
+            <span className="font-medium">T:</span> Time to expiration
+          </div>
+          <div>
+            <span className="font-medium">r:</span> Risk-free rate
+          </div>
+          <div>
+            <span className="font-medium">σ:</span> Volatility
+          </div>
+          {includeDividend && (
+            <div>
+              <span className="font-medium">q:</span> Dividend yield
+            </div>
+          )}
+          <div>
+            <span className="font-medium">N(x):</span> Standard normal CDF
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
-
-
+  );
 }
 
 export default BlackScholesFormula;
