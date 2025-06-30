@@ -6,10 +6,16 @@ class ConvergencePoint(BaseModel):
     N: int
     price: float
 
+class TimeSeriesPoint(BaseModel):
+    """Single point in time series analysis"""
+    t: float
+    price: float
+
 class BinomialResponse(BaseModel):
     """Response model for binomial option pricing"""
     price: float
     convergence: Optional[List[ConvergencePoint]] = None
+    time_series: Optional[List[TimeSeriesPoint]] = None
     success: bool = True
     model_info: Optional[Dict[str, Any]] = None
 
