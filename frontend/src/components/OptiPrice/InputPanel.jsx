@@ -97,16 +97,18 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
             <button
               key={modelOption.id}
               onClick={() => setModel(modelOption.id)}
-              className={`p-4 rounded-xl border text-left transition-all duration-200 ${
+              className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
                 model === modelOption.id
-                  ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-300 ring-2 ring-blue-500/20"
-                  : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg scale-105"
+                  : "!bg-gray-100 text-gray-900 border-gray-500 hover:text-blue-700 shadow-md"
               }`}
             >
-              <div className="font-medium text-gray-900">
+              <div className="font-semibold text-lg">
                 {modelOption.name}
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className={`text-sm mt-1 ${
+                model === modelOption.id ? "text-blue-100" : "text-gray-600"
+              }`}>
                 {modelOption.description}
               </div>
             </button>
@@ -119,20 +121,20 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Option Type
         </h3>
-        <div className="flex bg-gray-100 rounded-xl p-1">
+        <div className="grid grid-cols-2 gap-3">
           {["call", "put"].map((type) => (
             <button
               key={type}
               onClick={() =>
                 setForm((prev) => ({ ...prev, option_type: type }))
               }
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+              className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
                 form.option_type === type
-                  ? "bg-white text-blue-600 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg scale-105"
+                  : "!bg-gray-100 text-gray-900 border-gray-500 hover: hover:text-blue-700 shadow-md"
               }`}
             >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {type.charAt(0).toUpperCase() + type.slice(1)} Option
             </button>
           ))}
         </div>
@@ -146,7 +148,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Current Price ($)
+                Current Price ($) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -155,12 +157,13 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 value={form.S0 || ""}
                 onChange={handleChange}
                 placeholder="100.00"
+                required
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Strike Price ($)
+                Strike Price ($) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -169,6 +172,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 value={form.K || ""}
                 onChange={handleChange}
                 placeholder="105.00"
+                required
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
               />
             </div>
@@ -177,7 +181,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Expiry (Years)
+                Expiry (Years) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -186,12 +190,13 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 value={form.T || ""}
                 onChange={handleChange}
                 placeholder="0.25"
+                required
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Risk-Free Rate (%)
+                Risk-Free Rate (%) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -200,12 +205,13 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 value={form.r_percent || ""}
                 onChange={handlePercentageChange}
                 placeholder="5.0"
+                required
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Volatility (%)
+                Volatility (%) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -214,6 +220,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 value={form.sigma_percent || ""}
                 onChange={handlePercentageChange}
                 placeholder="20.0"
+                required
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
               />
             </div>
@@ -317,20 +324,8 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
       {/* Action Buttons */}
       <div className="space-y-3">
         <button
-          onClick={handleCalculate}
-          disabled={!isFormValid}
-          className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
-            isFormValid
-              ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-          }`}
-        >
-          Calculate Option Price
-        </button>
-
-        <button
           onClick={() => navigate(`/${model}-info`)}
-          className="w-full py-3 px-4 rounded-xl font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-all duration-200"
+          className="w-full py-3 px-4 rounded-xl font-medium text-blue-600 !bg-gray-100 hover:bg-blue-100 border border-blue-200 transition-all duration-200 shadow-md"
         >
           Learn About {displayModel} Model
         </button>

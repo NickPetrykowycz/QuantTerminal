@@ -62,16 +62,36 @@ function BlackScholesFormula({
       ? `${displayPrice} \\approx ${price.toFixed(4)}`
       : `${displayPrice} = ?`;
 
+  // Check if all required fields are filled
+  const requiredFieldsFilled = S0 && K && T && r && sigma;
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          {isCall ? "Call Option" : "Put Option"} Formula
+          {isCall ? "Call Option" : "Put Option"}
         </h3>
         {includeDividend && (
           <p className="text-sm text-blue-600">Including dividend yield</p>
         )}
       </div>
+
+      {/* Live Price Display - Added here */}
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 shadow-sm">
+        <div className="text-center">
+          <div className="text-3xl font-bold text-green-700">
+            {requiredFieldsFilled
+              ? `$${price?.toFixed(2) || '0.00'}`
+              : 'Fill in required fields'
+            }
+          </div>
+        </div>
+      </div>
+        <div className="text-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          Formula
+        </h3>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Main Formula */}
