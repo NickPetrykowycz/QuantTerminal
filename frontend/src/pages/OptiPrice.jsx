@@ -31,9 +31,11 @@ function OptiPrice() {
 
   const [binomial, setBinomial] = useState({
     convergence: [],
+    timeSeries: [],  // ADD THIS LINE
     price: null,
     precision: 'simple',
   });
+  
   const [loading, setLoading] = useState(false);
 
   async function fetchBinomialPrice(form, precision = 'simple') {
@@ -73,6 +75,7 @@ function OptiPrice() {
       setBinomial(s => ({
         ...s,
         convergence: result.convergence,
+        timeSeries: result.time_series || [],  // ADD THIS LINE
         price: result.price,
       }));
     } finally {
@@ -136,6 +139,7 @@ function OptiPrice() {
                     <BinomialVisual
                       form={form}
                       convergence={binomial.convergence}
+                      timeSeries={binomial.timeSeries}  // ADD THIS LINE
                       precision={binomial.precision}
                       onPrecisionChange={handleBinomialPrecisionChange}
                       onGenerate={handleBinomialGenerate}

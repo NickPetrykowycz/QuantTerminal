@@ -1,8 +1,10 @@
 import React from "react";
 import BinomialChart from "./BinomialChart";
+import BinomialTimeChart from "./BinomialTimeChart";
 
 function BinomialVisual({
   convergence = [],
+  timeSeries = [],
   precision = "advanced",
   onPrecisionChange,
   onGenerate,
@@ -95,13 +97,18 @@ function BinomialVisual({
               : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg"
           }`}
         >
-          {loading ? "Generating Convergence Data..." : "Generate Convergence Analysis"}
+          {loading ? "Generating Analysis..." : "Generate Convergence Analysis"}
         </button>
       </div>
 
-      {/* Chart */}
+      {/* Convergence Chart */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <BinomialChart data={convergence} isCall={isCall} />
+      </div>
+
+      {/* Price vs Time Chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <BinomialTimeChart data={timeSeries} form={form} />
       </div>
     </div>
   );
