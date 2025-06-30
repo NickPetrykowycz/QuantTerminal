@@ -140,6 +140,32 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
         </div>
       </div>
 
+      {/* Option Style Selection - Binomial Only */}
+      {model === "binomial" && (
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Option Style
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            {["european", "american"].map((style) => (
+              <button
+                key={style}
+                onClick={() =>
+                  setForm((prev) => ({ ...prev, style: style }))
+                }
+                className={`py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 border-2 ${
+                  (form.style || 'european') === style
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg scale-105"
+                    : "!bg-gray-100 text-gray-900 border-gray-500 hover: hover:text-blue-700 shadow-md"
+                }`}
+              >
+                {style.charAt(0).toUpperCase() + style.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Input Parameters */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Parameters</h3>
@@ -227,25 +253,53 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
           </div>
 
           {/* Dividend Section */}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex items-center space-x-3 mb-4">
-              <input
-                type="checkbox"
-                id="includeDividend"
-                name="includeDividend"
-                checked={form.includeDividend}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="includeDividend"
-                className="text-sm font-medium text-gray-700"
-              >
-                Include Dividend Yield
-              </label>
-            </div>
+      <div className="border-t border-gray-200 pt-4">
+        <div className="flex items-center space-x-3 mb-4">
+          <input
+            type="checkbox"
+            id="includeDividend"
+            name="includeDividend"
+            checked={form.includeDividend}
+            onChange={handleChange}
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+          />
+          <label
+            htmlFor="includeDividend"
+            className="text-sm font-medium text-gray-700"
+          >
+            Include Dividends
+          </label>
+        </div>
 
-            {form.includeDividend && (
+        {form.includeDividend && (
+          <div className="space-y-6">
+            {/* Dividend Mode Selection - Binomial Only */}
+            {model === "binomial" && (
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  Dividend Type
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {["yield", "discrete"].map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, dividend_mode: mode }))}
+                      className={`py-3 px-4 rounded-xl font-medium transition-all duration-200 border-2 ${
+                        (form.dividend_mode || 'yield') === mode
+                          ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-500 shadow-lg"
+                          : "!bg-gray-100 text-gray-900 border-gray-300 hover:border-blue-300 hover:text-blue-700 shadow-md"
+                      }`}
+                    >
+                      {mode === 'yield' ? 'Continuous Yield' : 'Discrete Payments'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Dividend Yield Input */}
+            {(model !== "binomial" || (form.dividend_mode || 'yield') === 'yield') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Dividend Yield (%)
@@ -261,64 +315,58 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 />
               </div>
             )}
+
+            {/* Discrete Dividend Inputs - Binomial Only */}
+            {model === "binomial" && form.dividend_mode === 'discrete' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dividend Amount ($)
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    name="dividend_amt"
+                    value={form.dividend_amt || ""}
+                    onChange={handleChange}
+                    placeholder="0.50"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Frequency (Days)
+                    </label>
+                    <input
+                      type="number"
+                      name="dividend_freq"
+                      value={form.dividend_freq || ""}
+                      onChange={handleChange}
+                      placeholder="90"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Payment (Days)
+                    </label>
+                    <input
+                      type="number"
+                      name="dividend_first_day"
+                      value={form.dividend_first_day || ""}
+                      onChange={handleChange}
+                      placeholder="30"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Monte Carlo Specific */}
-          {model === "monte-carlo" && (
-            <div className="border-t border-gray-200 pt-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Simulations
-                  </label>
-                  <input
-                    type="number"
-                    name="simulations"
-                    value={form.simulations || ""}
-                    onChange={handleChange}
-                    placeholder="10000"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Time Steps
-                  </label>
-                  <input
-                    type="number"
-                    name="timeSteps"
-                    value={form.timeSteps || ""}
-                    onChange={handleChange}
-                    placeholder="252"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Binomial Specific */}
-          {model === "binomial" && (
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flex items-center space-x-3 mb-4">
-                <input
-                  type="checkbox"
-                  id="american"
-                  name="american"
-                  checked={form.american}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="american"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  American Style Option
-                </label>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
+      </div>
+      </div>
       </div>
 
       {/* Action Buttons */}
