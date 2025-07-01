@@ -26,8 +26,10 @@ function OptiPrice() {
     q_percent: "",
     option_type: "call",
     N: 100,
-    american: false,
+    style: "american", // Set American as default for both binomial and Monte Carlo
+    american: false, // Keep for legacy compatibility
   });
+
   const isFormValid = form.S0 && form.K && form.T && form.r && form.sigma;
 
   const [binomial, setBinomial] = useState({
@@ -57,7 +59,7 @@ function OptiPrice() {
       sigma: Number(form.sigma),
       N: 512,
       option_type: form.option_type,
-      style: form.style ? form.style : form.american ? "american" : "european",
+      style: form.style || "american",
       dividend_mode: form.dividend_mode
         ? form.dividend_mode
         : form.includeDividend
@@ -144,7 +146,7 @@ function OptiPrice() {
       r: Number(form.r),
       sigma: Number(form.sigma),
       option_type: form.option_type,
-      style: form.style ? form.style : form.american ? "american" : "european",
+      style: form.style || "american",
       dividend_mode: form.dividend_mode
         ? form.dividend_mode
         : form.includeDividend

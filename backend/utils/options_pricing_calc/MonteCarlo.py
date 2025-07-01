@@ -1,10 +1,12 @@
 # Monte Carlo Options Pricing Calculator
 # Designed and created by Nick Petrykowycz 2025.
 
-import numpy as np
-from typing import Tuple, List, Optional
 import math
+from typing import List, Optional, Tuple
+
+import numpy as np
 from scipy import stats
+
 
 def price_monte_carlo(
     S0: float,
@@ -14,16 +16,18 @@ def price_monte_carlo(
     sigma: float,
     simulations: int = 100000,
     option_type: str = "call",
-    style: str = "european",
+    style: str = "american",
     time_steps: int = 252,
     random_seed: Optional[int] = None,
     antithetic: bool = True,
     q: float = 0.0,
-    **kwargs
+    dividend_dates: Optional[List[float]] = None,
+    dividend_amounts: Optional[List[float]] = None,
+    **kwargs,
 ) -> Tuple[float, np.ndarray]:
     """
     Calculate option price using Monte Carlo simulation.
-    
+
     Parameters:
     -----------
     S0 : float
@@ -41,7 +45,7 @@ def price_monte_carlo(
     option_type : str
         'call' or 'put'
     style : str
-        'european' or 'american'
+        'american' or 'asian'
     time_steps : int
         Number of time steps per simulation
     random_seed : int, optional
@@ -50,65 +54,101 @@ def price_monte_carlo(
         Use antithetic variance reduction
     q : float
         Continuous dividend yield
-        
+    dividend_dates : List[float], optional
+        Discrete dividend payment dates (in years)
+    dividend_amounts : List[float], optional
+        Discrete dividend amounts
+
     Returns:
     --------
     Tuple[float, np.ndarray]
         Option price and array of all simulated payoffs
     """
-    
+
     if random_seed is not None:
         np.random.seed(random_seed)
-    
+
     # Adjust simulations for antithetic variates
     if antithetic:
         actual_sims = simulations // 2
     else:
         actual_sims = simulations
-    
+
     dt = T / time_steps
-    drift = (r - q - 0.5 * sigma**2) * dt
-    vol_sqrt_dt = sigma * math.sqrt(dt)
-    
+    time_grid = np.linspace(0, T, time_steps + 1)
+
     # Generate random numbers
     Z = np.random.standard_normal((actual_sims, time_steps))
-    
+
     if antithetic:
         # Add antithetic variates
         Z = np.concatenate([Z, -Z], axis=0)
-    
+
     # Initialize price paths
     S = np.zeros((Z.shape[0], time_steps + 1))
     S[:, 0] = S0
-    
-    # Generate stock price paths using geometric Brownian motion
+
+    # Generate stock price paths with discrete dividends
     for t in range(1, time_steps + 1):
-        S[:, t] = S[:, t-1] * np.exp(drift + vol_sqrt_dt * Z[:, t-1])
-    
+        current_time = time_grid[t]
+
+        # Adjust for continuous dividend yield
+        drift = (r - q - 0.5 * sigma**2) * dt
+        vol_term = sigma * math.sqrt(dt) * Z[:, t - 1]
+
+        S[:, t] = S[:, t - 1] * np.exp(drift + vol_term)
+
+        # Apply discrete dividends if any
+        if dividend_dates and dividend_amounts:
+            for div_date, div_amount in zip(dividend_dates, dividend_amounts):
+                if abs(current_time - div_date) < dt / 2:  # Dividend payment
+                    S[:, t] -= div_amount
+                    S[:, t] = np.maximum(S[:, t], 0.01)  # Prevent negative prices
+
     # Calculate payoffs based on option type and style
-    if style.lower() == "european":
-        # European options: payoff at expiry only
+    if style.lower() == "asian":
+        # Asian options: payoff based on average price
+        avg_prices = np.mean(S[:, 1:], axis=1)  # Exclude initial price
         if option_type.lower() == "call":
-            payoffs = np.maximum(S[:, -1] - K, 0)
+            payoffs = np.maximum(avg_prices - K, 0)
         else:  # put
-            payoffs = np.maximum(K - S[:, -1], 0)
-    
-    else:  # American options
+            payoffs = np.maximum(K - avg_prices, 0)
+
+        # Discount payoffs to present value
+        option_price = np.mean(payoffs) * math.exp(-r * T)
+        return option_price, payoffs
+
+    elif style.lower() == "american":
         # American options: optimal exercise at any time
-        if option_type.lower() == "call":
-            # For American calls without dividends, early exercise is rarely optimal
-            # Use simple max over all time steps (approximation)
-            intrinsic_values = np.maximum(S - K, 0)
-            payoffs = np.max(intrinsic_values, axis=1)
-        else:  # put
-            # For American puts, early exercise can be optimal
-            intrinsic_values = np.maximum(K - S, 0)
-            payoffs = np.max(intrinsic_values, axis=1)
-    
-    # Discount payoffs to present value
-    option_price = np.mean(payoffs) * math.exp(-r * T)
-    
-    return option_price, payoffs
+        payoffs = np.zeros(S.shape[0])
+
+        for path_idx in range(S.shape[0]):
+            max_payoff = 0.0
+
+            for t in range(time_steps + 1):
+                current_time = time_grid[t]
+                current_price = S[path_idx, t]
+
+                if option_type.lower() == "call":
+                    intrinsic = max(current_price - K, 0)
+                else:  # put
+                    intrinsic = max(K - current_price, 0)
+
+                # Discount to present value
+                discounted_intrinsic = intrinsic * math.exp(-r * current_time)
+                max_payoff = max(max_payoff, discounted_intrinsic)
+
+            payoffs[path_idx] = max_payoff
+
+        # For American options, payoffs are already discounted
+        option_price = np.mean(payoffs)
+        return option_price, payoffs
+
+    else:
+        raise ValueError(
+            f"Unsupported option style: {style}. Use 'american' or 'asian'."
+        )
+
 
 def monte_carlo_convergence_analysis(
     S0: float,
@@ -119,137 +159,131 @@ def monte_carlo_convergence_analysis(
     max_simulations: int,
     convergence_points: int = 20,
     option_type: str = "call",
-    style: str = "european",
+    style: str = "american",
     time_steps: int = 252,
     random_seed: Optional[int] = None,
     antithetic: bool = True,
     q: float = 0.0,
-    **kwargs
+    dividend_dates: Optional[List[float]] = None,
+    dividend_amounts: Optional[List[float]] = None,
+    **kwargs,
 ) -> List[dict]:
     """
     Perform convergence analysis for Monte Carlo simulation.
-    
+
     Returns a list of convergence points showing how the estimate improves
     with more simulations.
     """
-    
+
     if random_seed is not None:
         np.random.seed(random_seed)
-    
-    # Generate simulation points (logarithmic scale for better visualization)
-    min_sims = max(1000, max_simulations // 1000)
-    sim_points = np.logspace(
-        np.log10(min_sims), 
-        np.log10(max_simulations), 
-        convergence_points
+
+    # Create logarithmically spaced simulation counts
+    sim_counts = np.logspace(
+        np.log10(1000),  # Start at 1K
+        np.log10(max_simulations),  # End at max_simulations
+        convergence_points,
     ).astype(int)
-    
-    # Remove duplicates and sort
-    sim_points = sorted(list(set(sim_points)))
-    
+
     convergence_data = []
-    cumulative_payoffs = []
-    
-    # Generate all random numbers at once for consistency
-    total_sims = max_simulations
-    if antithetic:
-        actual_sims = total_sims // 2
-    else:
-        actual_sims = total_sims
-    
-    dt = T / time_steps
-    drift = (r - q - 0.5 * sigma**2) * dt
-    vol_sqrt_dt = sigma * math.sqrt(dt)
-    
-    # Generate all random numbers
-    Z = np.random.standard_normal((actual_sims, time_steps))
-    if antithetic:
-        Z = np.concatenate([Z, -Z], axis=0)
-    
-    # Calculate all payoffs
-    S = np.zeros((Z.shape[0], time_steps + 1))
-    S[:, 0] = S0
-    
-    for t in range(1, time_steps + 1):
-        S[:, t] = S[:, t-1] * np.exp(drift + vol_sqrt_dt * Z[:, t-1])
-    
-    # Calculate payoffs
-    if style.lower() == "european":
-        if option_type.lower() == "call":
-            payoffs = np.maximum(S[:, -1] - K, 0)
-        else:
-            payoffs = np.maximum(K - S[:, -1], 0)
-    else:  # American
-        if option_type.lower() == "call":
-            intrinsic_values = np.maximum(S - K, 0)
-            payoffs = np.max(intrinsic_values, axis=1)
-        else:
-            intrinsic_values = np.maximum(K - S, 0)
-            payoffs = np.max(intrinsic_values, axis=1)
-    
-    # Calculate convergence points
-    for n_sims in sim_points:
-        current_payoffs = payoffs[:n_sims]
-        price = np.mean(current_payoffs) * math.exp(-r * T)
-        
+
+    for sim_count in sim_counts:
+        # Calculate price with current simulation count
+        price, payoffs = price_monte_carlo(
+            S0=S0,
+            K=K,
+            T=T,
+            r=r,
+            sigma=sigma,
+            simulations=sim_count,
+            option_type=option_type,
+            style=style,
+            time_steps=time_steps,
+            random_seed=random_seed,
+            antithetic=antithetic,
+            q=q,
+            dividend_dates=dividend_dates,
+            dividend_amounts=dividend_amounts,
+            **kwargs,
+        )
+
         # Calculate standard error and confidence interval
-        std_error = np.std(current_payoffs) / math.sqrt(n_sims) * math.exp(-r * T)
-        
-        # 95% confidence interval
-        z_score = 1.96  # For 95% confidence
+        if style.lower() == "asian":
+            discounted_payoffs = payoffs * math.exp(-r * T)
+        else:  # American already discounted
+            discounted_payoffs = payoffs
+
+        std_error = np.std(discounted_payoffs) / math.sqrt(len(discounted_payoffs))
+        z_score = 1.96  # 95% confidence
         ci_margin = z_score * std_error
-        
-        convergence_data.append({
-            'simulations': int(n_sims),
-            'price': float(price),
-            'std_error': float(std_error),
-            'upper_ci': float(price + ci_margin),
-            'lower_ci': float(price - ci_margin)
-        })
-    
+
+        convergence_data.append(
+            {
+                "simulations": int(sim_count),
+                "price": float(price),
+                "std_error": float(std_error),
+                "lower_ci": float(price - ci_margin),
+                "upper_ci": float(price + ci_margin),
+            }
+        )
+
     return convergence_data
+
 
 def generate_sample_paths(
     S0: float,
     T: float,
     r: float,
     sigma: float,
-    time_steps: int = 252,
     num_paths: int = 10,
+    time_steps: int = 252,
     random_seed: Optional[int] = None,
     q: float = 0.0,
-    **kwargs
+    dividend_dates: Optional[List[float]] = None,
+    dividend_amounts: Optional[List[float]] = None,
+    **kwargs,
 ) -> List[dict]:
     """
-    Generate sample price paths for visualization.
-    
+    Generate sample paths for visualization.
+
     Returns a list of path points for charting.
     """
-    
+
     if random_seed is not None:
         np.random.seed(random_seed + 1000)  # Different seed for paths
-    
+
     dt = T / time_steps
-    drift = (r - q - 0.5 * sigma**2) * dt
-    vol_sqrt_dt = sigma * math.sqrt(dt)
-    
+    time_grid = np.linspace(0, T, time_steps + 1)
+
     # Generate random numbers
     Z = np.random.standard_normal((num_paths, time_steps))
-    
+
     # Initialize price paths
     S = np.zeros((num_paths, time_steps + 1))
     S[:, 0] = S0
-    
+
     # Generate paths
     for t in range(1, time_steps + 1):
-        S[:, t] = S[:, t-1] * np.exp(drift + vol_sqrt_dt * Z[:, t-1])
-    
+        current_time = time_grid[t]
+
+        # Adjust for continuous dividend yield
+        drift = (r - q - 0.5 * sigma**2) * dt
+        vol_term = sigma * math.sqrt(dt) * Z[:, t - 1]
+
+        S[:, t] = S[:, t - 1] * np.exp(drift + vol_term)
+
+        # Apply discrete dividends if any
+        if dividend_dates and dividend_amounts:
+            for div_date, div_amount in zip(dividend_dates, dividend_amounts):
+                if abs(current_time - div_date) < dt / 2:  # Dividend payment
+                    S[:, t] -= div_amount
+                    S[:, t] = np.maximum(S[:, t], 0.01)  # Prevent negative prices
+
     # Convert to chart format
     path_data = []
-    time_points = np.linspace(0, T, time_steps + 1)
-    
+
     for path_id in range(num_paths):
-        for t_idx, (time, price) in enumerate(zip(time_points, S[path_id, :])):
+        for time, price in zip(time_grid, S[path_id, :]):
             path_data.append({
                 'time': float(time),
                 'price': float(price),
@@ -258,16 +292,14 @@ def generate_sample_paths(
     
     return path_data
 
+
 def get_simulation_count(precision: str) -> int:
     """
     Get the number of simulations based on precision level.
     """
-    precision_map = {
-        'fast': 10000,
-        'standard': 100000,
-        'high': 1000000
-    }
+    precision_map = {"fast": 10000, "standard": 100000, "high": 1000000}
     return precision_map.get(precision.lower(), 100000)
+
 
 def calculate_monte_carlo_full(
     S0: float,
@@ -276,66 +308,98 @@ def calculate_monte_carlo_full(
     r: float,
     sigma: float,
     option_type: str = "call",
-    style: str = "european",
+    style: str = "american",
     precision: str = "standard",
     random_seed: Optional[int] = None,
-    **kwargs
+    dividend_mode: str = "none",
+    dividend_dates: Optional[List[float]] = None,
+    dividend_amounts: Optional[List[float]] = None,
+    **kwargs,
 ) -> dict:
     """
     Full Monte Carlo calculation with convergence analysis and sample paths.
-    
+
     Returns a complete analysis including price, convergence, and sample paths.
     """
-    
+
     simulations = get_simulation_count(precision)
-    
+
+    # Prepare dividend parameters
+    div_dates = None
+    div_amounts = None
+
+    if dividend_mode == "discrete" and dividend_dates and dividend_amounts:
+        div_dates = dividend_dates
+        div_amounts = dividend_amounts
+
     # Calculate main price
     price, all_payoffs = price_monte_carlo(
-        S0=S0, K=K, T=T, r=r, sigma=sigma,
+        S0=S0,
+        K=K,
+        T=T,
+        r=r,
+        sigma=sigma,
         simulations=simulations,
         option_type=option_type,
         style=style,
         random_seed=random_seed,
-        **kwargs
+        dividend_dates=div_dates,
+        dividend_amounts=div_amounts,
+        **kwargs,
     )
-    
+
     # Calculate convergence analysis
     convergence = monte_carlo_convergence_analysis(
-        S0=S0, K=K, T=T, r=r, sigma=sigma,
+        S0=S0,
+        K=K,
+        T=T,
+        r=r,
+        sigma=sigma,
         max_simulations=simulations,
         option_type=option_type,
         style=style,
         random_seed=random_seed,
-        **kwargs
+        dividend_dates=div_dates,
+        dividend_amounts=div_amounts,
+        **kwargs,
     )
-    
+
     # Generate sample paths
     sample_paths = generate_sample_paths(
-        S0=S0, T=T, r=r, sigma=sigma,
+        S0=S0,
+        T=T,
+        r=r,
+        sigma=sigma,
         random_seed=random_seed,
-        **kwargs
+        dividend_dates=div_dates,
+        dividend_amounts=div_amounts,
+        **kwargs,
     )
-    
+
     # Calculate final statistics
-    discounted_payoffs = all_payoffs * math.exp(-r * T)
+    if style.lower() == "asian":
+        discounted_payoffs = all_payoffs * math.exp(-r * T)
+    else:  # American already discounted
+        discounted_payoffs = all_payoffs
+
     std_error = np.std(discounted_payoffs) / math.sqrt(len(discounted_payoffs))
-    
+
     # 95% confidence interval
     z_score = 1.96
     ci_margin = z_score * std_error
-    
+
     return {
-        'price': float(price),
-        'convergence': convergence,
-        'path_sample': sample_paths,
-        'confidence_interval': {
-            'lower': float(price - ci_margin),
-            'upper': float(price + ci_margin),
-            'confidence_level': 0.95
+        "price": float(price),
+        "convergence": convergence,
+        "path_sample": sample_paths,
+        "confidence_interval": {
+            "lower": float(price - ci_margin),
+            "upper": float(price + ci_margin),
+            "confidence_level": 0.95,
         },
-        'stats': {
-            'simulations': int(simulations),
-            'std_error': float(std_error),
-            'confidence_level': 0.95
-        }
+        "stats": {
+            "simulations": int(simulations),
+            "std_error": float(std_error),
+            "confidence_level": 0.95,
+        },
     }
