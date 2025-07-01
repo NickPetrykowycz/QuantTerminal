@@ -4,75 +4,73 @@ import {
   Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 
-function CustomTooltip({ active, payload }) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white/95 backdrop-blur-sm border border-gray-200 p-3 rounded-lg shadow-lg">
-        <div className="text-sm text-gray-600">Steps (N)</div>
-        <div className="font-medium text-gray-900">{payload[0].payload.N}</div>
-        <div className="text-sm text-gray-600 mt-1">Option Price</div>
-        <div className="font-semibold text-blue-600">
-          ${payload[0].payload.price}
-        </div>
-      </div>
-    );
-  }
-  return null;
-}
-
-// Simplified smart ticks (powers of 2 + min/max)
-function getSmartTicks(data) {
-  if (!data || !data.length) return [];
-  const minN = data[0].N;
-  const maxN = data[data.length - 1].N;
-  if (data.length <= 20) return data.map((d) => d.N);
-  const ticks = [minN];
-  let pow = 1;
-  while (pow < maxN) {
-    if (pow > minN) ticks.push(pow);
-    pow *= 2;
-  }
-  if (!ticks.includes(maxN)) ticks.push(maxN);
-  return Array.from(new Set(ticks)).sort((a, b) => a - b);
-}
-
-function BinomialChart({ data, isCall }) {
+function BinomialChart({ data = [], isCall = true }) {
   if (!data || data.length === 0) {
     return (
-      <div className="space-y-4">
+      <div className="h-96 flex items-center justify-center">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-            Binomial Tree Convergence
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H9z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Binomial Convergence Analysis
           </h3>
-          <p className="text-sm text-gray-600">
-            How option price converges as tree steps increase
+          <p className="text-gray-600 mb-4">
+            Run an analysis to see how the option price converges as the number
+            of binomial steps increases.
           </p>
-        </div>
-        <div className="h-80 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-center">
-          <p className="text-gray-500">
-            Click "Generate Convergence Analysis" to see the chart
-          </p>
+          <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+            <p className="text-sm text-purple-700">
+              The convergence chart will show the running average of the option
+              price as more binomial steps are added, demonstrating the
+              numerical stability of the lattice approach.
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
-  const lastN = data[data.length - 1]?.N;
-  const ticks = getSmartTicks(data);
+  // Original generated chart styling
+  const formatTooltip = (value, name) => {
+    if (name === "price") {
+      return [`${value.toFixed(4)}`, "Option Price"];
+    }
+    return [value, name];
+  };
+
+  const formatXAxisTick = (value) => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K`;
+    }
+    return value.toString();
+  };
 
   return (
     <div className="space-y-4">
       <div className="text-center">
         <h3 className="text-lg font-semibold text-gray-900 mb-1">
-          {isCall ? "Call" : "Put"} Option Price Convergence
+          {isCall ? "Call" : "Put"} Option Convergence
         </h3>
         <p className="text-sm text-gray-600">
-          How option price converges as binomial tree steps increase
+          How option price converges as tree steps increase
         </p>
       </div>
 
@@ -89,55 +87,47 @@ function BinomialChart({ data, isCall }) {
             />
             <XAxis
               dataKey="N"
+              stroke="#6b7280"
+              tick={{ fill: "#6b7280", fontSize: 12 }}
+              tickLine={{ stroke: "#6b7280" }}
+              tickFormatter={formatXAxisTick}
               label={{
-                value: "Steps (N)",
+                value: "Binomial Steps (N)",
                 position: "insideBottom",
                 offset: -40,
                 style: { textAnchor: "middle", fill: "#6b7280" },
               }}
+            />
+            <YAxis
               stroke="#6b7280"
               tick={{ fill: "#6b7280", fontSize: 12 }}
               tickLine={{ stroke: "#6b7280" }}
-              type="number"
-              domain={[data[0].N, data[data.length - 1].N]}
-              ticks={ticks}
-              allowDecimals={false}
-            />
-            <YAxis
+              domain={["auto", "auto"]}
               label={{
                 value: "Option Price ($)",
                 angle: -90,
                 position: "insideLeft",
                 style: { textAnchor: "middle", fill: "#6b7280" },
               }}
-              stroke="#6b7280"
-              tick={{ fill: "#6b7280", fontSize: 12 }}
-              tickLine={{ stroke: "#6b7280" }}
-              type="number"
-              domain={["auto", "auto"]}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              formatter={formatTooltip}
+              labelFormatter={(value) => `Steps: ${value}`}
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+              }}
+            />
             <Line
               type="monotone"
               dataKey="price"
-              stroke={isCall ? "#3b82f6" : "#ef4444"}
+              stroke={isCall ? "#10b981" : "#ef4444"}
               strokeWidth={3}
               dot={false}
               name={`${isCall ? "Call" : "Put"} Price`}
               strokeLinecap="round"
-            />
-            {/* Highlight the final N as a gold dot */}
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke="#facc15"
-              strokeWidth={0}
-              dot={({ cx, cy, payload }) =>
-                payload.N === lastN ? (
-                  <circle key={payload.N} cx={cx} cy={cy} r={5} fill="#facc15" />
-                ) : null
-              }
-              legendType="none"
             />
           </LineChart>
         </ResponsiveContainer>
@@ -145,7 +135,8 @@ function BinomialChart({ data, isCall }) {
 
       <div className="text-center">
         <p className="text-xs text-gray-500">
-          Chart shows binomial tree convergence - gold dot indicates final price at N=512
+          Chart shows binomial model convergence - final price calculated at N =
+          512
         </p>
       </div>
     </div>

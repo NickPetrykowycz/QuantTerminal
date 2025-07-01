@@ -44,7 +44,7 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
             "r": request.r,
             "sigma": request.sigma,
             "option_type": request.option_type,
-            "style": request.style or "european",
+            "style": request.style or "american",
             "precision": request.precision or "standard",
             "time_steps": request.time_steps or 252,
             "random_seed": request.random_seed,
@@ -54,19 +54,51 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
             "q": request.q or 0.0,
         }
 
-        # Handle dividends
+        dividend_dates = None
+        dividend_amounts = None
+
         if request.dividend_mode and request.dividend_mode != "none":
             if request.dividend_mode == "yield" and request.q:
                 params["q"] = request.q
+
             elif request.dividend_mode == "discrete":
-                # For discrete dividends, we'd need more complex handling
-                # For now, approximate with continuous yield
-                if request.dividend_amt and request.dividend_freq:
-                    # Convert discrete to approximate continuous yield
-                    annual_dividend = request.dividend_amt * (
-                        365 / request.dividend_freq
-                    )
-                    params["q"] = annual_dividend / request.S0
+                # Handle new discrete dividend format
+                if request.dividend_dates and request.dividend_amounts:
+                    dividend_dates = request.dividend_dates
+                    dividend_amounts = request.dividend_amounts
+                    params["dividend_dates"] = dividend_dates
+                    params["dividend_amounts"] = dividend_amounts
+                    params["dividend_mode"] = "discrete"
+
+                # Handle legacy discrete dividend format
+                elif (
+                    request.dividend_amt
+                    and request.dividend_freq
+                    and request.dividend_first_day is not None
+                ):
+                    # Convert legacy format to new format
+                    dividend_dates = []
+                    dividend_amounts = []
+
+                    current_div_day = request.dividend_first_day
+                    while current_div_day <= request.T * 365:
+                        div_time = current_div_day / 365.0
+                        if div_time <= request.T:
+                            dividend_dates.append(div_time)
+                            dividend_amounts.append(request.dividend_amt)
+                        current_div_day += request.dividend_freq
+
+                    if dividend_dates:
+                        params["dividend_dates"] = dividend_dates
+                        params["dividend_amounts"] = dividend_amounts
+                        params["dividend_mode"] = "discrete"
+                else:
+                    # Fallback: approximate with continuous yield if no proper discrete data
+                    if request.dividend_amt and request.dividend_freq:
+                        annual_dividend = request.dividend_amt * (
+                            365 / request.dividend_freq
+                        )
+                        params["q"] = annual_dividend / request.S0
 
         print(f"🚀 Starting Monte Carlo simulation...")
 
@@ -129,7 +161,7 @@ async def get_monte_carlo_info():
         "model": "Monte Carlo Simulation",
         "description": "Stochastic simulation for option pricing using geometric Brownian motion",
         "features": [
-            "American and European options",
+            "American and Asian options",
             "Statistical confidence intervals",
             "Convergence analysis",
             "Sample path visualization",
