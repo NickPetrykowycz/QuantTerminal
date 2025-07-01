@@ -42,8 +42,13 @@ class BinomialRequest(BaseModel):
     
     conv_points: Optional[int] = Field(10, ge=5, le=100, description="Convergence points for charting")
 
-class BlackScholesRequest(BaseModel):
-    """Request model for Black-Scholes option pricing"""
+class MonteCarloPrecision(str, Enum):
+    FAST = "fast"
+    STANDARD = "standard"
+    HIGH = "high"
+
+class MonteCarloRequest(BaseModel):
+    """Request model for Monte Carlo option pricing"""
     S0: float = Field(..., gt=0, description="Current stock price")
     K: float = Field(..., gt=0, description="Strike price")
     T: float = Field(..., gt=0, description="Time to expiry in years")
@@ -51,5 +56,22 @@ class BlackScholesRequest(BaseModel):
     sigma: float = Field(..., gt=0, description="Volatility")
     
     option_type: str = Field(..., description="Call or put option")
-    include_dividend: bool = Field(False, description="Include dividend yield")
+    style: Optional[str] = Field("european", description="European or American")
+    precision: Optional[str] = Field("standard", description="Simulation precision")
+
+    # Monte Carlo specific parameters
+    simulations: Optional[int] = Field(None, ge=1000, le=10000000, description="Number of simulations")
+    time_steps: Optional[int] = Field(252, ge=1, le=1000, description="Time steps per simulation")
+    random_seed: Optional[int] = Field(None, ge=0, description="Random seed for reproducibility")
+    antithetic: Optional[bool] = Field(True, description="Use antithetic variance reduction")
+
+    # Dividend parameters
+    dividend_mode: Optional[str] = Field("none", description="Dividend mode")
     q: Optional[float] = Field(None, ge=0, description="Continuous dividend yield")
+    dividend_freq: Optional[int] = Field(None, gt=0, description="Dividend frequency in days")
+    dividend_amt: Optional[float] = Field(None, gt=0, description="Dividend amount")
+    dividend_first_day: Optional[int] = Field(None, ge=0, description="First dividend day")
+
+    # Analysis parameters
+    convergence_points: Optional[int] = Field(20, ge=10, le=100, description="Convergence analysis points")
+    sample_paths: Optional[int] = Field(10, ge=5, le=50, description="Sample paths to show")
