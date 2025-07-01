@@ -1,103 +1,153 @@
-import React from 'react';
+import React from "react";
+import MonteCarloChart from "./MonteCarloChart";
+import MonteCarloPathChart from "./MonteCarloPathChart";
 
-function MonteCarloVisual({ form }) {
+function MonteCarloVisual({
+  convergence = [],
+  pathSample = [],
+  precision = "standard",
+  onPrecisionChange,
+  onGenerate,
+  price,
+  form,
+  loading,
+  confidence_interval = null,
+  stats = null,
+}) {
+  const precisionOptions = [
+    { label: "Fast (10K simulations)", value: "fast" },
+    { label: "Standard (100K simulations)", value: "standard" },
+    { label: "High (1M simulations)", value: "high" },
+  ];
+
+  const isCall = form?.option_type === "call";
+  const optionTypeText = isCall ? "Call Option" : "Put Option";
+  const isAmerican = form?.style === "american" || form?.american === true;
+  const styleText = isAmerican ? "American" : "European";
+
+  const divYieldMode = form?.dividend_mode || (form?.includeDividend ? (form?.q ? "yield" : "discrete") : "none");
+  const getDividendText = () => {
+    if (!form?.includeDividend || divYieldMode === "none") return "";
+    if (divYieldMode === "yield") return " with Continuous Dividend Yield";
+    if (divYieldMode === "discrete") return " with Discrete Dividends";
+    return "";
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Monte Carlo Simulation
         </h2>
         <p className="text-gray-600">
-          Simulation-based option pricing (Coming Soon)
+          Stochastic simulation for American/European option pricing
         </p>
       </div>
 
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-200">
+      {/* Price Display */}
+      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl border border-purple-200 shadow-sm p-6">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-amber-800 mb-2">
-            Monte Carlo Implementation
-          </h3>
-          <p className="text-amber-700 mb-6">
-            Advanced simulation-based pricing engine is currently under development. 
-            This will include path-dependent options, exotic derivatives, and variance reduction techniques.
+          <p className="text-sm text-purple-600 mb-1">
+            {styleText} {optionTypeText}{getDividendText()} Price
           </p>
-          
-          <div className="bg-white/60 rounded-xl p-4 border border-amber-300/50">
-            <h4 className="font-medium text-amber-800 mb-2">Planned Features</h4>
-            <ul className="text-sm text-amber-700 space-y-1 text-left max-w-md mx-auto">
-              <li>• Geometric Brownian Motion simulation</li>
-              <li>• Antithetic variates for variance reduction</li>
-              <li>• Control variates optimization</li>
-              <li>• Path-dependent option support</li>
-              <li>• Real-time convergence visualization</li>
-              <li>• Multiple random number generators</li>
-            </ul>
+          <div className="text-3xl font-bold text-purple-700">
+            ${typeof price === "number" ? `${price.toFixed(4)}` : "—"}
           </div>
-          
-          <div className="mt-6">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-              Expected Release: Q2 2025
-            </span>
-          </div>
+          {confidence_interval && (
+            <div className="mt-2 text-sm text-purple-600">
+              95% CI: [${confidence_interval.lower?.toFixed(4) || "—"}, ${confidence_interval.upper?.toFixed(4) || "—"}]
+            </div>
+          )}
+          {stats && (
+            <div className="mt-2 grid grid-cols-2 gap-4 text-xs text-purple-600">
+              <div>
+                <span className="font-medium">Std Error:</span> ${stats.std_error?.toFixed(6) || "—"}
+              </div>
+              <div>
+                <span className="font-medium">Simulations:</span> {stats.simulations?.toLocaleString() || "—"}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Preview Parameters */}
+      {/* Precision Settings and Generate Button */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Preview: Monte Carlo Parameters
+          Simulation Settings
         </h3>
-        <div className="grid grid-cols-2 gap-4 opacity-50">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Number of Simulations
-            </label>
-            <input
-              type="number"
-              value={form.simulations || '100000'}
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Time Steps
-            </label>
-            <input
-              type="number"
-              value={form.timeSteps || '252'}
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Random Seed
-            </label>
-            <input
-              type="number"
-              placeholder="42"
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Variance Reduction
-            </label>
-            <select
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+        <p className="text-sm text-gray-600 mb-4">
+          Choose simulation precision. Higher precision provides more accurate results but takes longer to compute.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+          {precisionOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onPrecisionChange(option.value)}
+              disabled={loading}
+              className={`p-4 rounded-xl border text-left transition-all duration-200 ${
+                precision === option.value
+                  ? "bg-gradient-to-r from-purple-50 to-violet-50 border-purple-300 ring-2 ring-purple-500/20"
+                  : "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <option>Antithetic Variates</option>
-              <option>Control Variates</option>
-              <option>Importance Sampling</option>
-            </select>
+              <div className="font-medium text-gray-900">{option.label}</div>
+              <div className="text-sm text-gray-600 mt-1">
+                {option.value === "fast" && "Quick approximation"}
+                {option.value === "standard" && "Balanced accuracy"}
+                {option.value === "high" && "Maximum precision"}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={onGenerate}
+          disabled={loading}
+          className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
+            loading
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-purple-600 to-violet-600 text-white hover:from-purple-700 hover:to-violet-700 shadow-md hover:shadow-lg"
+          }`}
+        >
+          {loading ? "Running Simulation..." : "Run Monte Carlo Simulation"}
+        </button>
+      </div>
+
+      {/* Convergence Chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <MonteCarloChart data={convergence} isCall={isCall} />
+      </div>
+
+      {/* Sample Paths Chart */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <MonteCarloPathChart data={pathSample} form={form} />
+      </div>
+
+      {/* Technical Details */}
+      <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Monte Carlo Method Details
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-medium text-gray-800 mb-2">Simulation Process</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• Geometric Brownian Motion paths</li>
+              <li>• Antithetic variance reduction</li>
+              <li>• European & American exercise</li>
+              <li>• Statistical confidence intervals</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-medium text-gray-800 mb-2">Advantages</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• Handles complex payoffs</li>
+              <li>• Path-dependent options</li>
+              <li>• Multiple underlying assets</li>
+              <li>• Flexible boundary conditions</li>
+            </ul>
           </div>
         </div>
       </div>

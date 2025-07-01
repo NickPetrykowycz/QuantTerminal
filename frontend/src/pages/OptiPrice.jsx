@@ -1,44 +1,54 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import InputPanel from '../components/OptiPrice/InputPanel';
-import BlackScholesVisual from '../components/OptiPrice/BlackScholes/BlackScholesVisual';
-import BinomialVisual from '../components/OptiPrice/Binomial/BinomialVisual';
-import MonteCarloVisual from '../components/OptiPrice/MonteCarlo/MonteCarloVisual';
-import Navigation from '../components/Navigation';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import InputPanel from "../components/OptiPrice/InputPanel";
+import BlackScholesVisual from "../components/OptiPrice/BlackScholes/BlackScholesVisual";
+import BinomialVisual from "../components/OptiPrice/Binomial/BinomialVisual";
+import MonteCarloVisual from "../components/OptiPrice/MonteCarlo/MonteCarloVisual";
+import Navigation from "../components/Navigation";
 
 function OptiPrice() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [model, setModel] = useState('black-scholes');
+  const [model, setModel] = useState("black-scholes");
   const [result, setResult] = useState(null);
 
   const [form, setForm] = useState({
     includeDividend: false,
-    S0: '',
-    K: '',
-    T: '',
-    r: '',
-    sigma: '',
-    q: '',
-    r_percent: '',
-    sigma_percent: '',
-    q_percent: '',
-    option_type: 'call',
+    S0: "",
+    K: "",
+    T: "",
+    r: "",
+    sigma: "",
+    q: "",
+    r_percent: "",
+    sigma_percent: "",
+    q_percent: "",
+    option_type: "call",
     N: 100,
     american: false,
   });
+  const isFormValid = form.S0 && form.K && form.T && form.r && form.sigma;
 
   const [binomial, setBinomial] = useState({
     convergence: [],
-    timeSeries: [],  // ADD THIS LINE
+    timeSeries: [], // ADD THIS LINE
     price: null,
-    precision: 'simple',
+    precision: "simple",
   });
-  
+
+  const [monteCarlo, setMonteCarlo] = useState({
+    convergence: [],
+    pathSample: [],
+    price: null,
+    precision: "standard",
+    confidence_interval: null,
+    stats: null,
+  });
+
   const [loading, setLoading] = useState(false);
 
-  async function fetchBinomialPrice(form, precision = 'simple') {
+  async function fetchBinomialPrice(form, precision = "simple") {
     const payload = {
       S0: Number(form.S0),
       K: Number(form.K),
@@ -47,35 +57,53 @@ function OptiPrice() {
       sigma: Number(form.sigma),
       N: 512,
       option_type: form.option_type,
-      style: form.style ? form.style : (form.american ? 'american' : 'european'),
-      dividend_mode: form.dividend_mode ? form.dividend_mode : (form.includeDividend ? (form.q ? 'yield' : 'discrete') : 'none'),
+      style: form.style ? form.style : form.american ? "american" : "european",
+      dividend_mode: form.dividend_mode
+        ? form.dividend_mode
+        : form.includeDividend
+          ? form.q
+            ? "yield"
+            : "discrete"
+          : "none",
       precision,
-      q: form.includeDividend && form.dividend_mode === 'yield' ? Number(form.q) : null,
-      dividend_freq: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_freq) : null,
-      dividend_amt: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_amt) : null,
-      dividend_first_day: form.includeDividend && form.dividend_mode === 'discrete' ? Number(form.dividend_first_day) : null,
+      q:
+        form.includeDividend && form.dividend_mode === "yield"
+          ? Number(form.q)
+          : null,
+      dividend_freq:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_freq)
+          : null,
+      dividend_amt:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_amt)
+          : null,
+      dividend_first_day:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_first_day)
+          : null,
     };
-    const res = await fetch('http://localhost:8000/api/binomial', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("http://localhost:8000/api/binomial", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error('API error');
+    if (!res.ok) throw new Error("API error");
     return await res.json();
   }
 
   const handleBinomialPrecisionChange = (precision) => {
-    setBinomial(s => ({ ...s, precision }));
+    setBinomial((s) => ({ ...s, precision }));
   };
 
   const handleBinomialGenerate = async () => {
     setLoading(true);
     try {
       const result = await fetchBinomialPrice(form, binomial.precision);
-      setBinomial(s => ({
+      setBinomial((s) => ({
         ...s,
         convergence: result.convergence,
-        timeSeries: result.time_series || [],  // ADD THIS LINE
+        timeSeries: result.time_series || [], // ADD THIS LINE
         price: result.price,
       }));
     } finally {
@@ -85,8 +113,95 @@ function OptiPrice() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
+
+  const handleMonteCarloGenerate = async () => {
+    if (!isFormValid) return;
+
+    setLoading(true);
+    try {
+      await fetchMonteCarloPrice(form, monteCarlo.precision);
+    } catch (error) {
+      console.error("Error generating Monte Carlo analysis:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMonteCarloPrecisionChange = (newPrecision) => {
+    setMonteCarlo((prev) => ({
+      ...prev,
+      precision: newPrecision,
+    }));
+  };
+
+  async function fetchMonteCarloPrice(form, precision = "standard") {
+    const payload = {
+      S0: Number(form.S0),
+      K: Number(form.K),
+      T: Number(form.T),
+      r: Number(form.r),
+      sigma: Number(form.sigma),
+      option_type: form.option_type,
+      style: form.style ? form.style : form.american ? "american" : "european",
+      dividend_mode: form.dividend_mode
+        ? form.dividend_mode
+        : form.includeDividend
+          ? form.q
+            ? "yield"
+            : "discrete"
+          : "none",
+      precision,
+      q:
+        form.includeDividend && form.dividend_mode === "yield"
+          ? Number(form.q)
+          : null,
+      dividend_freq:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_freq)
+          : null,
+      dividend_amt:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_amt)
+          : null,
+      dividend_first_day:
+        form.includeDividend && form.dividend_mode === "discrete"
+          ? Number(form.dividend_first_day)
+          : null,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/api/monte-carlo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Monte Carlo API response:", data);
+
+      if (data.success) {
+        setMonteCarlo((prev) => ({
+          ...prev,
+          price: data.price,
+          convergence: data.convergence || [],
+          pathSample: data.path_sample || [],
+          confidence_interval: data.confidence_interval || null,
+          stats: data.stats || null,
+        }));
+      } else {
+        throw new Error(data.error || "Monte Carlo calculation failed");
+      }
+    } catch (error) {
+      console.error("Monte Carlo API Error:", error);
+      throw error;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100/30">
@@ -134,12 +249,14 @@ function OptiPrice() {
               {/* Right Panel - Visualization */}
               <div className="lg:w-3/5 p-8 bg-gray-50/50">
                 <div className="h-full">
-                  {model === 'black-scholes' && <BlackScholesVisual form={form} />}
-                  {model === 'binomial' && (
+                  {model === "black-scholes" && (
+                    <BlackScholesVisual form={form} />
+                  )}
+                  {model === "binomial" && (
                     <BinomialVisual
                       form={form}
                       convergence={binomial.convergence}
-                      timeSeries={binomial.timeSeries}  // ADD THIS LINE
+                      timeSeries={binomial.timeSeries} // ADD THIS LINE
                       precision={binomial.precision}
                       onPrecisionChange={handleBinomialPrecisionChange}
                       onGenerate={handleBinomialGenerate}
@@ -147,14 +264,32 @@ function OptiPrice() {
                       loading={loading}
                     />
                   )}
-                  {model === 'monte-carlo' && <MonteCarloVisual form={form} />}
+                  {model === "monte-carlo" && (
+                    <MonteCarloVisual
+                      form={form}
+                      convergence={monteCarlo.convergence}
+                      pathSample={monteCarlo.pathSample}
+                      precision={monteCarlo.precision}
+                      onPrecisionChange={handleMonteCarloPrecisionChange}
+                      onGenerate={handleMonteCarloGenerate}
+                      price={monteCarlo.price}
+                      loading={loading}
+                      confidence_interval={monteCarlo.confidence_interval}
+                      stats={monteCarlo.stats}
+                    />
+                  )}
                   {/* Result Display */}
                   {result !== null && (
                     <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
                       <div className="text-center">
-                        <p className="text-sm font-medium text-blue-600 mb-1">Option Price</p>
+                        <p className="text-sm font-medium text-blue-600 mb-1">
+                          Option Price
+                        </p>
                         <p className="text-3xl font-bold text-blue-900">
-                          ${typeof result === 'number' ? result.toFixed(4) : result}
+                          $
+                          {typeof result === "number"
+                            ? result.toFixed(4)
+                            : result}
                         </p>
                       </div>
                     </div>
