@@ -68,12 +68,12 @@ function BlackScholesFormula({
   return (
     <div className="space-y-8">
       {/* Price Display */}
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 shadow-sm p-6">
+      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl border border-purple-200 shadow-sm p-6">
         <div className="text-center">
-          <p className="text-sm text-green-600 mb-1">
+          <p className="text-sm text-purple-600 mb-1">
             European {isCall ? "Call Option" : "Put Option"}{includeDividend ? " with Dividend Yield" : ""} Price
           </p>
-          <div className="text-3xl font-bold text-green-700">
+          <div className="text-3xl font-bold text-purple-700">
             {requiredFieldsFilled
               ? `$${price?.toFixed(4) || '0.0000'}`
               : '—'
@@ -110,8 +110,8 @@ function BlackScholesFormula({
           </div>
 
           {/* d1 Formula */}
-          <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200">
-            <div className="text-center" style={{ color: "#6b21a8" }}>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+            <div className="text-center" style={{ color: "green" }}>
               <div className="text-lg">
                 <InlineMath math={d1Latex} />
               </div>
