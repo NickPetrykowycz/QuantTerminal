@@ -265,7 +265,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
           </div>
         </div>
 
-        {/* Dividend Section */}
+        {/* Dividend Section - UPDATED */}
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center space-x-3 mb-4">
             <input
@@ -286,8 +286,8 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
 
           {form.includeDividend && (
             <div className="space-y-6">
-              {/* Dividend Mode Selection - Binomial and Monte Carlo */}
-              {(model === "binomial" || model === "monte-carlo") && (
+              {/* Dividend Mode Selection - Only for Binomial */}
+              {model === "binomial" && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-3">
                     Dividend Type
@@ -315,60 +315,56 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 </div>
               )}
 
-              {/* Dividend Yield Input */}
-              {((model !== "binomial" && model !== "monte-carlo") ||
-                (form.dividend_mode || "yield") === "yield") && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Dividend Yield (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="any"
-                    name="q_percent"
-                    value={form.q_percent || ""}
-                    onChange={handlePercentageChange}
-                    placeholder="2.0"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                  />
+              {/* Monte Carlo Info - Only Continuous Yield Supported */}
+              {model === "monte-carlo" && (
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-blue-800">
+                        Monte Carlo Dividend Support
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Monte Carlo simulation supports continuous dividend yield only.
+                        For discrete dividends, use the Binomial model.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Discrete Dividend Inputs - Binomial and Monte Carlo */}
-              {(model === "binomial" || model === "monte-carlo") &&
-                form.dividend_mode === "discrete" && (
-                  <div className="space-y-4">
-                    {/* For Monte Carlo: New discrete dividend format */}
-                    {model === "monte-carlo" && (
-                      <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 mb-4">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                            <svg
-                              className="w-3 h-3 text-white"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-blue-800">
-                              Monte Carlo Discrete Dividends
-                            </p>
-                            <p className="text-xs text-blue-600 mt-1">
-                              For precise dividend timing, use the legacy format
-                              below. Future versions will support flexible
-                              dividend scheduling.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+              {/* Dividend Yield Input - Always shown when dividends enabled */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Dividend Yield (%)
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  name="q_percent"
+                  value={form.q_percent || ""}
+                  onChange={handlePercentageChange}
+                  placeholder="2.0"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                />
+              </div>
 
+              {/* Discrete Dividend Inputs - Only for Binomial */}
+              {model === "binomial" && form.dividend_mode === "discrete" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Dividend Amount ($)
@@ -379,40 +375,44 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                         name="dividend_amt"
                         value={form.dividend_amt || ""}
                         onChange={handleChange}
-                        placeholder="0.50"
+                        placeholder="2.0"
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Frequency (Days)
-                        </label>
-                        <input
-                          type="number"
-                          name="dividend_freq"
-                          value={form.dividend_freq || ""}
-                          onChange={handleChange}
-                          placeholder="90"
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          First Payment (Days)
-                        </label>
-                        <input
-                          type="number"
-                          name="dividend_first_day"
-                          value={form.dividend_first_day || ""}
-                          onChange={handleChange}
-                          placeholder="30"
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                        />
-                      </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Frequency (Days)
+                      </label>
+                      <select
+                        name="dividend_freq"
+                        value={form.dividend_freq || "90"}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                      >
+                        <option value="90">Quarterly (90 days)</option>
+                        <option value="180">Semi-Annual (180 days)</option>
+                        <option value="365">Annual (365 days)</option>
+                        <option value="30">Monthly (30 days)</option>
+                      </select>
                     </div>
                   </div>
-                )}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Payment (Days from now)
+                    </label>
+                    <input
+                      type="number"
+                      name="dividend_first_day"
+                      value={form.dividend_first_day || ""}
+                      onChange={handleChange}
+                      placeholder="90"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

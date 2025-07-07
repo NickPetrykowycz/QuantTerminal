@@ -139,6 +139,21 @@ function BinomialChart({ data = [], isCall = true }) {
           512
         </p>
       </div>
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+        <h4 className="font-medium text-gray-800 mb-2">Key Insights</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div>
+            <strong>Convergence Behavior:</strong> The binomial model converges
+            to the true option price as the number of steps increases, showing
+            the numerical stability of the lattice approach.
+          </div>
+          <div>
+            <strong>Step Efficiency:</strong> Most accuracy is achieved within
+            the first few hundred steps. Beyond N=200, improvements become
+            marginal for typical market parameters.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
