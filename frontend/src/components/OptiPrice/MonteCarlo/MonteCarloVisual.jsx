@@ -1,3 +1,4 @@
+// Updated MonteCarloVisual.jsx - Remove discrete dividend references
 import React from "react";
 import MonteCarloChart from "./MonteCarloChart";
 import MonteCarloPathChart from "./MonteCarloPathChart";
@@ -15,9 +16,9 @@ function MonteCarloVisual({
   stats = null,
 }) {
   const precisionOptions = [
-    { label: "Fast (10K simulations)", value: "fast" },
-    { label: "Standard (100K simulations)", value: "standard" },
-    { label: "High (1M simulations)", value: "high" },
+    { label: "Fast", value: "fast", description: "10K simulations" },
+    { label: "Standard", value: "standard", description: "100K simulations" },
+    { label: "High", value: "high", description: "1M simulations" },
   ];
 
   const isCall = form?.option_type === "call";
@@ -27,14 +28,10 @@ function MonteCarloVisual({
   const style = form?.style || "american";
   const styleText = style === "american" ? "American" : "Asian";
 
-  const divYieldMode =
-    form?.dividend_mode ||
-    (form?.includeDividend ? (form?.q ? "yield" : "discrete") : "none");
+  // Simplified dividend text - only continuous yield for Monte Carlo
   const getDividendText = () => {
-    if (!form?.includeDividend || divYieldMode === "none") return "";
-    if (divYieldMode === "yield") return " with Continuous Dividend Yield";
-    if (divYieldMode === "discrete") return " with Discrete Dividends";
-    return "";
+    if (!form?.includeDividend) return "";
+    return " with Continuous Dividend Yield";
   };
 
   return (
@@ -77,7 +74,7 @@ function MonteCarloVisual({
           results but takes longer to compute.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
           {precisionOptions.map((option) => (
             <button
               key={option.value}
@@ -89,9 +86,11 @@ function MonteCarloVisual({
                   : "bg-gray-50 hover:bg-purple-50 border-gray-200 hover:border-purple-300 text-gray-700 hover:text-purple-700"
               } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <div className="font-medium">{option.label.split(" ")[0]}</div>
-              <div className="text-sm opacity-90 mt-1">
-                {option.label.match(/\((.*?)\)/)?.[1] || ""}
+              <div className="font-medium">{option.label}</div>
+              <div className={`text-sm mt-1 ${
+                precision === option.value ? "text-white/90" : "text-gray-600"
+              }`}>
+                {option.description}
               </div>
             </button>
           ))}
@@ -99,67 +98,76 @@ function MonteCarloVisual({
 
         <button
           onClick={onGenerate}
-          disabled={
-            loading ||
-            !form?.S0 ||
-            !form?.K ||
-            !form?.T ||
-            !form?.r ||
-            !form?.sigma
-          }
-          className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 ${
-            loading ||
-            !form?.S0 ||
-            !form?.K ||
-            !form?.T ||
-            !form?.r ||
-            !form?.sigma
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-purple-600 to-violet-600 text-white hover:from-purple-700 hover:to-violet-700 shadow-md hover:shadow-lg"
-          }`}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-purple-600 to-violet-600 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-700 hover:to-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
-          {loading ? "Running Simulation..." : "Run Monte Carlo Simulation"}
+          {loading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Running Monte Carlo Simulation...</span>
+            </div>
+          ) : (
+            "Run Monte Carlo Simulation"
+          )}
         </button>
       </div>
 
-      {/* Statistics Display */}
-      {stats && (
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl border border-indigo-200 p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Statistical Results
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-700">
-                {stats.simulations?.toLocaleString() || "—"}
+          {/* Statistics */}
+          {stats && (
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Statistical Results
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {stats.simulations?.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-600">Simulations</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    ${stats.std_error?.toFixed(6)}
+                  </div>
+                  <div className="text-sm text-gray-600">Standard Error</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {((stats.confidence_level || 0.95) * 100).toFixed(0)}%
+                  </div>
+                  <div className="text-sm text-gray-600">Confidence Level</div>
+                </div>
               </div>
-              <div className="text-sm text-indigo-600">Simulations</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-700">
-                ${stats.std_error?.toFixed(6) || "—"}
-              </div>
-              <div className="text-sm text-indigo-600">Standard Error</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-700">
-                {((stats.confidence_level || 0.95) * 100).toFixed(0)}%
-              </div>
-              <div className="text-sm text-indigo-600">Confidence Level</div>
-            </div>
+          )}
+
+      {/* Results Section */}
+      {convergence.length > 0 || pathSample.length > 0 ? (
+        <div className="space-y-8">
+          {/* Convergence Chart */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <MonteCarloChart data={convergence} isCall={isCall} />
+          </div>
+
+          {/* Path Chart */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <MonteCarloPathChart data={pathSample} form={form} />
+          </div>
+        </div>
+      ) : (
+        // Empty state with nice styling (like the original)
+        <div className="space-y-8">
+          {/* Convergence Chart Placeholder */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <MonteCarloChart data={[]} isCall={isCall} />
+          </div>
+
+          {/* Path Chart Placeholder */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <MonteCarloPathChart data={[]} form={form} />
           </div>
         </div>
       )}
-
-      {/* Convergence Chart */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <MonteCarloChart data={convergence} isCall={isCall} />
-      </div>
-
-      {/* Sample Paths Chart */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <MonteCarloPathChart data={pathSample} form={form} />
-      </div>
     </div>
   );
 }
