@@ -15,6 +15,10 @@ function OptiPrice() {
 
   const [form, setForm] = useState({
     includeDividend: false,
+    dividend_mode: "yield",
+    dividend_freq: "90",
+    dividend_amt: "",
+    dividend_first_day: "",
     S0: "",
     K: "",
     T: "",
@@ -60,29 +64,40 @@ function OptiPrice() {
       N: 512,
       option_type: form.option_type,
       style: form.style || "american",
-      dividend_mode: form.includeDividend
-        ? form.dividend_mode || "yield"
-        : "none",
-      q: form.includeDividend &&
-        (form.dividend_mode === "yield" || !form.dividend_mode)
-          ? Number(form.q) || 0
-          : 0,
       precision,
-      // REMOVE THE DUPLICATE q FIELD HERE
-      dividend_freq: form.includeDividend && form.dividend_mode === "discrete"
-        ? Number(form.dividend_freq) : null,
-      dividend_amt: form.includeDividend && form.dividend_mode === "discrete"
-        ? Number(form.dividend_amt) : null,
-      dividend_first_day: form.includeDividend && form.dividend_mode === "discrete"
-        ? Number(form.dividend_first_day) : null,
     };
-    
+
+    // Handle dividend parameters properly
+    if (form.includeDividend) {
+      const dividendMode = form.dividend_mode || "yield";
+      payload.dividend_mode = dividendMode;
+
+      if (dividendMode === "yield") {
+        payload.q = Number(form.q) || 0;
+      } else if (dividendMode === "discrete") {
+        payload.dividend_freq = Number(form.dividend_freq) || null;
+        payload.dividend_amt = Number(form.dividend_amt) || null;
+        payload.dividend_first_day = Number(form.dividend_first_day) || null;
+        payload.q = 0; // Set to 0 for discrete dividends
+      }
+    } else {
+      payload.dividend_mode = "none";
+      payload.q = 0;
+    }
+
+    console.log("Binomial payload:", payload); // Debug log
+
     const res = await fetch("http://localhost:8000/api/binomial", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("API error");
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`API error: ${errorText}`);
+    }
+
     return await res.json();
   }
 

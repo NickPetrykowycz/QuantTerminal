@@ -36,13 +36,13 @@ def generate_convergence_analysis(
 ) -> List[dict]:
     """Generate convergence analysis data"""
     convergence_points = []
-    
+
     # Use fewer points but with more reasonable simulation counts
     sim_counts = [1000, 2500, 5000, 10000, 25000, 50000, 75000, 100000]
-    
+
     # Only include counts that are <= max_sims
     sim_counts = [s for s in sim_counts if s <= max_sims]
-    
+
     # Always include the final max_sims if it's not already there
     if max_sims not in sim_counts and max_sims > sim_counts[-1]:
         sim_counts.append(max_sims)
@@ -53,27 +53,46 @@ def generate_convergence_analysis(
 
         if params["style"] == "european":
             result = temp_simulator.price_european_option(
-                params["S0"], params["K"], params["r"], params["q"],
-                params["sigma"], params["T"], params["option_type"]
+                params["S0"],
+                params["K"],
+                params["r"],
+                params["q"],
+                params["sigma"],
+                params["T"],
+                params["option_type"],
             )
         elif params["style"] == "asian":
             result = temp_simulator.price_asian_option(
-                params["S0"], params["K"], params["r"], params["q"],
-                params["sigma"], params["T"], params["option_type"], params["time_steps"]
+                params["S0"],
+                params["K"],
+                params["r"],
+                params["q"],
+                params["sigma"],
+                params["T"],
+                params["option_type"],
+                params["time_steps"],
             )
         else:  # american
             result = temp_simulator.price_american_option(
-                params["S0"], params["K"], params["r"], params["q"],
-                params["sigma"], params["T"], params["option_type"], params["time_steps"]
+                params["S0"],
+                params["K"],
+                params["r"],
+                params["q"],
+                params["sigma"],
+                params["T"],
+                params["option_type"],
+                params["time_steps"],
             )
 
-        convergence_points.append({
-            "simulations": int(sim_count),
-            "price": result["price"],
-            "std_error": result["std_error"],
-            "lower_ci": result["lower_bound"],
-            "upper_ci": result["upper_bound"]
-        })
+        convergence_points.append(
+            {
+                "simulations": int(sim_count),
+                "price": result["price"],
+                "std_error": result["std_error"],
+                "lower_ci": result["lower_bound"],
+                "upper_ci": result["upper_bound"],
+            }
+        )
 
     return convergence_points
 
@@ -155,9 +174,7 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
         if request.random_seed:
             np.random.seed(request.random_seed)
 
-        print(
-            f"🚀 Starting Monte Carlo simulation with {simulations:,} simulations..."
-        )
+        print(f"🚀 Starting Monte Carlo simulation with {simulations:,} simulations...")
 
         # Create simulator
         simulator = MonteCarloSimulator(simulations)
@@ -206,7 +223,7 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
         print("🛤️ Generating sample paths...")
         path_sample_data = generate_sample_paths(simulator, params)
 
-        print(f"✅ Monte Carlo calculation complete!")
+        print("✅ Monte Carlo calculation complete!")
         print(f"📈 Convergence points: {len(convergence_data)}")
         print(f"🛤️ Sample paths: {len(set(p['path_id'] for p in path_sample_data))}")
 
@@ -224,7 +241,7 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
         stats = MonteCarloStats(
             simulations=simulations,
             std_error=result["std_error"],
-            confidence_level=0.95
+            confidence_level=0.95,
         )
 
         return MonteCarloResponse(
@@ -250,6 +267,7 @@ async def calculate_monte_carlo_price(request: MonteCarloRequest):
 
     except ValueError as ve:
         print(f"🚫 Monte Carlo Validation Error: {ve}")
+        # trunk-ignore(ruff/B904)
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         print(f"💥 Monte Carlo API Error: {e}")
