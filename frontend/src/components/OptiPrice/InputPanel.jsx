@@ -337,8 +337,9 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                         Monte Carlo Dividend Support
                       </p>
                       <p className="text-xs text-blue-600 mt-1">
-                        Monte Carlo simulation supports continuous dividend yield only.
-                        For discrete dividends, use the Binomial model.
+                        Monte Carlo simulation supports continuous dividend
+                        yield only. For discrete dividends, use the Binomial
+                        model.
                       </p>
                     </div>
                   </div>
@@ -346,7 +347,8 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
               )}
 
               {/* Dividend Yield Input - Show for Black-Scholes always, or when yield is selected */}
-              {(model === "black-scholes" || 
+              {(model === "black-scholes" ||
+                model === "monte-carlo" ||
                 (form.dividend_mode || "yield") === "yield") && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
