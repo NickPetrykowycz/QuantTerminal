@@ -60,31 +60,23 @@ function OptiPrice() {
       N: 512,
       option_type: form.option_type,
       style: form.style || "american",
-      dividend_mode: form.dividend_mode
-        ? form.dividend_mode
-        : form.includeDividend
-          ? form.q
-            ? "yield"
-            : "discrete"
-          : "none",
+      dividend_mode: form.includeDividend
+        ? form.dividend_mode || "yield"
+        : "none",
+      q: form.includeDividend &&
+        (form.dividend_mode === "yield" || !form.dividend_mode)
+          ? Number(form.q) || 0
+          : 0,
       precision,
-      q:
-        form.includeDividend && form.dividend_mode === "yield"
-          ? Number(form.q)
-          : null,
-      dividend_freq:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_freq)
-          : null,
-      dividend_amt:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_amt)
-          : null,
-      dividend_first_day:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_first_day)
-          : null,
+      // REMOVE THE DUPLICATE q FIELD HERE
+      dividend_freq: form.includeDividend && form.dividend_mode === "discrete"
+        ? Number(form.dividend_freq) : null,
+      dividend_amt: form.includeDividend && form.dividend_mode === "discrete"
+        ? Number(form.dividend_amt) : null,
+      dividend_first_day: form.includeDividend && form.dividend_mode === "discrete"
+        ? Number(form.dividend_first_day) : null,
     };
+    
     const res = await fetch("http://localhost:8000/api/binomial", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -147,31 +139,18 @@ function OptiPrice() {
       sigma: Number(form.sigma),
       option_type: form.option_type,
       style: form.style || "american",
-      dividend_mode: form.dividend_mode
-        ? form.dividend_mode
-        : form.includeDividend
-          ? form.q
-            ? "yield"
-            : "discrete"
-          : "none",
       precision,
+      dividend_mode: form.includeDividend
+        ? form.dividend_mode || "yield"
+        : "none",
       q:
-        form.includeDividend && form.dividend_mode === "yield"
-          ? Number(form.q)
-          : null,
-      dividend_freq:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_freq)
-          : null,
-      dividend_amt:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_amt)
-          : null,
-      dividend_first_day:
-        form.includeDividend && form.dividend_mode === "discrete"
-          ? Number(form.dividend_first_day)
-          : null,
+        form.includeDividend &&
+        (form.dividend_mode === "yield" || !form.dividend_mode)
+          ? Number(form.q) || 0
+          : 0,
     };
+
+    console.log("Monte Carlo payload:", payload);
 
     try {
       const response = await fetch("http://localhost:8000/api/monte-carlo", {

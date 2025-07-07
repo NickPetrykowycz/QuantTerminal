@@ -1,398 +1,558 @@
-import math
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+import pandas as pd
 
 
-def price_monte_carlo(
-    S0: float,
-    K: float,
-    T: float,
-    r: float,
-    sigma: float,
-    simulations: int = 100000,
-    option_type: str = "call",
-    style: str = "american",
-    time_steps: int = 252,
-    random_seed: Optional[int] = None,
-    antithetic: bool = True,
-    q: float = 0.0,
-    **kwargs
-) -> Tuple[float, np.ndarray]:
+class MonteCarloSimulator:
     """
-    Main Monte Carlo pricing function.
-    Supports: American (default) and Asian options with dividend yield.
+    Vectorized Monte Carlo option pricing simulator with dividend yield support.
     """
 
-    if random_seed:
-        np.random.seed(random_seed)
+    def __init__(self, num_simulations: int = 10000):
+        """
+        Initialize the Monte Carlo simulator.
 
-    # Input validation
-    S0, K, T, r, sigma, q = (
-        float(S0),
-        float(K),
-        float(T),
-        float(r),
-        float(sigma),
-        float(q),
-    )
-    simulations = max(1000, min(int(simulations), 200000))
+        Args:
+            num_simulations: Number of Monte Carlo simulations to run
+        """
+        self.num_simulations = num_simulations
 
-    # Route to appropriate pricing method
-    if style.lower() == "asian":
-        return asian_option_vectorized(
-            S0, K, T, r, sigma, q, simulations, option_type, time_steps, antithetic
-        )
-    else:  # american (default)
-        return american_option_vectorized(
-            S0, K, T, r, sigma, q, simulations, option_type, antithetic
-        )
+    def simulate_geometric_brownian_motion(
+        self,
+        S0: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        num_steps: int = 252,
+    ) -> np.ndarray:
+        """
+        Simulate stock price paths using Geometric Brownian Motion.
 
+        Args:
+            S0: Initial stock price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            num_steps: Number of time steps
 
-def american_option_vectorized(
-    S0, K, T, r, sigma, q, simulations, option_type, antithetic
-):
-    """
-    Vectorized American option pricing.
-    For calls without dividends: American = European (no early exercise benefit)
-    For calls with dividends: Consider early exercise before ex-dividend
-    For puts: Add early exercise premium based on interest rate benefit
-    """
+        Returns:
+            Array of simulated stock prices at maturity
+        """
+        dt = T / num_steps
 
-    # Generate random numbers (vectorized)
-    if antithetic:
-        z = np.random.standard_normal(simulations // 2)
-        z = np.concatenate([z, -z])
-    else:
-        z = np.random.standard_normal(simulations)
+        # Pre-calculate constants for efficiency
+        drift = (r - q - 0.5 * sigma**2) * dt
+        diffusion = sigma * np.sqrt(dt)
 
-    # Terminal stock prices with dividend yield (vectorized)
-    # S_T = S_0 * exp((r-q-0.5*σ²)*T + σ*√T*Z)
-    drift = (r - q - 0.5 * sigma**2) * T
-    diffusion = sigma * math.sqrt(T) * z
-    ST = S0 * np.exp(drift + diffusion)
+        # Generate random shocks for all simulations and time steps
+        random_shocks = np.random.normal(0, 1, (self.num_simulations, num_steps))
 
-    # Calculate European-style payoffs (vectorized)
-    if option_type.lower() == "call":
-        european_payoffs = np.maximum(ST - K, 0)
-    else:
-        european_payoffs = np.maximum(K - ST, 0)
+        # Calculate price changes
+        price_changes = drift + diffusion * random_shocks
 
-    # Discount to present value (vectorized)
-    discounted_payoffs = european_payoffs * math.exp(-r * T)
-    european_price = np.mean(discounted_payoffs)
+        # Calculate cumulative log returns
+        log_returns = np.cumsum(price_changes, axis=1)
 
-    # Calculate American early exercise premium
-    if option_type.lower() == "call":
-        # Calls: early exercise benefit only with dividends
-        if q > 0:
-            # Higher dividend yield = more early exercise value
-            early_exercise_premium = european_price * min(q / r, 0.15) if r > 0 else 0
+        # Calculate final stock prices
+        ST = S0 * np.exp(log_returns[:, -1])
+
+        return ST
+
+    def simulate_american_option_paths(
+        self,
+        S0: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        num_steps: int = 252,
+    ) -> np.ndarray:
+        """
+        Simulate full stock price paths for American option pricing.
+
+        Args:
+            S0: Initial stock price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            num_steps: Number of time steps
+
+        Returns:
+            Array of shape (num_simulations, num_steps + 1) containing full price paths
+        """
+        dt = T / num_steps
+
+        # Pre-calculate constants
+        drift = (r - q - 0.5 * sigma**2) * dt
+        diffusion = sigma * np.sqrt(dt)
+
+        # Generate random shocks
+        random_shocks = np.random.normal(0, 1, (self.num_simulations, num_steps))
+
+        # Calculate price changes
+        price_changes = drift + diffusion * random_shocks
+
+        # Initialize paths array
+        paths = np.zeros((self.num_simulations, num_steps + 1))
+        paths[:, 0] = S0
+
+        # Calculate full paths
+        for i in range(num_steps):
+            paths[:, i + 1] = paths[:, i] * np.exp(price_changes[:, i])
+
+        return paths
+
+    def price_european_option(
+        self,
+        S0: float,
+        K: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        option_type: str = "call",
+    ) -> Dict[str, float]:
+        """
+        Price European option using Monte Carlo simulation.
+
+        Args:
+            S0: Initial stock price
+            K: Strike price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            option_type: 'call' or 'put'
+
+        Returns:
+            Dictionary containing option price and statistics
+        """
+        # Simulate final stock prices
+        ST = self.simulate_geometric_brownian_motion(S0, r, q, sigma, T)
+
+        # Calculate payoffs
+        if option_type.lower() == "call":
+            payoffs = np.maximum(ST - K, 0)
+        elif option_type.lower() == "put":
+            payoffs = np.maximum(K - ST, 0)
         else:
-            # No dividends = no early exercise benefit
-            early_exercise_premium = 0
-    else:  # put
-        # Puts: early exercise benefit from capturing interest on strike price
-        # More benefit when deep ITM and high interest rates
-        moneyness = S0 / K
-        interest_benefit = min(r * 0.2, 0.1)  # Up to 10% benefit
-        itm_factor = (
-            max(0, 1 - moneyness) if moneyness < 1 else 0
-        )  # More benefit when deep ITM
-        early_exercise_premium = european_price * interest_benefit * (1 + itm_factor)
+            raise ValueError("option_type must be 'call' or 'put'")
 
-    # American price = European price + early exercise premium
-    american_price = european_price + early_exercise_premium
+        # Discount payoffs to present value
+        option_price = np.exp(-r * T) * np.mean(payoffs)
 
-    # Scale payoffs proportionally (vectorized)
-    if european_price > 0:
-        scale_factor = american_price / european_price
-        american_payoffs = discounted_payoffs * scale_factor
-    else:
-        american_payoffs = discounted_payoffs
+        # Calculate statistics
+        std_error = np.std(payoffs) / np.sqrt(self.num_simulations)
+        confidence_interval = 1.96 * std_error * np.exp(-r * T)
 
-    return float(american_price), american_payoffs
+        return {
+            "price": option_price,
+            "std_error": std_error * np.exp(-r * T),
+            "confidence_interval": confidence_interval,
+            "lower_bound": option_price - confidence_interval,
+            "upper_bound": option_price + confidence_interval,
+            "payoff_mean": np.mean(payoffs),
+            "payoff_std": np.std(payoffs),
+        }
 
+    def price_asian_option(
+        self,
+        S0: float,
+        K: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        option_type: str = "call",
+        num_steps: int = 252,
+    ) -> Dict[str, float]:
+        """
+        Price Asian option using arithmetic average.
 
-def asian_option_vectorized(
-    S0, K, T, r, sigma, q, simulations, option_type, time_steps, antithetic
-):
-    """
-    Vectorized Asian option pricing using arithmetic average.
-    Generates all paths simultaneously for better performance.
-    """
+        Args:
+            S0: Initial stock price
+            K: Strike price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            option_type: 'call' or 'put'
+            num_steps: Number of time steps
 
-    # Limit parameters for memory efficiency
-    simulations = min(simulations, 50000)
-    time_steps = min(time_steps, 100)
+        Returns:
+            Dictionary containing option price and statistics
+        """
+        # Simulate stock price paths
+        paths = self.simulate_american_option_paths(S0, r, q, sigma, T, num_steps)
 
-    # Adjust for antithetic variates
-    if antithetic:
-        actual_sims = simulations // 2
-    else:
-        actual_sims = simulations
+        # Calculate arithmetic average for each path
+        average_prices = np.mean(paths, axis=1)
 
-    # Time parameters
-    dt = T / time_steps
-    sqrt_dt = math.sqrt(dt)
-    drift = (r - q - 0.5 * sigma**2) * dt
+        # Calculate payoffs based on average prices
+        if option_type.lower() == "call":
+            payoffs = np.maximum(average_prices - K, 0)
+        elif option_type.lower() == "put":
+            payoffs = np.maximum(K - average_prices, 0)
+        else:
+            raise ValueError("option_type must be 'call' or 'put'")
 
-    # Generate all random numbers at once (fully vectorized)
-    random_matrix = np.random.standard_normal((actual_sims, time_steps))
+        # Discount payoffs to present value
+        option_price = np.exp(-r * T) * np.mean(payoffs)
 
-    if antithetic:
-        # Add antithetic variates
-        random_matrix = np.vstack([random_matrix, -random_matrix])
-        total_sims = actual_sims * 2
-    else:
-        total_sims = actual_sims
+        # Calculate statistics
+        std_error = np.std(payoffs) / np.sqrt(self.num_simulations)
+        confidence_interval = 1.96 * std_error * np.exp(-r * T)
 
-    # Initialize price paths matrix (vectorized)
-    paths = np.zeros((total_sims, time_steps + 1))
-    paths[:, 0] = S0  # All paths start at S0
+        return {
+            "price": option_price,
+            "std_error": std_error * np.exp(-r * T),
+            "confidence_interval": confidence_interval,
+            "lower_bound": option_price - confidence_interval,
+            "upper_bound": option_price + confidence_interval,
+            "payoff_mean": np.mean(payoffs),
+            "payoff_std": np.std(payoffs),
+        }
 
-    # Generate all paths simultaneously (vectorized)
-    for t in range(1, time_steps + 1):
-        # Log returns for this time step (vectorized across all paths)
-        log_returns = drift + sigma * sqrt_dt * random_matrix[:, t - 1]
+    def price_american_option(
+        self,
+        S0: float,
+        K: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        option_type: str = "call",
+        num_steps: int = 252,
+    ) -> Dict[str, float]:
+        """
+        Price American option using Longstaff-Schwartz Monte Carlo method.
 
-        # Update all paths simultaneously (vectorized)
-        paths[:, t] = paths[:, t - 1] * np.exp(log_returns)
+        Args:
+            S0: Initial stock price
+            K: Strike price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            option_type: 'call' or 'put'
+            num_steps: Number of time steps
 
-    # Calculate arithmetic average for each path (vectorized)
-    average_prices = np.mean(paths, axis=1)
+        Returns:
+            Dictionary containing option price and statistics
+        """
+        # Simulate stock price paths
+        paths = self.simulate_american_option_paths(S0, r, q, sigma, T, num_steps)
 
-    # Calculate payoffs for all paths (vectorized)
-    if option_type.lower() == "call":
-        payoffs = np.maximum(average_prices - K, 0)
-    else:
-        payoffs = np.maximum(K - average_prices, 0)
+        dt = T / num_steps
+        discount_factor = np.exp(-r * dt)
 
-    # Discount all payoffs to present value (vectorized)
-    discounted_payoffs = payoffs * math.exp(-r * T)
+        # Calculate intrinsic values for all paths and times
+        if option_type.lower() == "call":
+            intrinsic_values = np.maximum(paths - K, 0)
+        elif option_type.lower() == "put":
+            intrinsic_values = np.maximum(K - paths, 0)
+        else:
+            raise ValueError("option_type must be 'call' or 'put'")
 
-    # Calculate option price
-    option_price = float(np.mean(discounted_payoffs))
+        # Initialize option values at maturity
+        option_values = intrinsic_values[:, -1].copy()
 
-    return option_price, discounted_payoffs
+        # Work backwards through time
+        for t in range(num_steps - 1, 0, -1):
+            # Find in-the-money paths
+            itm_mask = intrinsic_values[:, t] > 0
 
+            if np.any(itm_mask):
+                # Regression on in-the-money paths
+                X = paths[itm_mask, t]
+                Y = option_values[itm_mask] * discount_factor
 
-def monte_carlo_convergence_analysis(
-    S0,
-    K,
-    T,
-    r,
-    sigma,
-    max_simulations,
-    convergence_points=15,
-    option_type="call",
-    style="american",
-    random_seed=None,
-    q=0.0,
-    **kwargs
-):
-    """Convergence analysis with vectorized calculations."""
+                # Polynomial regression (quadratic)
+                if len(X) > 2:
+                    A = np.vstack([X**2, X, np.ones(len(X))]).T
+                    try:
+                        continuation_values = np.linalg.lstsq(A, Y, rcond=None)[0]
+                        cont_val = np.dot(A, continuation_values)
+                    except:
+                        cont_val = np.mean(Y)
+                else:
+                    cont_val = np.mean(Y) if len(Y) > 0 else 0
 
-    if random_seed:
-        np.random.seed(random_seed)
+                # Exercise decision
+                exercise_mask = intrinsic_values[itm_mask, t] > cont_val
 
-    max_simulations = min(max_simulations, 100000)
-    sim_counts = np.linspace(1000, max_simulations, convergence_points).astype(int)
+                # Update option values
+                option_values[itm_mask] = np.where(
+                    exercise_mask,
+                    intrinsic_values[itm_mask, t],
+                    option_values[itm_mask] * discount_factor,
+                )
 
-    results = []
-    for sims in sim_counts:
-        try:
-            price, payoffs = price_monte_carlo(
-                S0,
-                K,
-                T,
-                r,
-                sigma,
-                sims,
-                option_type,
-                style,
-                random_seed=random_seed,
-                q=q,
-            )
+                # Update non-ITM paths
+                non_itm_mask = ~itm_mask
+                option_values[non_itm_mask] *= discount_factor
+            else:
+                # No ITM paths, just discount
+                option_values *= discount_factor
 
-            # Vectorized statistics calculation
-            std_error = float(np.std(payoffs) / math.sqrt(len(payoffs)))
-            margin = 1.96 * std_error
+        # Final discounting to present value
+        option_values *= discount_factor
 
-            results.append(
-                {
-                    "simulations": int(sims),
-                    "price": float(price),
-                    "std_error": std_error,
-                    "lower_ci": float(price - margin),
-                    "upper_ci": float(price + margin),
-                }
-            )
-        except:
-            continue
+        # Calculate statistics
+        option_price = np.mean(option_values)
+        std_error = np.std(option_values) / np.sqrt(self.num_simulations)
+        confidence_interval = 1.96 * std_error
 
-    return (
-        results
-        if results
-        else [
-            {
-                "simulations": 10000,
-                "price": 1.0,
-                "std_error": 0.1,
-                "lower_ci": 0.9,
-                "upper_ci": 1.1,
+        return {
+            "price": option_price,
+            "std_error": std_error,
+            "confidence_interval": confidence_interval,
+            "lower_bound": option_price - confidence_interval,
+            "upper_bound": option_price + confidence_interval,
+            "payoff_mean": np.mean(option_values),
+            "payoff_std": np.std(option_values),
+        }
+
+    def calculate_greeks(
+        self,
+        S0: float,
+        K: float,
+        r: float,
+        q: float,
+        sigma: float,
+        T: float,
+        option_type: str = "call",
+        style: str = "european",
+    ) -> Dict[str, float]:
+        """
+        Calculate option Greeks using finite difference method.
+
+        Args:
+            S0: Initial stock price
+            K: Strike price
+            r: Risk-free rate
+            q: Dividend yield (0 if not paying dividends)
+            sigma: Volatility
+            T: Time to maturity
+            option_type: 'call' or 'put'
+            style: 'european' or 'american'
+
+        Returns:
+            Dictionary containing Greeks
+        """
+        # Small perturbations for finite differences
+        dS = S0 * 0.01
+        dr = 0.0001
+        dsigma = 0.01
+        dT = T * 0.01
+
+        # Base price
+        if style.lower() == "european":
+            base_price = self.price_european_option(S0, K, r, q, sigma, T, option_type)[
+                "price"
+            ]
+        else:
+            base_price = self.price_american_option(S0, K, r, q, sigma, T, option_type)[
+                "price"
+            ]
+
+        # Delta: sensitivity to stock price
+        if style.lower() == "european":
+            price_up = self.price_european_option(
+                S0 + dS, K, r, q, sigma, T, option_type
+            )["price"]
+            price_down = self.price_european_option(
+                S0 - dS, K, r, q, sigma, T, option_type
+            )["price"]
+        else:
+            price_up = self.price_american_option(
+                S0 + dS, K, r, q, sigma, T, option_type
+            )["price"]
+            price_down = self.price_american_option(
+                S0 - dS, K, r, q, sigma, T, option_type
+            )["price"]
+
+        delta = (price_up - price_down) / (2 * dS)
+
+        # Gamma: second derivative w.r.t. stock price
+        gamma = (price_up - 2 * base_price + price_down) / (dS**2)
+
+        # Theta: sensitivity to time
+        if T > dT:
+            if style.lower() == "european":
+                price_theta = self.price_european_option(
+                    S0, K, r, q, sigma, T - dT, option_type
+                )["price"]
+            else:
+                price_theta = self.price_american_option(
+                    S0, K, r, q, sigma, T - dT, option_type
+                )["price"]
+            theta = (price_theta - base_price) / dT
+        else:
+            theta = 0
+
+        # Vega: sensitivity to volatility
+        if style.lower() == "european":
+            price_vega = self.price_european_option(
+                S0, K, r, q, sigma + dsigma, T, option_type
+            )["price"]
+        else:
+            price_vega = self.price_american_option(
+                S0, K, r, q, sigma + dsigma, T, option_type
+            )["price"]
+        vega = (price_vega - base_price) / dsigma
+
+        # Rho: sensitivity to interest rate
+        if style.lower() == "european":
+            price_rho = self.price_european_option(
+                S0, K, r + dr, q, sigma, T, option_type
+            )["price"]
+        else:
+            price_rho = self.price_american_option(
+                S0, K, r + dr, q, sigma, T, option_type
+            )["price"]
+        rho = (price_rho - base_price) / dr
+
+        return {
+            "delta": delta,
+            "gamma": gamma,
+            "theta": theta,
+            "vega": vega,
+            "rho": rho,
+        }
+
+    def run_sensitivity_analysis(
+        self,
+        base_params: Dict[str, float],
+        sensitivity_ranges: Dict[str, Tuple[float, float]],
+        option_type: str = "call",
+        style: str = "european",
+    ) -> pd.DataFrame:
+        """
+        Run sensitivity analysis across parameter ranges.
+
+        Args:
+            base_params: Dictionary with keys 'S0', 'K', 'r', 'q', 'sigma', 'T'
+            sensitivity_ranges: Dictionary with parameter ranges to test
+            option_type: 'call' or 'put'
+            style: 'european' or 'american'
+
+        Returns:
+            DataFrame with sensitivity analysis results
+        """
+        results = []
+
+        for param, (min_val, max_val) in sensitivity_ranges.items():
+            param_values = np.linspace(min_val, max_val, 20)
+
+            for param_val in param_values:
+                # Create parameter set
+                params = base_params.copy()
+                params[param] = param_val
+
+                # Ensure dividend yield is included
+                if "q" not in params:
+                    params["q"] = 0.0
+
+                # Price option
+                if style.lower() == "european":
+                    result = self.price_european_option(
+                        params["S0"],
+                        params["K"],
+                        params["r"],
+                        params["q"],
+                        params["sigma"],
+                        params["T"],
+                        option_type,
+                    )
+                else:
+                    result = self.price_american_option(
+                        params["S0"],
+                        params["K"],
+                        params["r"],
+                        params["q"],
+                        params["sigma"],
+                        params["T"],
+                        option_type,
+                    )
+
+                results.append(
+                    {
+                        "parameter": param,
+                        "value": param_val,
+                        "option_price": result["price"],
+                        "std_error": result["std_error"],
+                        "lower_bound": result["lower_bound"],
+                        "upper_bound": result["upper_bound"],
+                    }
+                )
+
+        return pd.DataFrame(results)
+
+    def batch_price_options(self, option_specs: List[Dict[str, any]]) -> pd.DataFrame:
+        """
+        Price multiple options in batch.
+
+        Args:
+            option_specs: List of dictionaries, each containing option parameters
+
+        Returns:
+            DataFrame with pricing results for all options
+        """
+        results = []
+
+        for i, spec in enumerate(option_specs):
+            # Ensure dividend yield is included
+            if "q" not in spec:
+                spec["q"] = 0.0
+
+            # Extract parameters
+            S0 = spec["S0"]
+            K = spec["K"]
+            r = spec["r"]
+            q = spec["q"]
+            sigma = spec["sigma"]
+            T = spec["T"]
+            option_type = spec.get("option_type", "call")
+            style = spec.get("style", "european")
+
+            # Price option
+            if style.lower() == "european":
+                result = self.price_european_option(S0, K, r, q, sigma, T, option_type)
+            else:
+                result = self.price_american_option(S0, K, r, q, sigma, T, option_type)
+
+            # Calculate Greeks if requested
+            greeks = {}
+            if spec.get("calculate_greeks", False):
+                greeks = self.calculate_greeks(
+                    S0, K, r, q, sigma, T, option_type, style
+                )
+
+            # Compile results
+            result_dict = {
+                "option_id": i,
+                "S0": S0,
+                "K": K,
+                "r": r,
+                "q": q,
+                "sigma": sigma,
+                "T": T,
+                "option_type": option_type,
+                "style": style,
+                "price": result["price"],
+                "std_error": result["std_error"],
+                "lower_bound": result["lower_bound"],
+                "upper_bound": result["upper_bound"],
             }
-        ]
-    )
 
+            # Add Greeks if calculated
+            result_dict.update(greeks)
 
-def generate_sample_paths(
-    S0, T, r, sigma, num_paths=10, time_steps=50, random_seed=None, q=0.0, **kwargs
-):
-    """Generate sample paths using vectorized calculations."""
+            results.append(result_dict)
 
-    if random_seed:
-        np.random.seed(random_seed + 1000)
-
-    num_paths = min(num_paths, 20)
-    time_steps = min(time_steps, 100)
-
-    # Time parameters
-    dt = T / time_steps
-    sqrt_dt = math.sqrt(dt)
-    drift = (r - q - 0.5 * sigma**2) * dt
-
-    # Generate all random numbers at once (vectorized)
-    random_matrix = np.random.standard_normal((num_paths, time_steps))
-
-    # Initialize paths matrix (vectorized)
-    paths = np.zeros((num_paths, time_steps + 1))
-    paths[:, 0] = S0
-
-    # Generate all paths simultaneously (vectorized)
-    for t in range(1, time_steps + 1):
-        log_returns = drift + sigma * sqrt_dt * random_matrix[:, t - 1]
-        paths[:, t] = paths[:, t - 1] * np.exp(log_returns)
-
-    # Convert to chart format (vectorized)
-    time_grid = np.linspace(0, T, time_steps + 1)
-    path_data = []
-
-    for path_id in range(num_paths):
-        for t_idx, (time, price) in enumerate(zip(time_grid, paths[path_id, :])):
-            path_data.append(
-                {"time": float(time), "price": float(price), "path_id": int(path_id)}
-            )
-
-    return path_data
-
-
-def get_simulation_count(precision):
-    """Get simulation count by precision level."""
-    return {"fast": 10000, "standard": 50000, "high": 100000}.get(
-        precision.lower(), 50000
-    )
-
-
-def calculate_monte_carlo_full(
-    S0,
-    K,
-    T,
-    r,
-    sigma,
-    option_type="call",
-    style="american",
-    precision="standard",
-    random_seed=None,
-    dividend_mode="none",
-    **kwargs
-):
-    """
-    Complete Monte Carlo calculation with vectorized performance.
-
-    Supports:
-    - American options (default): Calls and puts with early exercise premiums
-    - Asian options: Arithmetic average with full path simulation
-    - Dividend yield: Continuous yield (q) built into drift
-    """
-
-    try:
-        simulations = get_simulation_count(precision)
-
-        # Handle dividend yield
-        q = 0.0
-        if dividend_mode == "yield":
-            q = float(kwargs.get("q", 0.0))
-
-        # Main calculation (vectorized)
-        price, payoffs = price_monte_carlo(
-            S0,
-            K,
-            T,
-            r,
-            sigma,
-            simulations,
-            option_type,
-            style,
-            random_seed=random_seed,
-            q=q,
-        )
-
-        # Convergence analysis (vectorized)
-        convergence = monte_carlo_convergence_analysis(
-            S0, K, T, r, sigma, simulations, 15, option_type, style, random_seed, q
-        )
-
-        # Sample paths (vectorized)
-        paths = generate_sample_paths(S0, T, r, sigma, 10, 50, random_seed, q)
-
-        # Statistics (vectorized)
-        std_error = float(np.std(payoffs) / math.sqrt(len(payoffs)))
-        margin = 1.96 * std_error
-
-        return {
-            "price": float(price),
-            "convergence": convergence,
-            "path_sample": paths,
-            "confidence_interval": {
-                "lower": float(price - margin),
-                "upper": float(price + margin),
-                "confidence_level": 0.95,
-            },
-            "stats": {
-                "simulations": int(simulations),
-                "std_error": std_error,
-                "confidence_level": 0.95,
-            },
-        }
-
-    except Exception:
-        # Simple fallback
-        fallback_price = max(0.01, abs(S0 - K) * 0.1)
-
-        return {
-            "price": fallback_price,
-            "convergence": [
-                {
-                    "simulations": 10000,
-                    "price": fallback_price,
-                    "std_error": 0.01,
-                    "lower_ci": fallback_price - 0.01,
-                    "upper_ci": fallback_price + 0.01,
-                }
-            ],
-            "path_sample": [
-                {"time": 0.0, "price": S0, "path_id": 0},
-                {"time": T, "price": S0 * 1.1, "path_id": 0},
-            ],
-            "confidence_interval": {
-                "lower": fallback_price - 0.01,
-                "upper": fallback_price + 0.01,
-                "confidence_level": 0.95,
-            },
-            "stats": {
-                "simulations": 10000,
-                "std_error": 0.01,
-                "confidence_level": 0.95,
-            },
-        }
+        return pd.DataFrame(results)
