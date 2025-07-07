@@ -87,6 +87,10 @@ function MonteCarloChart({ data = [], isCall = true }) {
             <YAxis 
               stroke="#6b7280"
               fontSize={12}
+              domain={[
+                (dataMin) => Math.floor(dataMin * 0.85 * 100) / 100,  // ← Floor to 2 decimals
+                (dataMax) => Math.ceil(dataMax * 1.15 * 100) / 100    // ← Ceil to 2 decimals
+              ]}
               tickFormatter={(value) => `$${value.toFixed(2)}`}
               label={{
                 value: "Option Price ($)",

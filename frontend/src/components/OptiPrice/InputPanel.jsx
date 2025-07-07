@@ -265,7 +265,7 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
           </div>
         </div>
 
-        {/* Dividend Section - UPDATED */}
+        {/* Dividend Section - FIXED */}
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center space-x-3 mb-4">
             <input
@@ -345,23 +345,26 @@ function InputPanel({ model, setModel, form, setForm, setResult }) {
                 </div>
               )}
 
-              {/* Dividend Yield Input - Always shown when dividends enabled */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Dividend Yield (%)
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  name="q_percent"
-                  value={form.q_percent || ""}
-                  onChange={handlePercentageChange}
-                  placeholder="2.0"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
-                />
-              </div>
+              {/* Dividend Yield Input - Show for Black-Scholes always, or when yield is selected */}
+              {(model === "black-scholes" || 
+                (form.dividend_mode || "yield") === "yield") && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dividend Yield (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    name="q_percent"
+                    value={form.q_percent || ""}
+                    onChange={handlePercentageChange}
+                    placeholder="2.0"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  />
+                </div>
+              )}
 
-              {/* Discrete Dividend Inputs - Only for Binomial */}
+              {/* Discrete Dividend Inputs - Only for Binomial when discrete is selected */}
               {model === "binomial" && form.dividend_mode === "discrete" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
