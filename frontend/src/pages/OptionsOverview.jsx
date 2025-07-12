@@ -893,50 +893,56 @@ const OptionsOverview = () => {
             </div>
           </div>
 
-          {/* Tab Navigation */}
-          <div className="mb-8">
-            <div className="flex space-x-1 mb-0">
-              {tabs.map((tab, index) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`!px-6 !py-3 text-sm !font-bold !transition-all duration-200 border-2 focus:outline-none focus:ring-0 focus:border-gray-300 active:outline-none ${
-                    activeTab === tab.id
-                      ? `!bg-white !text-gray-700 !border-gray-300 !border-b-white !relative !z-30 !rounded-t-lg !rounded-b-none !border-t-2 !border-r-2 !border-l-2`
-                      : `!bg-gray-100 !text-gray-600 !border-gray-300 !border-b-gray-300 !hover:bg-gray-200 !hover:text-blue-700 !rounded-t-lg !rounded-b-none !border-b-0 !border-t-2 !border-r-2 !border-l-2`
-                  }`}
-                  style={{ outline: "none", boxShadow: "none" }}
-                >
-                  <span className="mr-2 text-lg">{tab.icon}</span>
-                  <span className="font-semibold">{tab.label}</span>
-                </button>
-              ))}
-            </div>
+{/* Tab Navigation */}
+<div className="mb-8">
+  {/* Desktop Tabs */}
+  <div className="hidden md:flex bg-white rounded-lg border border-gray-200 p-2 mb-4 gap-1">
+    {tabs.map((tab) => (
+      <button
+        key={tab.id}
+        onClick={() => setActiveTab(tab.id)}
+        className={`flex-1 flex items-center justify-center !px-3 !py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+          activeTab === tab.id
+            ? '!bg-blue-600 !text-white !shadow-sm'
+            : '!bg-gray-100 !border-gray-200 !text-gray-600 !hover:text-blue-600 !hover:bg-gray-50'
+        }`}
+      >
+        <span className="mr-2 text-lg">{tab.icon}</span>
+        <span>{tab.label}</span>
+      </button>
+    ))}
+  </div>
 
-            {/* Tab Content Container */}
-            <div className="relative">
-              {/* Gray background - matches content area only */}
-              <div
-                className="absolute inset-0 bg-gray-100 border-2 border-gray-300 shadow-lg border-t-0 rounded-tr-2xl rounded-b-2xl"
-                style={{ zIndex: 5 }}
-              ></div>
+  {/* Mobile Dropdown */}
+  <div className="md:hidden mb-6">
+    <div className="relative">
+      <select
+        value={activeTab}
+        onChange={(e) => setActiveTab(e.target.value)}
+        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+      >
+        {tabs.map((tab) => (
+          <option key={tab.id} value={tab.id}>
+            {tab.icon} {tab.label}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  </div>
 
-              {/* White content on top */}
-              <div
-                className={`bg-white border-2 border-gray-300 p-8 relative z-20 ${
-                  activeTab === "basics"
-                    ? "rounded-tr-2xl rounded-b-2xl"
-                    : "rounded-2xl"
-                }`}
-                style={{ marginTop: "-2px" }}
-              >
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  {tabContent[activeTab].title}
-                </h2>
-                {tabContent[activeTab].content}
-              </div>
-            </div>
-          </div>
+  {/* Tab Content */}
+  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+    <h2 className="text-3xl font-bold text-gray-900 mb-6">
+      {tabContent[activeTab].title}
+    </h2>
+    {tabContent[activeTab].content}
+  </div>
+</div>
 
           {/* Navigation */}
           <div className="flex justify-between items-center">

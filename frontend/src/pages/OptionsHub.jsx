@@ -81,7 +81,7 @@ const OptionsHub = () => {
       gradient: "from-purple-500 to-indigo-500",
       route: "/learning/options/black-scholes",
       difficulty: "Intermediate",
-      duration: "30 min",
+      duration: "45 min",
       completed: false
     },
     {
@@ -96,7 +96,7 @@ const OptionsHub = () => {
       gradient: "from-green-500 to-emerald-500",
       route: "/learning/options/binomial",
       difficulty: "Intermediate",
-      duration: "35 min",
+      duration: "45 min",
       completed: false
     },
     {
