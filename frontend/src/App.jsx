@@ -10,6 +10,7 @@ import OptionsOverview from './pages/OptionsOverview';
 import AmericanOptions from './pages/AmericanOptions';
 import EuropeanOptions from './pages/EuropeanOptions';
 import AsianOptions from './pages/AsianOptions';
+import BlackScholes from './pages/BlackScholes';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/learning/options/american" element={<AmericanOptions />} />
           <Route path="/learning/options/european" element={<EuropeanOptions />} />
           <Route path="/learning/options/asian" element={<AsianOptions />} />
+          <Route path="/learning/options/black-scholes" element={<BlackScholes />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
