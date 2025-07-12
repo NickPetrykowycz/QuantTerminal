@@ -7,6 +7,7 @@ import OptiPrice from './pages/OptiPrice';
 import LearningCenter from './pages/LearningCenter';
 import OptionsHub from './pages/OptionsHub';
 import OptionsOverview from './pages/OptionsOverview';
+import AmericanOptions from './pages/AmericanOptions';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/learning" element={<LearningCenter />} />
           <Route path="/learning/options" element={<OptionsHub />} />
           <Route path="/learning/options/overview" element={<OptionsOverview />} />
+          <Route path="/learning/options/american" element={<AmericanOptions />} />
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
