@@ -66,7 +66,7 @@ const OptionsHub = () => {
       gradient: "from-amber-500 to-orange-500",
       route: "/learning/options/asian",
       difficulty: "Advanced",
-      duration: "25 min",
+      duration: "35 min",
       completed: false
     },
     {
@@ -120,7 +120,7 @@ const OptionsHub = () => {
     switch (difficulty) {
       case 'Beginner': return 'text-green-600 bg-green-100';
       case 'Intermediate': return 'text-blue-600 bg-blue-100';
-      case 'Advanced': return 'text-purple-600 bg-purple-100';
+      case 'Advanced': return 'text-red-600 bg-red-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
