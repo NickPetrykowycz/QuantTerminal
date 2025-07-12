@@ -633,8 +633,8 @@ const OptionsOverview = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`!px-6 !py-3 text-sm !font-bold !transition-all duration-200 border-2 focus:outline-none focus:ring-0 focus:border-gray-300 active:outline-none ${
                     activeTab === tab.id
-                      ? `!bg-white !text-gray-700 !border-gray-300 !border-b-white !relative !z-30 !rounded-t-lg !rounded-b-none`
-                      : `!bg-gray-100 !text-gray-600 !border-gray-300 !border-b-gray-300 !hover:bg-gray-200 !hover:text-blue-700 !rounded-t-lg !rounded-b-none !border-b-0`
+                      ? `!bg-white !text-gray-700 !border-gray-300 !border-b-white !relative !z-30 !rounded-t-lg !rounded-b-none !border-t-2 !border-r-2 !border-l-2`
+                      : `!bg-gray-100 !text-gray-600 !border-gray-300 !border-b-gray-300 !hover:bg-gray-200 !hover:text-blue-700 !rounded-t-lg !rounded-b-none !border-b-0 !border-t-2 !border-r-2 !border-l-2`
                   }`}
                   style={{ outline: 'none', boxShadow: 'none' }}
                 >

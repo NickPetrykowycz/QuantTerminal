@@ -36,7 +36,7 @@ const OptionsHub = () => {
       gradient: "from-red-500 to-rose-500",
       route: "/learning/options/american",
       difficulty: "Intermediate",
-      duration: "20 min",
+      duration: "35 min",
       completed: false
     },
     {
