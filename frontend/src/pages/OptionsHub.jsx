@@ -25,6 +25,21 @@ const OptionsHub = () => {
       completed: false
     },
     {
+      title: "European Options",
+      description: "Exercise restrictions, analytical solutions, and theoretical foundations",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+        </svg>
+      ),
+      gradient: "from-blue-600 to-indigo-600",
+      route: "/learning/options/european",
+      difficulty: "Intermediate",
+      duration: "25 min",
+      completed: false
+    },
+    {
       title: "American Options",
       description: "Early exercise features, optimal exercise strategies, and pricing considerations",
       icon: (
@@ -37,21 +52,6 @@ const OptionsHub = () => {
       route: "/learning/options/american",
       difficulty: "Intermediate",
       duration: "35 min",
-      completed: false
-    },
-    {
-      title: "European Options",
-      description: "Exercise restrictions, analytical solutions, and theoretical foundations",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
-        </svg>
-      ),
-      gradient: "from-blue-600 to-indigo-600",
-      route: "/learning/options/european", 
-      difficulty: "Intermediate",
-      duration: "18 min",
       completed: false
     },
     {
