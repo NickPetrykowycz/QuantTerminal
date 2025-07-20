@@ -883,12 +883,12 @@ const OptionsOverview = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4 mb-8">
             <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
               <span>Lesson Progress</span>
-              <span>1 of 7 lessons</span>
+              <span>1 of 8 lessons</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full"
-                style={{ width: "14%" }}
+                style={{ width: "12.5%" }}
               ></div>
             </div>
           </div>
