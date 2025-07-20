@@ -4,14 +4,8 @@ import Navigation from "../components/Navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { InlineMath, BlockMath } from "react-katex";
 import "katex/dist/katex.min.css";
-import {
-  BinomialTreeFlow,
-  CompleteTreeVisualization,
-} from "../components/OptiPrice/Binomial/BinomialTreeComponents";
 
-import { CodeBlock } from "../components/OptiPrice/Binomial/CodeBlock";
-
-const BinomialOptions = () => {
+const MonteCarloOptions = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
@@ -23,12 +17,12 @@ const BinomialOptions = () => {
         <div className="space-y-8">
           <div>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              <strong>The Binomial Model</strong> provides an intuitive,
-              step-by-step approach to option pricing by modeling stock price
-              movements as a series of discrete up and down moves. Developed by
-              Cox, Ross, and Rubinstein in 1979, it bridges the gap between
-              simple intuition and complex mathematical models, making option
-              pricing accessible while maintaining theoretical rigor.
+              <strong>The Monte Carlo method</strong> revolutionized option
+              pricing by using simulation to model thousands of possible stock
+              price paths. Originally developed by mathematicians working on
+              nuclear weapons in the 1940s, it was adapted for financial
+              derivatives in the 1970s and now provides the most flexible
+              framework for pricing complex options and exotic derivatives.
             </p>
 
             <div className="bg-emerald-100 border-2 border-emerald-300 text-emerald-900 p-6 rounded-xl mb-6">
@@ -45,14 +39,13 @@ const BinomialOptions = () => {
                   />
                 </svg>
                 <div>
-                  <h4 className="font-bold mb-2">The Tree Building Insight</h4>
+                  <h4 className="font-bold mb-2">The Simulation Insight</h4>
                   <p>
-                    Binomial models work by breaking time into small periods
-                    where stock prices can only move up or down by specific
-                    amounts. By building a "tree" of all possible price paths
-                    and working backwards from expiration, we can determine
-                    today's fair option value through simple risk-neutral
-                    probability calculations.
+                    Monte Carlo works by generating thousands of random stock
+                    price paths, calculating the option payoff for each path,
+                    then averaging all payoffs and discounting back to present
+                    value. This "brute force" approach can handle any payoff
+                    structure or market complexity that can be programmed.
                   </p>
                 </div>
               </div>
@@ -63,9 +56,9 @@ const BinomialOptions = () => {
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6 rounded-xl">
             <h4 className="font-bold text-blue-800 text-xl mb-6 flex items-center">
               <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white text-sm">🌳</span>
+                <span className="text-white text-sm">🎲</span>
               </div>
-              What the Binomial Model Does
+              What the Monte Carlo Method Does
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -75,12 +68,12 @@ const BinomialOptions = () => {
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                     <div>
                       <div className="font-semibold text-blue-700">
-                        Discrete Price Modeling
+                        Random Path Generation
                       </div>
                       <p className="text-blue-600 text-sm">
-                        Models stock price as a series of discrete up/down
-                        movements over time periods, creating a branching tree
-                        of possible paths
+                        Simulates thousands of possible stock price paths using
+                        random number generation and stochastic differential
+                        equations
                       </p>
                     </div>
                   </div>
@@ -91,12 +84,12 @@ const BinomialOptions = () => {
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                     <div>
                       <div className="font-semibold text-blue-700">
-                        Backward Induction Pricing
+                        Complex Payoff Handling
                       </div>
                       <p className="text-blue-600 text-sm">
-                        Starts at expiration with known payoffs and works
-                        backward through the tree using risk-neutral
-                        probabilities
+                        Calculates option values for any payoff structure, from
+                        simple calls to exotic path-dependent derivatives like
+                        Asian or barrier options
                       </p>
                     </div>
                   </div>
@@ -109,11 +102,11 @@ const BinomialOptions = () => {
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                     <div>
                       <div className="font-semibold text-blue-700">
-                        American Option Handling
+                        Statistical Convergence
                       </div>
                       <p className="text-blue-600 text-sm">
-                        Naturally handles early exercise decisions by comparing
-                        intrinsic value to continuation value at each node
+                        Achieves accuracy through the law of large numbers—more
+                        simulations yield more precise option values
                       </p>
                     </div>
                   </div>
@@ -124,11 +117,12 @@ const BinomialOptions = () => {
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                     <div>
                       <div className="font-semibold text-blue-700">
-                        Dividend Flexibility
+                        Market Reality Modeling
                       </div>
                       <p className="text-blue-600 text-sm">
-                        Easily incorporates discrete dividends and complex
-                        payout schedules by adjusting tree structure
+                        Incorporates realistic market features like jumps,
+                        stochastic volatility, and time-varying parameters
+                        easily
                       </p>
                     </div>
                   </div>
@@ -137,37 +131,37 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Approach: Discrete vs Continuous */}
+          {/* Approach: Simulation vs Analytical */}
           <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 p-6 rounded-xl">
             <h4 className="font-bold text-purple-800 text-xl mb-6 text-center">
-              Modeling Approach: Discrete-Time Framework
+              Modeling Approach: Simulation-Based Framework
             </h4>
 
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-5 rounded-lg border border-purple-200">
                 <div className="text-center mb-4">
                   <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="text-white">🌳</span>
+                    <span className="text-white">🎯</span>
                   </div>
-                  <h5 className="font-bold text-purple-700">Discrete Steps</h5>
+                  <h5 className="font-bold text-purple-700">Random Sampling</h5>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                     <span className="text-purple-600">
-                      Time divided into finite periods
+                      Generate random numbers from distributions
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                     <span className="text-purple-600">
-                      Only two possible moves per period
+                      Create thousands of price scenarios
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                     <span className="text-purple-600">
-                      Tree structure builds all paths
+                      Each path is equally probable
                     </span>
                   </div>
                 </div>
@@ -184,19 +178,19 @@ const BinomialOptions = () => {
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
                     <span className="text-amber-600">
-                      Black-Scholes: Continuous time
+                      Black-Scholes: Closed-form solution
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
                     <span className="text-amber-600">
-                      Monte Carlo: Random paths
+                      Binomial: Discrete tree structure
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
                     <span className="text-amber-600">
-                      Binomial: Discrete approximation
+                      Monte Carlo: Statistical approximation
                     </span>
                   </div>
                 </div>
@@ -213,19 +207,19 @@ const BinomialOptions = () => {
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     <span className="text-green-600">
-                      Intuitive visualization
+                      Unlimited flexibility
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     <span className="text-green-600">
-                      American exercise natural
+                      Handles any complexity
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                     <span className="text-green-600">
-                      Converges to Black-Scholes
+                      Scales to exotic derivatives
                     </span>
                   </div>
                 </div>
@@ -234,36 +228,46 @@ const BinomialOptions = () => {
 
             <div className="mt-6 bg-white p-5 rounded-lg border border-purple-200">
               <h5 className="font-bold text-purple-700 mb-3 text-center">
-                The Core Tree Logic
+                The Core Simulation Logic
               </h5>
-              <div className="grid md:grid-cols-3 gap-4 mb-4">
+              <div className="grid md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-purple-50 p-4 rounded-lg text-center">
+                  <div className="text-2xl mb-2">🎲</div>
+                  <div className="font-semibold text-purple-700">
+                    Generate Random Numbers
+                  </div>
+                  <div className="text-purple-600 text-sm">
+                    Sample from normal distribution
+                  </div>
+                </div>
+
                 <div className="bg-purple-50 p-4 rounded-lg text-center">
                   <div className="text-2xl mb-2">📈</div>
                   <div className="font-semibold text-purple-700">
-                    Up Move (u)
+                    Simulate Price Path
                   </div>
                   <div className="text-purple-600 text-sm">
-                    Stock multiplied by up factor
+                    Use stochastic process model
                   </div>
                 </div>
 
                 <div className="bg-purple-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl mb-2">⚖️</div>
+                  <div className="text-2xl mb-2">💰</div>
                   <div className="font-semibold text-purple-700">
-                    Risk-Neutral Probability
+                    Calculate Payoff
                   </div>
                   <div className="text-purple-600 text-sm">
-                    Probability that ensures no arbitrage
+                    Apply option payoff function
                   </div>
                 </div>
 
                 <div className="bg-purple-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl mb-2">📉</div>
+                  <div className="text-2xl mb-2">📊</div>
                   <div className="font-semibold text-purple-700">
-                    Down Move (d)
+                    Average Results
                   </div>
                   <div className="text-purple-600 text-sm">
-                    Stock multiplied by down factor
+                    Discount back to present value
                   </div>
                 </div>
               </div>
@@ -276,11 +280,11 @@ const BinomialOptions = () => {
                       Why This Works:
                     </div>
                     <p className="text-amber-600 text-sm">
-                      The binomial model approximates continuous price movements
-                      by making the time steps smaller and smaller. As the
-                      number of steps approaches infinity, the binomial tree
-                      converges exactly to the Black-Scholes formula, providing
-                      both intuitive understanding and mathematical rigor.
+                      The law of large numbers guarantees that as the number of
+                      simulations increases, the average of the simulated
+                      payoffs converges to the true expected value. This makes
+                      Monte Carlo both mathematically rigorous and practically
+                      flexible for any derivative structure you can program.
                     </p>
                   </div>
                 </div>
@@ -299,85 +303,111 @@ const BinomialOptions = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <h5 className="font-bold text-gray-700 mb-3">
-                      The Pre-1979 Challenge
+                      The Origins (1940s)
                     </h5>
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex items-start space-x-2">
-                        <span className="text-red-500 mt-1">❌</span>
-                        <span>Black-Scholes limited to European options</span>
+                        <span className="text-blue-500 mt-1">⚛️</span>
+                        <span>
+                          Developed for nuclear weapon design at Los Alamos
+                        </span>
                       </div>
                       <div className="flex items-start space-x-2">
-                        <span className="text-red-500 mt-1">❌</span>
-                        <span>No clear way to handle early exercise</span>
+                        <span className="text-blue-500 mt-1">🎰</span>
+                        <span>
+                          Named after Monte Carlo casino (random sampling)
+                        </span>
                       </div>
                       <div className="flex items-start space-x-2">
-                        <span className="text-red-500 mt-1">❌</span>
-                        <span>Dividend timing complications</span>
+                        <span className="text-blue-500 mt-1">🖥️</span>
+                        <span>
+                          Required early computers for complex calculations
+                        </span>
                       </div>
                       <div className="flex items-start space-x-2">
-                        <span className="text-red-500 mt-1">❌</span>
-                        <span>Difficult to explain to non-mathematicians</span>
+                        <span className="text-blue-500 mt-1">📊</span>
+                        <span>
+                          Solved problems too complex for analytical methods
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <h5 className="font-bold text-gray-700 mb-3">
-                      The 1979 Solution
+                      Financial Adaptation (1970s-1980s)
                     </h5>
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex items-start space-x-2">
                         <span className="text-green-500 mt-1">✅</span>
-                        <span>Intuitive discrete-time framework</span>
+                        <span>
+                          Applied to option pricing for complex derivatives
+                        </span>
                       </div>
                       <div className="flex items-start space-x-2">
                         <span className="text-green-500 mt-1">✅</span>
-                        <span>Natural American option pricing</span>
+                        <span>Enabled pricing of path-dependent options</span>
                       </div>
                       <div className="flex items-start space-x-2">
                         <span className="text-green-500 mt-1">✅</span>
-                        <span>Easy dividend incorporation</span>
+                        <span>
+                          Handled multi-dimensional problems naturally
+                        </span>
                       </div>
                       <div className="flex items-start space-x-2">
                         <span className="text-green-500 mt-1">✅</span>
-                        <span>Visual tree representation</span>
+                        <span>
+                          Became standard for exotic derivatives trading
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-4 rounded-lg border border-blue-200">
                   <div className="font-semibold text-blue-700 mb-2">
-                    📅 1979
+                    📅 1940s
                   </div>
                   <div className="text-blue-600 text-sm">
-                    <strong>Cox-Ross-Rubinstein paper</strong>
+                    <strong>Manhattan Project</strong>
                     <br />
-                    "Option Pricing: A Simplified Approach"
+                    Stanislaw Ulam and John von Neumann develop the method
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-lg border border-purple-200">
                   <div className="font-semibold text-purple-700 mb-2">
-                    🏆 1980s
+                    🏦 1970s
                   </div>
                   <div className="text-purple-600 text-sm">
-                    <strong>Computing Revolution</strong>
+                    <strong>Finance Adoption</strong>
                     <br />
-                    Personal computers make multi-step trees practical
+                    First applications to option pricing and risk management
                   </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-green-100 to-green-50 p-4 rounded-lg border border-green-200">
                   <div className="font-semibold text-green-700 mb-2">
+                    💻 1990s
+                  </div>
+                  <div className="text-purple-600 text-sm">
+                    <strong>Computing Power</strong>
+                    <br />
+                    Personal computers make Monte Carlo practical for trading
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 p-4 rounded-lg border border-orange-200">
+                  <div className="font-semibold text-orange-700 mb-2">
                     🚀 Today
                   </div>
-                  <div className="text-green-600 text-sm">
-                    <strong>Teaching Standard</strong>
+                  <div className="text-orange-600 text-sm">
+                    <strong>GPU Acceleration</strong>
                     <br />
-                    Primary educational tool for option pricing worldwide
+                    Parallel processing enables millions of simulations per
+                    second
                   </div>
                 </div>
               </div>
@@ -387,41 +417,42 @@ const BinomialOptions = () => {
           {/* Why It Exists */}
           <div className="bg-gradient-to-r from-cyan-50 to-teal-50 border-2 border-cyan-200 p-6 rounded-xl">
             <h4 className="font-bold text-cyan-800 text-xl mb-6 text-center">
-              Why the Binomial Model Exists
+              Why the Monte Carlo Method Exists
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-5 rounded-lg border border-cyan-200">
                 <h5 className="font-bold text-cyan-700 mb-4 flex items-center">
-                  <span className="mr-2">📚</span>
-                  Educational Need
+                  <span className="mr-2">🧩</span>
+                  Complex Problem Solving
                 </h5>
                 <div className="space-y-3 text-sm">
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      Intuitive Understanding
+                      Path-Dependent Options
                     </div>
                     <div className="text-cyan-600">
-                      Students can see and understand each step of the pricing
-                      process without advanced mathematics
+                      Asian options, lookback options, and barrier options
+                      require tracking the entire price path, not just the final
+                      price
                     </div>
                   </div>
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      Visual Representation
+                      Multi-Asset Derivatives
                     </div>
                     <div className="text-cyan-600">
-                      Tree diagrams make abstract concepts concrete and help
-                      build financial intuition
+                      Basket options, rainbow options, and correlation-dependent
+                      products need high-dimensional modeling
                     </div>
                   </div>
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      Foundation Building
+                      Non-Standard Features
                     </div>
                     <div className="text-cyan-600">
-                      Demonstrates core principles like risk-neutral valuation
-                      and dynamic hedging clearly
+                      Jump processes, stochastic volatility, and
+                      regime-switching models can't be solved analytically
                     </div>
                   </div>
                 </div>
@@ -429,34 +460,35 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-cyan-200">
                 <h5 className="font-bold text-cyan-700 mb-4 flex items-center">
-                  <span className="mr-2">🔧</span>
-                  Practical Solutions
+                  <span className="mr-2">🔬</span>
+                  Market Reality Modeling
                 </h5>
                 <div className="space-y-3 text-sm">
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      American Options
+                      Real Market Behavior
                     </div>
                     <div className="text-cyan-600">
-                      Black-Scholes couldn't handle early exercise; binomial
-                      trees solve this naturally
+                      Incorporate empirically observed features like volatility
+                      clustering, fat tails, and market microstructure effects
                     </div>
                   </div>
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      Dividend Handling
+                      Regulatory Requirements
                     </div>
                     <div className="text-cyan-600">
-                      Discrete dividends and complex payout schedules are easily
-                      incorporated
+                      Stress testing and scenario analysis for risk management
+                      often require Monte Carlo simulation
                     </div>
                   </div>
                   <div className="bg-cyan-50 p-3 rounded">
                     <div className="font-semibold text-cyan-700 mb-1">
-                      Computational Flexibility
+                      Model Validation
                     </div>
                     <div className="text-cyan-600">
-                      Can be programmed easily and adjusted for exotic features
+                      Cross-check analytical models and provide confidence
+                      intervals for pricing estimates
                     </div>
                   </div>
                 </div>
@@ -465,16 +497,18 @@ const BinomialOptions = () => {
 
             <div className="mt-6 bg-cyan-50 p-4 rounded-lg border border-cyan-200">
               <h6 className="font-semibold text-cyan-700 mb-2">
-                Bridge Between Theory and Practice
+                The Universal Problem Solver
               </h6>
               <p className="text-cyan-600 text-sm">
-                The binomial model serves as the perfect bridge between
-                intuitive understanding and mathematical sophistication. It's
-                simple enough for beginners to grasp the fundamental concepts of
-                option pricing, yet powerful enough for professionals to use in
-                complex applications. This dual nature has made it the standard
-                teaching tool in finance programs worldwide and a practical
-                pricing method for many real-world scenarios.
+                Monte Carlo exists because many financial problems simply cannot
+                be solved analytically. When Black-Scholes fails due to complex
+                payoffs, when binomial trees become computationally prohibitive,
+                and when closed-form solutions don't exist, Monte Carlo provides
+                the answer. It's the method of last resort that always
+                works—given enough computational power and time. This
+                universality has made it indispensable for modern quantitative
+                finance, from exotic derivatives trading to regulatory stress
+                testing.
               </p>
             </div>
           </div>
@@ -487,12 +521,12 @@ const BinomialOptions = () => {
         <div className="space-y-8">
           <div>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              The Binomial Model operates under a simpler set of assumptions
-              compared to Black-Scholes, making it more flexible and adaptable
-              to real-world conditions. While it shares some fundamental
-              assumptions with continuous-time models, its discrete framework
-              allows for easier handling of dividends, early exercise, and other
-              practical complications.
+              The Monte Carlo method operates under flexible assumptions that
+              can be easily modified for different market conditions. Unlike
+              analytical models with rigid mathematical constraints, Monte
+              Carlo's simulation-based framework allows for realistic modeling
+              of market complexities while maintaining theoretical rigor through
+              statistical convergence.
             </p>
 
             <div className="bg-blue-100 border-2 border-blue-300 text-blue-900 p-6 rounded-xl mb-6">
@@ -510,15 +544,16 @@ const BinomialOptions = () => {
                 </svg>
                 <div>
                   <h4 className="font-bold mb-2">
-                    Flexible Discrete Framework
+                    Adaptive Assumption Framework
                   </h4>
                   <p>
-                    The binomial model's discrete time structure makes it
-                    inherently more flexible than continuous models. Many of the
-                    restrictive assumptions of Black-Scholes become less
-                    problematic when working with discrete time steps, allowing
-                    for practical implementations that better match real market
-                    conditions.
+                    Monte Carlo's greatest strength lies in its ability to
+                    modify assumptions on-the-fly. Unlike closed-form solutions,
+                    you can easily incorporate jumps, changing volatility,
+                    complex dividends, and non-standard features by simply
+                    adjusting the simulation code. This flexibility makes it
+                    ideal for real-world applications where market assumptions
+                    rarely hold perfectly.
                   </p>
                 </div>
               </div>
@@ -528,7 +563,7 @@ const BinomialOptions = () => {
           {/* Core Assumptions */}
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 p-6 rounded-xl">
             <h4 className="font-bold text-indigo-800 text-xl mb-6 text-center">
-              The Five Core Assumptions
+              Flexible Core Assumptions
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -540,14 +575,16 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-bold text-indigo-700 mb-2">
-                        Binary Price Movements
+                        Stochastic Process Model
                       </h5>
                       <p className="text-indigo-600 text-sm mb-2">
-                        Stock price can only move up or down by predetermined
-                        factors during each time period
+                        Stock prices follow a chosen stochastic process (usually
+                        geometric Brownian motion as baseline)
                       </p>
                       <div className="bg-indigo-50 p-2 rounded text-xs">
-                        <strong>Formula:</strong> S(up) = S × u, S(down) = S × d
+                        <strong>Flexibility:</strong> Can easily switch to
+                        jump-diffusion, stochastic volatility, or other
+                        processes
                       </div>
                     </div>
                   </div>
@@ -560,36 +597,36 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-bold text-indigo-700 mb-2">
-                        Constant Risk-Free Rate
+                        Risk-Neutral Valuation
                       </h5>
                       <p className="text-indigo-600 text-sm mb-2">
-                        Interest rate remains constant throughout all time
-                        periods
+                        Options are valued using risk-neutral probabilities and
+                        discounted at the risk-free rate
                       </p>
                       <div className="bg-indigo-50 p-2 rounded text-xs">
-                        <strong>Reality:</strong> Can be adjusted for
-                        time-varying rates in practice
+                        <strong>Foundation:</strong> Same theoretical basis as
+                        Black-Scholes and binomial models
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-indigo-200">
+                <div className="bg-white p-5 rounded-lg border border-purple-200">
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">3</span>
                     </div>
                     <div>
                       <h5 className="font-bold text-purple-700 mb-2">
-                        No Transaction Costs
+                        Sufficient Sample Size
                       </h5>
                       <p className="text-purple-600 text-sm mb-2">
-                        Trading is frictionless with no bid-ask spreads or
-                        commissions
+                        Large number of simulations ensures convergence to true
+                        expected value
                       </p>
                       <div className="bg-purple-50 p-2 rounded text-xs">
-                        <strong>Impact:</strong> Less critical than in
-                        continuous models due to discrete rebalancing
+                        <strong>Trade-off:</strong> More samples = higher
+                        accuracy but longer computation time
                       </div>
                     </div>
                   </div>
@@ -597,42 +634,43 @@ const BinomialOptions = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-white p-5 rounded-lg border border-indigo-200">
+                <div className="bg-white p-5 rounded-lg border border-purple-200">
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">4</span>
                     </div>
                     <div>
                       <h5 className="font-bold text-purple-700 mb-2">
-                        Constant Volatility Within Periods
+                        Quality Random Number Generation
                       </h5>
                       <p className="text-purple-600 text-sm mb-2">
-                        Up and down factors remain constant across all time
-                        periods
+                        Pseudo-random numbers must be of sufficient quality to
+                        avoid bias in results
                       </p>
                       <div className="bg-purple-50 p-2 rounded text-xs">
-                        <strong>Flexibility:</strong> Can vary parameters
-                        between periods if needed
+                        <strong>Implementation:</strong> Use proven generators
+                        like Mersenne Twister or Sobol sequences
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-lg border border-indigo-200">
+                <div className="bg-white p-5 rounded-lg border border-purple-200">
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">5</span>
                     </div>
                     <div>
                       <h5 className="font-bold text-purple-700 mb-2">
-                        Perfect Market Liquidity
+                        Market Frictionlessness (Optional)
                       </h5>
                       <p className="text-purple-600 text-sm mb-2">
-                        Can trade any amount at fair value without market impact
+                        Traditional assumption of no transaction costs or
+                        liquidity constraints
                       </p>
                       <div className="bg-purple-50 p-2 rounded text-xs">
-                        <strong>Practice:</strong> Less restrictive for discrete
-                        rebalancing strategies
+                        <strong>Reality:</strong> Can be relaxed by
+                        incorporating bid-ask spreads in simulation
                       </div>
                     </div>
                   </div>
@@ -640,12 +678,13 @@ const BinomialOptions = () => {
 
                 <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
                   <h5 className="font-bold text-gray-700 mb-2">
-                    Key Advantage Over Black-Scholes
+                    Key Advantage Over Other Models
                   </h5>
                   <p className="text-gray-600 text-sm">
-                    The binomial model doesn't require continuous trading or
-                    perfect hedge maintenance. This makes many assumptions more
-                    realistic and violations less problematic.
+                    Monte Carlo assumptions can be modified individually without
+                    requiring new mathematical derivations. This modularity
+                    makes it ideal for testing different market scenarios and
+                    incorporating empirical observations.
                   </p>
                 </div>
               </div>
@@ -666,14 +705,14 @@ const BinomialOptions = () => {
                 <div className="space-y-3">
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      Current Stock Price (S₀)
+                      Current Asset Price (S₀)
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      Starting point for the binomial tree construction
+                      Starting point for all simulated price paths
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Use:</strong> Today's market price or last traded
-                      price
+                      <strong>Source:</strong> Current market price or last
+                      traded price
                     </div>
                   </div>
 
@@ -682,10 +721,12 @@ const BinomialOptions = () => {
                       Strike Price (K)
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      Exercise price specified in option contract
+                      Exercise price for payoff calculation at each simulation
+                      endpoint
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Note:</strong> Fixed throughout tree calculation
+                      <strong>Use:</strong> Applied in payoff function for each
+                      simulated path
                     </div>
                   </div>
 
@@ -694,24 +735,25 @@ const BinomialOptions = () => {
                       Time to Expiration (T)
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      Total time remaining until option expiration
+                      Total simulation time horizon in years
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Units:</strong> Typically in years (e.g., 30 days
-                      = 30/365)
+                      <strong>Division:</strong> Split into smaller time steps
+                      (Δt) for path generation
                     </div>
                   </div>
 
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      Number of Steps (N)
+                      Risk-Free Rate (r)
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      How many time periods to divide the option's life into
+                      Rate for discounting expected payoffs back to present
+                      value
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Trade-off:</strong> More steps = better accuracy
-                      but slower computation
+                      <strong>Application:</strong> Final step after averaging
+                      all simulated payoffs
                     </div>
                   </div>
                 </div>
@@ -719,31 +761,20 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-green-200">
                 <h5 className="font-bold text-green-700 mb-4 text-center">
-                  📈 Model Parameters
+                  📈 Process Parameters
                 </h5>
                 <div className="space-y-3">
-                  <div className="bg-green-50 p-3 rounded">
-                    <div className="font-semibold text-green-700 text-sm mb-1">
-                      Risk-Free Rate (r)
-                    </div>
-                    <p className="text-green-600 text-xs mb-1">
-                      Continuous risk-free interest rate
-                    </p>
-                    <div className="text-gray-600 text-xs">
-                      <strong>Source:</strong> Treasury rate matching option
-                      maturity
-                    </div>
-                  </div>
-
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
                       Volatility (σ)
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      Annualized volatility used to calculate up/down factors
+                      Annualized volatility for the underlying stochastic
+                      process
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Calculation:</strong> u = e^(σ√Δt), d = 1/u
+                      <strong>Enhancement:</strong> Can be time-varying or
+                      stochastic in advanced models
                     </div>
                   </div>
 
@@ -752,24 +783,38 @@ const BinomialOptions = () => {
                       Dividend Yield (q) - Optional
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      Continuous dividend yield for dividend-paying stocks
+                      Continuous dividend yield or discrete dividend schedule
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Alternative:</strong> Can use discrete dividend
-                      amounts
+                      <strong>Flexibility:</strong> Can model complex dividend
+                      patterns easily
                     </div>
                   </div>
 
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      Option Style
+                      Correlation Matrix (ρ) - Multi-Asset
                     </div>
                     <p className="text-green-600 text-xs mb-1">
-                      European (exercise at expiration) or American (early
-                      exercise)
+                      Correlation structure between multiple underlying assets
                     </p>
                     <div className="text-gray-600 text-xs">
-                      <strong>Default:</strong> American for equity options
+                      <strong>Use Case:</strong> Basket options, rainbow
+                      options, spread options
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 p-3 rounded">
+                    <div className="font-semibold text-green-700 text-sm mb-1">
+                      Additional Model Parameters
+                    </div>
+                    <p className="text-green-600 text-xs mb-1">
+                      Jump intensity, mean reversion speed, volatility of
+                      volatility
+                    </p>
+                    <div className="text-gray-600 text-xs">
+                      <strong>Advanced:</strong> Depends on chosen stochastic
+                      process model
                     </div>
                   </div>
                 </div>
@@ -777,43 +822,49 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Tree Parameters */}
+          {/* Simulation Parameters */}
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 p-6 rounded-xl">
             <h4 className="font-bold text-amber-800 text-xl mb-6">
-              Tree Construction Parameters
+              Critical Simulation Parameters
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-5 rounded-lg border border-amber-200">
                 <h5 className="font-bold text-amber-700 mb-4">
-                  📐 Up and Down Factors
+                  📊 Number of Simulations (N)
                 </h5>
                 <div className="space-y-3">
                   <div className="bg-amber-50 p-3 rounded">
                     <div className="font-semibold text-amber-700 text-sm mb-2">
-                      Standard CRR Parameterization:
+                      Accuracy vs Speed Trade-off:
                     </div>
-                    <div className="text-center space-y-2">
+                    <div className="space-y-2 text-xs">
                       <div>
-                        <InlineMath math="u = e^{\sigma\sqrt{\Delta t}}" />
+                        <strong>N = 1,000:</strong> Quick estimates, ±5%
+                        accuracy
                       </div>
                       <div>
-                        <InlineMath math="d = \frac{1}{u} = e^{-\sigma\sqrt{\Delta t}}" />
+                        <strong>N = 10,000:</strong> Good for most applications,
+                        ±1.5% accuracy
                       </div>
                       <div>
-                        <InlineMath math="\Delta t = \frac{T}{N}" />
+                        <strong>N = 100,000:</strong> High precision, ±0.5%
+                        accuracy
+                      </div>
+                      <div>
+                        <strong>N = 1,000,000:</strong> Professional grade,
+                        ±0.15% accuracy
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded text-xs">
                     <div className="font-semibold text-gray-700 mb-1">
-                      Why this parameterization?
+                      Convergence Rate:
                     </div>
                     <div className="text-gray-600">
-                      • Ensures ud = 1 (recombining tree)
-                      <br />• Matches volatility of underlying process
-                      <br />• Converges to Black-Scholes as N → ∞
+                      Standard error decreases as 1/√N, so 100x more simulations
+                      give only 10x better accuracy
                     </div>
                   </div>
                 </div>
@@ -821,33 +872,40 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-amber-200">
                 <h5 className="font-bold text-amber-700 mb-4">
-                  ⚖️ Risk-Neutral Probability
+                  ⏱️ Time Steps (M)
                 </h5>
                 <div className="space-y-3">
                   <div className="bg-amber-50 p-3 rounded">
                     <div className="font-semibold text-amber-700 text-sm mb-2">
-                      Probability Calculation:
+                      Path Discretization:
                     </div>
-                    <div className="text-center space-y-2">
+                    <div className="space-y-2 text-xs">
                       <div>
-                        <InlineMath math="p = \frac{e^{r\Delta t} - d}{u - d}" />
+                        <strong>Daily steps:</strong> M = T × 252 (good for most
+                        options)
                       </div>
-                      <div className="text-xs">Risk-neutral up probability</div>
                       <div>
-                        <InlineMath math="1-p" /> = Down probability
+                        <strong>Weekly steps:</strong> M = T × 52 (faster, less
+                        accuracy)
+                      </div>
+                      <div>
+                        <strong>Hourly steps:</strong> Higher frequency for
+                        path-dependent options
+                      </div>
+                      <div>
+                        <strong>Adaptive:</strong> Finer steps near barriers or
+                        important dates
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded text-xs">
                     <div className="font-semibold text-gray-700 mb-1">
-                      Key Properties:
+                      Choice Guidelines:
                     </div>
                     <div className="text-gray-600">
-                      • 0 {"<"} p {"<"} 1 (valid probability)
-                      <br />• Independent of risk preferences
-                      <br />• Ensures no-arbitrage condition
-                      <br />• Creates risk-neutral expected return = r
+                      More steps needed for path-dependent options (Asian,
+                      barrier) vs European vanilla options
                     </div>
                   </div>
                 </div>
@@ -855,181 +913,93 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Convergence and Accuracy */}
+          {/* Stochastic Process Models */}
           <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 p-6 rounded-xl">
             <h4 className="font-bold text-purple-800 text-xl mb-6 text-center">
-              Number of Steps: Accuracy vs Speed Trade-off
-            </h4>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-4 rounded-lg border border-purple-200">
-                <h5 className="font-semibold text-purple-700 mb-3 text-center">
-                  🚀 Few Steps (N = 10-50)
-                </h5>
-                <div className="space-y-2 text-sm">
-                  <div className="bg-green-50 p-2 rounded">
-                    <strong className="text-green-700">Pros:</strong>
-                    <ul className="text-green-600 text-xs mt-1 space-y-1">
-                      <li>• Very fast calculation</li>
-                      <li>• Easy to visualize tree</li>
-                      <li>• Good for education</li>
-                    </ul>
-                  </div>
-                  <div className="bg-red-50 p-2 rounded">
-                    <strong className="text-red-700">Cons:</strong>
-                    <ul className="text-red-600 text-xs mt-1 space-y-1">
-                      <li>• Lower accuracy</li>
-                      <li>• May not converge well</li>
-                      <li>• Choppy convergence pattern</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-purple-200">
-                <h5 className="font-semibold text-purple-700 mb-3 text-center">
-                  ⚖️ Moderate Steps (N = 100-500)
-                </h5>
-                <div className="space-y-2 text-sm">
-                  <div className="bg-green-50 p-2 rounded">
-                    <strong className="text-green-700">Pros:</strong>
-                    <ul className="text-green-600 text-xs mt-1 space-y-1">
-                      <li>• Good accuracy</li>
-                      <li>• Reasonable speed</li>
-                      <li>• Practical for most uses</li>
-                    </ul>
-                  </div>
-                  <div className="bg-yellow-50 p-2 rounded">
-                    <strong className="text-yellow-700">Best for:</strong>
-                    <ul className="text-yellow-600 text-xs mt-1 space-y-1">
-                      <li>• Real-time pricing</li>
-                      <li>• Portfolio analysis</li>
-                      <li>• Risk management</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-purple-200">
-                <h5 className="font-semibold text-purple-700 mb-3 text-center">
-                  🎯 Many Steps (N = 1000+)
-                </h5>
-                <div className="space-y-2 text-sm">
-                  <div className="bg-green-50 p-2 rounded">
-                    <strong className="text-green-700">Pros:</strong>
-                    <ul className="text-green-600 text-xs mt-1 space-y-1">
-                      <li>• High accuracy</li>
-                      <li>• Smooth convergence</li>
-                      <li>• Close to Black-Scholes</li>
-                    </ul>
-                  </div>
-                  <div className="bg-red-50 p-2 rounded">
-                    <strong className="text-red-700">Cons:</strong>
-                    <ul className="text-red-600 text-xs mt-1 space-y-1">
-                      <li>• Slower computation</li>
-                      <li>• Memory intensive</li>
-                      <li>• Diminishing returns</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 bg-purple-50 p-4 rounded-lg border border-purple-200">
-              <h5 className="font-semibold text-purple-700 mb-2">
-                Convergence Rate and Error
-              </h5>
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <div className="font-semibold text-purple-700 mb-1">
-                    Theoretical Convergence:
-                  </div>
-                  <ul className="text-purple-600 space-y-1">
-                    <li>• Error decreases as O(1/N)</li>
-                    <li>• Oscillatory convergence pattern</li>
-                    <li>• Even N often more accurate than odd N</li>
-                    <li>• Converges to Black-Scholes limit</li>
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-semibold text-purple-700 mb-1">
-                    Practical Guidelines:
-                  </div>
-                  <ul className="text-purple-600 space-y-1">
-                    <li>• N ≥ 30 for basic accuracy</li>
-                    <li>• N ≥ 100 for serious pricing</li>
-                    <li>• N ≥ 500 for high-precision work</li>
-                    <li>• Test convergence with your specific parameters</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Dividend Handling */}
-          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-2 border-teal-200 p-6 rounded-xl">
-            <h4 className="font-bold text-teal-800 text-xl mb-6 text-center">
-              Dividend Handling in Binomial Trees
+              Common Stochastic Process Models
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white p-5 rounded-lg border border-teal-200">
-                <h5 className="font-bold text-teal-700 mb-4">
-                  💰 Continuous Dividend Yield
-                </h5>
-                <div className="space-y-3 text-sm">
-                  <div className="bg-teal-50 p-3 rounded">
-                    <div className="font-semibold text-teal-700 mb-2">
-                      Modified Risk-Neutral Probability:
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    📈 Geometric Brownian Motion (GBM)
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-center mb-3">
+                      <InlineMath math="dS = rS dt + \sigma S dW" />
                     </div>
-                    <div className="text-center">
-                      <InlineMath math="p = \frac{e^{(r-q)\Delta t} - d}{u - d}" />
+                    <div className="bg-purple-50 p-2 rounded text-xs">
+                      <strong>Pros:</strong> Simple, matches Black-Scholes
+                      assumptions, fast simulation
                     </div>
-                    <div className="text-teal-600 text-xs mt-2">
-                      Where q is the continuous dividend yield
+                    <div className="bg-red-50 p-2 rounded text-xs">
+                      <strong>Cons:</strong> Constant volatility, no jumps,
+                      log-normal distribution only
                     </div>
                   </div>
+                </div>
 
-                  <div className="bg-gray-50 p-3 rounded text-xs">
-                    <div className="font-semibold text-gray-700 mb-1">
-                      Implementation:
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    🦘 Jump-Diffusion (Merton)
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-center mb-3">
+                      <InlineMath math="dS = rS dt + \sigma S dW + S dJ" />
                     </div>
-                    <div className="text-gray-600">
-                      • Replace r with (r-q) in probability calculation
-                      <br />• Stock prices unaffected in tree
-                      <br />• Simple and mathematically clean
-                      <br />• Good for high dividend yield stocks
+                    <div className="bg-green-50 p-2 rounded text-xs">
+                      <strong>Pros:</strong> Captures market crashes, fat tails,
+                      more realistic
+                    </div>
+                    <div className="bg-red-50 p-2 rounded text-xs">
+                      <strong>Cons:</strong> More parameters to calibrate,
+                      slower simulation
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-lg border border-teal-200">
-                <h5 className="font-bold text-teal-700 mb-4">
-                  📅 Discrete Dividends
-                </h5>
-                <div className="space-y-3 text-sm">
-                  <div className="bg-teal-50 p-3 rounded">
-                    <div className="font-semibold text-teal-700 mb-2">
-                      Tree Adjustment Method:
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    🌊 Stochastic Volatility (Heston)
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-center mb-3 space-y-1">
+                      <div>
+                        <InlineMath math="dS = rS dt + \sqrt{v} S dW_1" />
+                      </div>
+                      <div>
+                        <InlineMath math="dv = \kappa(\theta - v) dt + \xi\sqrt{v} dW_2" />
+                      </div>
                     </div>
-                    <div className="space-y-1 text-xs">
-                      <div>1. Subtract PV of dividends from S₀</div>
-                      <div>2. Build tree with adjusted price</div>
-                      <div>3. Add back dividends at payment nodes</div>
-                      <div>4. Check early exercise after dividends</div>
+                    <div className="bg-green-50 p-2 rounded text-xs">
+                      <strong>Pros:</strong> Volatility clustering, realistic
+                      vol behavior, volatility smile
+                    </div>
+                    <div className="bg-red-50 p-2 rounded text-xs">
+                      <strong>Cons:</strong> Complex calibration,
+                      computationally intensive
                     </div>
                   </div>
+                </div>
 
-                  <div className="bg-gray-50 p-3 rounded text-xs">
-                    <div className="font-semibold text-gray-700 mb-1">
-                      Key Advantages:
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    🔄 Mean-Reverting Processes
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="text-center mb-3">
+                      <InlineMath math="dS = \kappa(\mu - \ln S) S dt + \sigma S dW" />
                     </div>
-                    <div className="text-gray-600">
-                      • Handles exact dividend timing
-                      <br />• Natural early exercise checking
-                      <br />• Matches real market behavior
-                      <br />• Can model variable dividend amounts
+                    <div className="bg-green-50 p-2 rounded text-xs">
+                      <strong>Use:</strong> Commodities, interest rates,
+                      volatility indices
+                    </div>
+                    <div className="bg-blue-50 p-2 rounded text-xs">
+                      <strong>Feature:</strong> Prices tend to revert to
+                      long-term mean level
                     </div>
                   </div>
                 </div>
@@ -1037,13 +1007,138 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Practical Input Guidelines */}
-          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-200 p-6 rounded-xl">
-            <h4 className="font-bold text-cyan-800 text-xl mb-6">
-              Practical Input Guidelines
+          {/* Parameter Sensitivity & Calibration */}
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-2 border-teal-200 p-6 rounded-xl">
+            <h4 className="font-bold text-teal-800 text-xl mb-6 text-center">
+              Parameter Sensitivity & Calibration
             </h4>
 
             <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <h5 className="font-semibold text-teal-700 mb-3 text-center">
+                  🎯 Critical Parameters
+                </h5>
+                <ul className="text-teal-600 text-sm space-y-2">
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Volatility:</strong> Most sensitive parameter -
+                      small changes create large price differences
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Time Steps:</strong> Balance accuracy vs speed,
+                      more critical for path-dependent options
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Random Seeds:</strong> Use different seeds to test
+                      simulation stability
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <h5 className="font-semibold text-teal-700 mb-3 text-center">
+                  📊 Calibration Sources
+                </h5>
+                <ul className="text-teal-600 text-sm space-y-2">
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Market Data:</strong> Implied volatilities from
+                      liquid options
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Historical Analysis:</strong> Realized volatility
+                      and correlation estimates
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Cross-Validation:</strong> Compare with analytical
+                      models where possible
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-teal-200">
+                <h5 className="font-semibold text-teal-700 mb-3 text-center">
+                  🔧 Quality Control
+                </h5>
+                <ul className="text-teal-600 text-sm space-y-2">
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Convergence Testing:</strong> Monitor how results
+                      change with more simulations
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Confidence Intervals:</strong> Calculate standard
+                      errors for price estimates
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-teal-500 mt-1">•</span>
+                    <span>
+                      <strong>Antithetic Variates:</strong> Use variance
+                      reduction techniques for efficiency
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Practical Guidelines */}
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-200 p-6 rounded-xl">
+            <h4 className="font-bold text-cyan-800 text-xl mb-6">
+              Practical Implementation Guidelines
+            </h4>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg border border-cyan-200">
+                <h5 className="font-semibold text-cyan-700 mb-3 text-center">
+                  🚀 For Speed
+                </h5>
+                <ul className="text-cyan-600 text-sm space-y-2">
+                  <li className="flex items-start space-x-2">
+                    <span className="text-cyan-500 mt-1">•</span>
+                    <span>
+                      <strong>Simulations:</strong> Start with N=10,000 for
+                      development and testing
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-cyan-500 mt-1">•</span>
+                    <span>
+                      <strong>Process:</strong> Use GBM for initial
+                      implementation and benchmarking
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-cyan-500 mt-1">•</span>
+                    <span>
+                      <strong>Steps:</strong> Weekly or bi-weekly time steps for
+                      European options
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
               <div className="bg-white p-4 rounded-lg border border-cyan-200">
                 <h5 className="font-semibold text-cyan-700 mb-3 text-center">
                   🎯 For Accuracy
@@ -1052,51 +1147,22 @@ const BinomialOptions = () => {
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Steps:</strong> Use N ≥ 100 for pricing, N ≥ 500
-                      for Greeks
+                      <strong>Simulations:</strong> Use N≥100,000 for production
+                      pricing
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Volatility:</strong> Use implied vol from similar
-                      options when available
+                      <strong>Volatility:</strong> Use implied vol from market
+                      data when available
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Dividends:</strong> Use discrete method for known
-                      dividend dates
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-cyan-200">
-                <h5 className="font-semibold text-cyan-700 mb-3 text-center">
-                  ⚡ For Speed
-                </h5>
-                <ul className="text-cyan-600 text-sm space-y-2">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-cyan-500 mt-1">•</span>
-                    <span>
-                      <strong>Steps:</strong> N = 50-100 for quick estimates and
-                      screening
-                    </span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-cyan-500 mt-1">•</span>
-                    <span>
-                      <strong>Batch Processing:</strong> Reuse tree structure
-                      for multiple strikes
-                    </span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-cyan-500 mt-1">•</span>
-                    <span>
-                      <strong>Convergence:</strong> Test with small N first,
-                      then increase if needed
+                      <strong>Validation:</strong> Cross-check simple options
+                      with Black-Scholes
                     </span>
                   </li>
                 </ul>
@@ -1104,28 +1170,28 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-4 rounded-lg border border-cyan-200">
                 <h5 className="font-semibold text-cyan-700 mb-3 text-center">
-                  🛡️ For Reliability
+                  🛡️ For Robustness
                 </h5>
                 <ul className="text-cyan-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Validation:</strong> Compare with Black-Scholes
-                      for European options
+                      <strong>Multiple Runs:</strong> Use different random seeds
+                      to verify stability
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Stress Testing:</strong> Vary N to check
-                      convergence stability
+                      <strong>Stress Testing:</strong> Test with extreme
+                      parameter values
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Documentation:</strong> Record parameter choices
-                      and rationale
+                      <strong>Documentation:</strong> Record all assumptions and
+                      parameter choices
                     </span>
                   </li>
                 </ul>
@@ -1141,11 +1207,11 @@ const BinomialOptions = () => {
         <div className="space-y-8">
           <div>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              The Binomial Model works by building a tree of possible stock
-              price paths, then calculating option values backward from
-              expiration. This intuitive approach makes American option pricing
-              natural while providing the same accuracy as more complex methods
-              when enough steps are used.
+              Monte Carlo simulation works by generating thousands of random
+              stock price paths, calculating option payoffs for each path, and
+              averaging the results. This brute-force approach can handle any
+              option complexity while maintaining mathematical accuracy through
+              the law of large numbers.
             </p>
 
             <div className="bg-blue-100 border-2 border-blue-300 text-blue-900 p-6 rounded-xl mb-6">
@@ -1162,51 +1228,52 @@ const BinomialOptions = () => {
                   />
                 </svg>
                 <div>
-                  <h4 className="font-bold mb-2">The Two-Step Process</h4>
+                  <h4 className="font-bold mb-2">The Three-Step Process</h4>
                   <p>
-                    First, build the stock price tree forward in time using up
-                    and down factors. Then, work backward from expiration,
-                    comparing intrinsic value with continuation value at each
-                    node to determine optimal exercise decisions.
+                    Generate random price paths using stochastic processes,
+                    calculate payoffs at expiration for each simulated path,
+                    then average and discount back to get today's option value.
+                    More simulations mean higher accuracy but longer computation
+                    time.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Core Formulas - Consistent blue theme */}
+          {/* Core Simulation Formulas */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6 rounded-xl">
             <h4 className="font-bold text-blue-800 text-xl mb-6 text-center">
-              The Core Binomial Formulas
+              Core Simulation Formulas
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-5 rounded-lg border border-blue-200 shadow-sm">
                 <h5 className="font-bold text-blue-700 mb-4 text-center">
-                  🌳 Tree Construction
+                  🎲 Stock Price Path Generation
                 </h5>
                 <div className="space-y-4">
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <div className="font-semibold text-blue-700 mb-3 text-center">
-                      Up Factor:
+                      Geometric Brownian Motion:
                     </div>
                     <div className="text-center">
-                      <BlockMath math="u = e^{\sigma\sqrt{\Delta t}}" />
+                      <BlockMath math="S_{t+\Delta t} = S_t \cdot e^{(r - \frac{\sigma^2}{2})\Delta t + \sigma\sqrt{\Delta t} \cdot Z}" />
                     </div>
                     <div className="text-blue-600 text-xs text-center mt-2">
-                      Stock multiplies by u in up movements
+                      Where Z ~ N(0,1) is a random normal variable
                     </div>
                   </div>
 
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <div className="font-semibold text-blue-700 mb-3 text-center">
-                      Down Factor:
+                      Discrete Time Steps:
                     </div>
                     <div className="text-center">
-                      <BlockMath math="d = \frac{1}{u}" />
+                      <BlockMath math="\Delta t = \frac{T}{M}" />
                     </div>
                     <div className="text-blue-600 text-xs text-center mt-2">
-                      Ensures tree recombines: ud = 1
+                      T = time to expiration, M = number of time steps
                     </div>
                   </div>
                 </div>
@@ -1214,30 +1281,30 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-blue-200 shadow-sm">
                 <h5 className="font-bold text-blue-700 mb-4 text-center">
-                  💰 Option Valuation
+                  💰 Option Value Calculation
                 </h5>
                 <div className="space-y-4">
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <div className="font-semibold text-blue-700 mb-3 text-center">
-                      Risk-Neutral Probability:
+                      Monte Carlo Estimator:
                     </div>
                     <div className="text-center">
-                      <BlockMath math="p = \frac{e^{r\Delta t} - d}{u - d}" />
+                      <BlockMath math="V_0 = e^{-rT} \cdot \frac{1}{N} \sum_{i=1}^{N} \text{Payoff}(S_T^{(i)})" />
                     </div>
                     <div className="text-blue-600 text-xs text-center mt-2">
-                      Probability that ensures no arbitrage
+                      Average discounted payoffs across N simulations
                     </div>
                   </div>
 
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <div className="font-semibold text-blue-700 mb-3 text-center">
-                      Backward Induction:
+                      Standard Error:
                     </div>
                     <div className="text-center">
-                      <BlockMath math="V = e^{-r\Delta t}[p \cdot V_u + (1-p) \cdot V_d]" />
+                      <BlockMath math="SE = \frac{\sigma_{\text{payoff}}}{\sqrt{N}}" />
                     </div>
                     <div className="text-blue-600 text-xs text-center mt-2">
-                      Expected discounted future value
+                      Decreases as 1/√N, so 4x simulations halve error
                     </div>
                   </div>
                 </div>
@@ -1245,19 +1312,19 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Step-by-Step Example - Consistent green theme */}
+          {/* Step-by-Step Example */}
           <div className="bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 p-6 rounded-xl">
             <h4 className="font-bold text-emerald-800 text-xl mb-6 text-center">
-              📚 Step-by-Step Example: American Put Option
+              📚 Step-by-Step Example: European Call Option
             </h4>
 
             <div className="bg-white p-6 rounded-lg border border-emerald-200 shadow-sm">
               <div className="text-center mb-6">
                 <h5 className="font-bold text-emerald-700 text-lg mb-2">
-                  Two-Period Tree Calculation
+                  Monte Carlo Simulation Walkthrough
                 </h5>
                 <p className="text-emerald-600 text-sm">
-                  See how American options handle early exercise naturally
+                  See how random paths converge to fair option value
                 </p>
               </div>
 
@@ -1269,78 +1336,69 @@ const BinomialOptions = () => {
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span>Stock Price (S₀):</span>
-                      <span className="font-mono font-bold">$50</span>
+                      <span className="font-mono font-bold">$100</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Strike Price (K):</span>
-                      <span className="font-mono font-bold">$52</span>
+                      <span className="font-mono font-bold">$105</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Periods (N):</span>
-                      <span className="font-mono font-bold">2</span>
+                      <span>Time to Expiration (T):</span>
+                      <span className="font-mono font-bold">0.25 years</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Up Factor (u):</span>
-                      <span className="font-mono font-bold">1.2</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Down Factor (d):</span>
-                      <span className="font-mono font-bold">0.8</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Risk-free Rate:</span>
+                      <span>Risk-free Rate (r):</span>
                       <span className="font-mono font-bold">5%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Volatility (σ):</span>
+                      <span className="font-mono font-bold">20%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Time Steps (M):</span>
+                      <span className="font-mono font-bold">252</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Simulations (N):</span>
+                      <span className="font-mono font-bold">10,000</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-slate-50 p-5 rounded-lg border border-slate-200">
                   <div className="font-semibold text-slate-700 mb-4 text-center">
-                    ⚖️ Risk-Neutral Probability
+                    🔧 Calculation Setup
                   </div>
                   <div className="space-y-3 text-sm">
                     <div className="text-center">
-                      <InlineMath math="p = \frac{e^{0.05} - 0.8}{1.2 - 0.8}" />
+                      <InlineMath math="\Delta t = \frac{0.25}{252} = 0.000992" />
                     </div>
                     <div className="text-center">
-                      <InlineMath math="p = \frac{1.0513 - 0.8}{0.4} = 0.628" />
+                      <InlineMath math="\sqrt{\Delta t} = 0.0315" />
+                    </div>
+                    <div className="text-center">
+                      <InlineMath math="(r - \frac{\sigma^2}{2})\Delta t = 0.000040" />
+                    </div>
+                    <div className="text-center">
+                      <InlineMath math="\sigma\sqrt{\Delta t} = 0.00630" />
                     </div>
                     <div className="bg-blue-50 p-3 rounded mt-3">
                       <div className="text-center font-bold text-blue-700">
-                        <div>Up probability: 62.8%</div>
-                        <div>Down probability: 37.2%</div>
+                        <div>Discount Factor: e^(-0.05×0.25) = 0.9876</div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Interactive Tree */}
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
-                <h6 className="font-semibold text-amber-700 mb-4 text-center">
-                  🎨 Interactive Decision Tree
-                </h6>
-                <BinomialTreeFlow />
-                <div className="mt-4 flex justify-center space-x-8 text-sm">
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-white border-2 border-gray-300 rounded mr-2"></div>
-                    <span>Continue Holding</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 bg-red-50 border-2 border-red-300 rounded mr-2"></div>
-                    <span>Exercise Early</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step-by-Step Calculation Process - Harmonized colors */}
+              {/* Step-by-Step Process */}
               <div className="mt-6 bg-white p-6 rounded-lg border border-emerald-200 shadow-sm">
                 <h6 className="font-semibold text-emerald-700 mb-4 text-center">
-                  📝 Step-by-Step Calculation Process
+                  📝 The Four-Step Simulation Process
                 </h6>
 
                 <div className="grid md:grid-cols-1 gap-6">
-                  {/* Step 1 - Blue theme */}
+                  {/* Step 1 */}
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1348,32 +1406,25 @@ const BinomialOptions = () => {
                       </div>
                       <div className="flex-1">
                         <h6 className="font-semibold text-blue-700 mb-2">
-                          Build the Stock Price Tree Forward
+                          Generate Random Normal Variables
                         </h6>
                         <div className="text-blue-600 text-sm mb-3">
-                          Start at $50 and calculate all possible stock prices
-                          using up and down factors.
+                          For each simulation i and time step j, generate
+                          Z[i][j] ~ N(0,1)
                         </div>
                         <div className="bg-white p-3 rounded border text-xs">
-                          <div className="grid grid-cols-3 gap-4">
-                            <div className="text-center">
-                              <div className="font-bold text-gray-700">
-                                Period 0
-                              </div>
-                              <div className="font-mono">$50</div>
+                          <div className="font-mono">
+                            <div>
+                              Path 1: Z = [0.234, -1.567, 0.891, -0.345, ...]
                             </div>
-                            <div className="text-center">
-                              <div className="font-bold text-gray-700">
-                                Period 1
-                              </div>
-                              <div className="font-mono">$60 (×1.2)</div>
-                              <div className="font-mono">$40 (×0.8)</div>
+                            <div>
+                              Path 2: Z = [-0.789, 0.123, 1.234, -0.567, ...]
                             </div>
-                            <div className="text-center">
-                              <div className="font-bold text-gray-700">
-                                Period 2
-                              </div>
-                              <div className="font-mono">$72, $48, $32</div>
+                            <div>
+                              Path 3: Z = [1.456, -0.234, -0.789, 1.123, ...]
+                            </div>
+                            <div className="text-gray-500">
+                              ... (10,000 paths total)
                             </div>
                           </div>
                         </div>
@@ -1381,7 +1432,7 @@ const BinomialOptions = () => {
                     </div>
                   </div>
 
-                  {/* Step 2 - Indigo theme */}
+                  {/* Step 2 */}
                   <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1389,26 +1440,42 @@ const BinomialOptions = () => {
                       </div>
                       <div className="flex-1">
                         <h6 className="font-semibold text-indigo-700 mb-2">
-                          Calculate Option Values at Expiration
+                          Simulate Stock Price Paths
                         </h6>
                         <div className="text-indigo-600 text-sm mb-3">
-                          At period 2, option values are simply the intrinsic
-                          value (payoff if exercised).
+                          Use geometric Brownian motion to build complete price
+                          paths from S₀ to S_T
                         </div>
                         <div className="bg-white p-3 rounded border text-xs">
                           <div className="grid grid-cols-3 gap-4 text-center">
                             <div>
-                              <div className="font-bold">S=$72</div>
-                              <div className="font-mono">max(52-72,0) = $0</div>
+                              <div className="font-bold">Path 1</div>
+                              <div className="font-mono">S₀: $100.00</div>
+                              <div className="font-mono">S₁: $100.15</div>
+                              <div className="font-mono">S₂: $98.92</div>
+                              <div className="font-mono">...</div>
+                              <div className="font-mono text-green-600">
+                                S_T: $108.45
+                              </div>
                             </div>
                             <div>
-                              <div className="font-bold">S=$48</div>
-                              <div className="font-mono">max(52-48,0) = $4</div>
+                              <div className="font-bold">Path 2</div>
+                              <div className="font-mono">S₀: $100.00</div>
+                              <div className="font-mono">S₁: $99.51</div>
+                              <div className="font-mono">S₂: $99.58</div>
+                              <div className="font-mono">...</div>
+                              <div className="font-mono text-red-600">
+                                S_T: $96.78
+                              </div>
                             </div>
                             <div>
-                              <div className="font-bold">S=$32</div>
-                              <div className="font-mono">
-                                max(52-32,0) = $20
+                              <div className="font-bold">Path 3</div>
+                              <div className="font-mono">S₀: $100.00</div>
+                              <div className="font-mono">S₁: $101.91</div>
+                              <div className="font-mono">S₂: $101.67</div>
+                              <div className="font-mono">...</div>
+                              <div className="font-mono text-green-600">
+                                S_T: $112.33
                               </div>
                             </div>
                           </div>
@@ -1417,7 +1484,7 @@ const BinomialOptions = () => {
                     </div>
                   </div>
 
-                  {/* Step 3 - Emerald theme */}
+                  {/* Step 3 */}
                   <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1425,45 +1492,47 @@ const BinomialOptions = () => {
                       </div>
                       <div className="flex-1">
                         <h6 className="font-semibold text-emerald-700 mb-2">
-                          Work Backward Through Tree
+                          Calculate Option Payoffs
                         </h6>
                         <div className="text-emerald-600 text-sm mb-3">
-                          At each node, compare continuation value vs. immediate
-                          exercise value.
+                          For each path's final stock price, compute the
+                          option's payoff at expiration
                         </div>
                         <div className="bg-white p-3 rounded border text-xs space-y-2">
                           <div>
                             <div className="font-bold text-emerald-700">
-                              At $60 node:
-                            </div>
-                            <div>
-                              Continuation: e^(-0.05) × [0.628×$0 + 0.372×$4] =
-                              $1.42
-                            </div>
-                            <div>Exercise now: max(52-60,0) = $0</div>
-                            <div className="text-emerald-600 font-bold">
-                              → Continue holding ($1.42)
+                              Call option payoffs: max(S_T - K, 0)
                             </div>
                           </div>
-                          <div>
-                            <div className="font-bold text-red-700">
-                              At $40 node:
+                          <div className="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                              <div>S_T = $108.45</div>
+                              <div className="font-mono text-green-600">
+                                Payoff = $3.45
+                              </div>
                             </div>
                             <div>
-                              Continuation: e^(-0.05) × [0.628×$4 + 0.372×$20] =
-                              $9.45
+                              <div>S_T = $96.78</div>
+                              <div className="font-mono text-red-600">
+                                Payoff = $0.00
+                              </div>
                             </div>
-                            <div>Exercise now: max(52-40,0) = $12</div>
-                            <div className="text-red-600 font-bold">
-                              → Exercise early ($12.00)
+                            <div>
+                              <div>S_T = $112.33</div>
+                              <div className="font-mono text-green-600">
+                                Payoff = $7.33
+                              </div>
                             </div>
+                          </div>
+                          <div className="text-gray-600 font-bold">
+                            Average payoff across 10,000 simulations: $2.48
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Step 4 - Orange theme */}
+                  {/* Step 4 */}
                   <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1471,23 +1540,21 @@ const BinomialOptions = () => {
                       </div>
                       <div className="flex-1">
                         <h6 className="font-semibold text-orange-700 mb-2">
-                          Calculate Today's Option Value
+                          Discount to Present Value
                         </h6>
                         <div className="text-orange-600 text-sm mb-3">
-                          Use the period 1 values to find today's fair price.
+                          Apply risk-free discounting to get today's fair option
+                          value
                         </div>
                         <div className="bg-white p-3 rounded border text-xs">
                           <div>
                             <div className="font-bold text-orange-700">
-                              At $50 node (today):
+                              Final calculation:
                             </div>
-                            <div>
-                              Continuation: e^(-0.05) × [0.628×$1.42 +
-                              0.372×$12.00] = $5.10
-                            </div>
-                            <div>Exercise now: max(52-50,0) = $2.00</div>
+                            <div>Average Payoff: $2.48</div>
+                            <div>Discount Factor: e^(-0.05×0.25) = 0.9876</div>
                             <div className="text-orange-600 font-bold text-lg">
-                              → American Put Value = $5.10
+                              → Call Option Value = $2.48 × 0.9876 = $2.45
                             </div>
                           </div>
                         </div>
@@ -1497,399 +1564,216 @@ const BinomialOptions = () => {
                 </div>
               </div>
 
-              {/* Key Results - Consistent color scheme */}
-              <div className="grid md:grid-cols-3 gap-4">
+              {/* Key Results */}
+              <div className="grid md:grid-cols-3 gap-4 mt-6">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center">
                   <div className="text-2xl mb-2">🎯</div>
-                  <div className="font-bold text-blue-700">Final Result</div>
-                  <div className="text-blue-600 text-sm mb-2">
-                    American Put Value
+                  <div className="font-bold text-blue-700">
+                    Monte Carlo Result
                   </div>
-                  <div className="text-2xl font-bold text-blue-800">$5.10</div>
+                  <div className="text-blue-600 text-sm mb-2">
+                    Call Option Value
+                  </div>
+                  <div className="text-2xl font-bold text-blue-800">$2.45</div>
                 </div>
 
                 <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 text-center">
-                  <div className="text-2xl mb-2">⚡</div>
-                  <div className="font-bold text-emerald-700">Key Insight</div>
+                  <div className="text-2xl mb-2">📊</div>
+                  <div className="font-bold text-emerald-700">
+                    Standard Error
+                  </div>
                   <div className="text-emerald-600 text-sm mb-2">
-                    Early exercise optimal at
+                    95% Confidence: ±
                   </div>
                   <div className="text-xl font-bold text-emerald-800">
-                    $40 node
+                    $0.02
                   </div>
                 </div>
 
                 <div className="bg-violet-50 p-4 rounded-lg border border-violet-200 text-center">
-                  <div className="text-2xl mb-2">💎</div>
-                  <div className="font-bold text-violet-700">
-                    American Premium
-                  </div>
+                  <div className="text-2xl mb-2">⚡</div>
+                  <div className="font-bold text-violet-700">Black-Scholes</div>
                   <div className="text-violet-600 text-sm mb-2">
-                    Value above European
+                    Exact Value
                   </div>
-                  <div className="text-xl font-bold text-violet-800">$0.61</div>
+                  <div className="text-xl font-bold text-violet-800">$2.46</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* European vs American Comparison - Streamlined color scheme */}
-          <div className="bg-gradient-to-r from-slate-50 to-gray-50 border-2 border-slate-200 p-6 rounded-xl">
-            <h4 className="font-bold text-slate-800 text-xl mb-6 text-center">
-              🔄 European vs American: Implementation Comparison
+          {/* Random Number Generation */}
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 p-6 rounded-xl">
+            <h4 className="font-bold text-amber-800 text-xl mb-6">
+              🎲 Random Number Generation: The Engine of Monte Carlo
             </h4>
 
-            <div className="space-y-8">
-              {/* European Implementation */}
-              <div className="bg-white p-5 rounded-lg border border-slate-200">
-                <h5 className="font-bold text-slate-700 mb-4 text-center">
-                  🇪🇺 European Option - Simple Backward Induction
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white p-5 rounded-lg border border-amber-200">
+                <h5 className="font-bold text-amber-700 mb-4">
+                  🔧 Quality Requirements
                 </h5>
-
-                {/* Algorithm explanation above code */}
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-slate-50 p-3 rounded">
-                    <div className="font-semibold text-slate-700 mb-2">
-                      Algorithm Steps:
+                <div className="space-y-3">
+                  <div className="bg-amber-50 p-3 rounded">
+                    <div className="font-semibold text-amber-700 text-sm mb-2">
+                      High-Quality Generators:
                     </div>
-                    <ul className="text-slate-600 space-y-1 text-sm">
-                      <li>1. Calculate payoffs at expiration only</li>
-                      <li>2. Work backward using continuation values</li>
-                      <li>3. No early exercise checking needed</li>
-                      <li>4. Faster computation</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-blue-50 p-3 rounded text-center">
-                    <div className="font-semibold text-blue-700 mb-2">
-                      Performance:
-                    </div>
-                    <div className="text-blue-600 text-sm">
-                      <div>Complexity: O(N²)</div>
-                      <div>Memory: Single array</div>
-                      <div>Speed: Fast convergence</div>
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-50 p-3 rounded text-center">
-                    <div className="font-semibold text-emerald-700 mb-2">
-                      Result:
-                    </div>
-                    <div className="text-emerald-600 font-mono text-lg font-bold">
-                      $4.49
-                    </div>
-                    <div className="text-emerald-600 text-sm">
-                      European Put Value
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <strong>Mersenne Twister:</strong> Period of 2^19937-1,
+                        excellent for finance
+                      </div>
+                      <div>
+                        <strong>Sobol Sequences:</strong> Low-discrepancy,
+                        better convergence
+                      </div>
+                      <div>
+                        <strong>Linear Congruential:</strong> Fast but avoid for
+                        serious work
+                      </div>
+                      <div>
+                        <strong>Cryptographic:</strong> Highest quality but
+                        slower
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Full-width code block */}
-                <div className="bg-gray-900 text-gray-100 p-6 rounded-lg font-mono text-sm overflow-x-auto">
-                  <div className="text-green-400 mb-4">
-                    # European Option - Simple Backward Induction
-                  </div>
-                  <div className="space-y-1">
-                    <div>
-                      <span className="text-blue-300">for</span>{" "}
-                      <span className="text-yellow-300">period</span>{" "}
-                      <span className="text-blue-300">in</span>{" "}
-                      <span className="text-purple-300">range</span>(N
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>,{" "}
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>,{" "}
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>):
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Key Properties Needed:
                     </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-blue-300">for</span>{" "}
-                      <span className="text-yellow-300">j</span>{" "}
-                      <span className="text-blue-300">in</span>{" "}
-                      <span className="text-purple-300">range</span>(period{" "}
-                      <span className="text-red-300">+</span>{" "}
-                      <span className="text-orange-300">1</span>):
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-gray-400">
-                        # Simple continuation value calculation
-                      </span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;option_values[j]{" "}
-                      <span className="text-red-300">=</span> discount{" "}
-                      <span className="text-red-300">*</span> (
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p{" "}
-                      <span className="text-red-300">*</span> option_values[j]{" "}
-                      <span className="text-red-300">+</span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(
-                      <span className="text-orange-300">1</span>{" "}
-                      <span className="text-red-300">-</span> p){" "}
-                      <span className="text-red-300">*</span> option_values[j{" "}
-                      <span className="text-red-300">+</span>{" "}
-                      <span className="text-orange-300">1</span>]
-                    </div>
-                    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
-                    <div className="mt-4 text-green-400">
-                      # No early exercise check needed - that's it!
+                    <div className="text-gray-600">
+                      • Long period ({">"} 10^12 before repeat)
+                      <br />• Good dimensional distribution
+                      <br />• Pass statistical randomness tests
+                      <br />• Reproducible with seed values
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* American Implementation */}
-              <div className="bg-white p-5 rounded-lg border border-slate-200">
-                <h5 className="font-bold text-slate-700 mb-4 text-center">
-                  🇺🇸 American Option - Enhanced with Early Exercise
+              <div className="bg-white p-5 rounded-lg border border-amber-200">
+                <h5 className="font-bold text-amber-700 mb-4">
+                  📈 Normal Distribution Generation
                 </h5>
-
-                {/* Algorithm explanation above code */}
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-slate-50 p-3 rounded">
-                    <div className="font-semibold text-slate-700 mb-2">
-                      Enhanced Algorithm:
+                <div className="space-y-3">
+                  <div className="bg-amber-50 p-3 rounded">
+                    <div className="font-semibold text-amber-700 text-sm mb-2">
+                      Box-Muller Transform:
                     </div>
-                    <ul className="text-slate-600 space-y-1 text-sm">
-                      <li>1. Calculate payoffs at expiration</li>
-                      <li>2. At each node: compute continuation value</li>
-                      <li>3. Compare with immediate exercise value</li>
-                      <li>4. Take maximum of both options</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-amber-50 p-3 rounded text-center">
-                    <div className="font-semibold text-amber-700 mb-2">
-                      Additional Complexity:
-                    </div>
-                    <div className="text-amber-600 text-sm">
-                      <div>Complexity: O(N²) + checks</div>
-                      <div>Memory: Extra calculations</div>
-                      <div>Speed: Slightly slower</div>
+                    <div className="text-center space-y-2 text-xs">
+                      <div>Generate U₁, U₂ ~ Uniform(0,1)</div>
+                      <div>
+                        <InlineMath math="Z_1 = \sqrt{-2\ln(U_1)} \cos(2\pi U_2)" />
+                      </div>
+                      <div>
+                        <InlineMath math="Z_2 = \sqrt{-2\ln(U_1)} \sin(2\pi U_2)" />
+                      </div>
+                      <div>Both Z₁, Z₂ ~ N(0,1)</div>
                     </div>
                   </div>
 
-                  <div className="bg-rose-50 p-3 rounded text-center">
-                    <div className="font-semibold text-rose-700 mb-2">
-                      Result:
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Alternative Methods:
                     </div>
-                    <div className="text-rose-600 font-mono text-lg font-bold">
-                      $5.10
-                    </div>
-                    <div className="text-rose-600 text-sm">
-                      American Put Value
-                    </div>
-                    <div className="text-rose-600 text-xs font-semibold">
-                      +$0.61 premium
-                    </div>
-                  </div>
-                </div>
-
-                {/* Full-width code block */}
-                <div className="bg-gray-900 text-gray-100 p-6 rounded-lg font-mono text-sm overflow-x-auto">
-                  <div className="text-green-400 mb-4">
-                    # American Option - Early Exercise Check Added
-                  </div>
-                  <div className="space-y-1">
-                    <div>
-                      <span className="text-blue-300">for</span>{" "}
-                      <span className="text-yellow-300">period</span>{" "}
-                      <span className="text-blue-300">in</span>{" "}
-                      <span className="text-purple-300">range</span>(N
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>,{" "}
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>,{" "}
-                      <span className="text-red-300">-</span>
-                      <span className="text-orange-300">1</span>):
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-blue-300">for</span>{" "}
-                      <span className="text-yellow-300">j</span>{" "}
-                      <span className="text-blue-300">in</span>{" "}
-                      <span className="text-purple-300">range</span>(period{" "}
-                      <span className="text-red-300">+</span>{" "}
-                      <span className="text-orange-300">1</span>):
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-gray-400">
-                        # Calculate continuation value (same as European)
-                      </span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;continuation{" "}
-                      <span className="text-red-300">=</span> discount{" "}
-                      <span className="text-red-300">*</span> (
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p{" "}
-                      <span className="text-red-300">*</span> option_values[j]{" "}
-                      <span className="text-red-300">+</span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(
-                      <span className="text-orange-300">1</span>{" "}
-                      <span className="text-red-300">-</span> p){" "}
-                      <span className="text-red-300">*</span> option_values[j{" "}
-                      <span className="text-red-300">+</span>{" "}
-                      <span className="text-orange-300">1</span>]
-                    </div>
-                    <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
-                    <div className="mt-2">
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-gray-400">
-                        # Calculate immediate exercise value
-                      </span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intrinsic{" "}
-                      <span className="text-red-300">=</span>{" "}
-                      <span className="text-purple-300">max</span>(K{" "}
-                      <span className="text-red-300">-</span>{" "}
-                      stock_price[period][j],{" "}
-                      <span className="text-orange-300">0</span>)
-                    </div>
-                    <div className="mt-2">
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <span className="text-gray-400">
-                        # KEY DIFFERENCE: Take maximum of both values
-                      </span>
-                    </div>
-                    <div>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;option_values[j]{" "}
-                      <span className="text-red-300">=</span>{" "}
-                      <span className="text-purple-300">max</span>(continuation,
-                      intrinsic)
-                    </div>
-                    <div className="mt-4 text-yellow-400">
-                      # This max() operation captures the early exercise
-                      premium!
+                    <div className="text-gray-600">
+                      • Inverse CDF: Precise but slower
+                      <br />• Ziggurat: Very fast, complex setup
+                      <br />• Acceptance-Rejection: Simple, inefficient
+                      <br />• Central Limit: Poor tail behavior
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Summary comparison - Harmonized colors */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-lg">
-                <h6 className="font-semibold text-blue-700 mb-4 text-center">
-                  🔑 Key Implementation Differences Summary
-                </h6>
+            <div className="mt-6 bg-white p-5 rounded-lg border border-amber-200">
+              <h5 className="font-bold text-amber-700 mb-4 text-center">
+                💡 Practical Implementation Tips
+              </h5>
 
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="bg-white p-4 rounded border border-blue-200">
-                      <div className="font-bold text-blue-700 mb-3 text-center">
-                        💡 The Core Difference
-                      </div>
-                      <div className="text-blue-600 text-sm text-center">
-                        <div className="bg-slate-50 p-3 rounded mb-2">
-                          <strong>European:</strong>{" "}
-                          <code>value = continuation</code>
-                        </div>
-                        <div className="bg-rose-50 p-3 rounded">
-                          <strong>American:</strong>{" "}
-                          <code>value = max(continuation, intrinsic)</code>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white p-4 rounded border border-blue-200">
-                      <div className="font-bold text-blue-700 mb-3 text-center">
-                        📊 Performance Impact
-                      </div>
-                      <div className="text-blue-600 text-sm">
-                        <div>
-                          • <strong>Speed:</strong> European ~10% faster
-                        </div>
-                        <div>
-                          • <strong>Memory:</strong> Similar usage
-                        </div>
-                        <div>
-                          • <strong>Complexity:</strong> One extra max()
-                          operation
-                        </div>
-                        <div>
-                          • <strong>Accuracy:</strong> American captures real
-                          market behavior
-                        </div>
-                      </div>
-                    </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-amber-50 p-3 rounded text-center">
+                  <div className="font-semibold text-amber-700 mb-2">
+                    🎯 Antithetic Variates
                   </div>
+                  <div className="text-amber-600 text-xs">
+                    Use both Z and -Z to reduce variance by ~50% with same
+                    computational cost
+                  </div>
+                </div>
 
-                  <div className="space-y-4">
-                    <div className="bg-white p-4 rounded border border-blue-200">
-                      <div className="font-bold text-blue-700 mb-3 text-center">
-                        🎯 When to Use Each
-                      </div>
-                      <div className="text-blue-600 text-sm">
-                        <div className="bg-slate-50 p-2 rounded mb-2">
-                          <strong>European Model:</strong> Index options,
-                          theoretical analysis, speed-critical applications
-                        </div>
-                        <div className="bg-rose-50 p-2 rounded">
-                          <strong>American Model:</strong> Equity options, real
-                          trading, dividend-paying stocks
-                        </div>
-                      </div>
-                    </div>
+                <div className="bg-amber-50 p-3 rounded text-center">
+                  <div className="font-semibold text-amber-700 mb-2">
+                    🔄 Control Variates
+                  </div>
+                  <div className="text-amber-600 text-xs">
+                    Use known analytical result (like Black-Scholes) to reduce
+                    simulation variance
+                  </div>
+                </div>
 
-                    <div className="bg-white p-4 rounded border border-blue-200">
-                      <div className="font-bold text-blue-700 mb-3 text-center">
-                        💰 Value Difference
-                      </div>
-                      <div className="text-blue-600 text-sm text-center">
-                        <div className="text-2xl font-bold text-emerald-600">
-                          $5.10 - $4.49 = $0.61
-                        </div>
-                        <div className="text-xs mt-1">
-                          American premium (12% higher value)
-                        </div>
-                      </div>
-                    </div>
+                <div className="bg-amber-50 p-3 rounded text-center">
+                  <div className="font-semibold text-amber-700 mb-2">
+                    📊 Importance Sampling
+                  </div>
+                  <div className="text-amber-600 text-xs">
+                    Sample more frequently near strike price where option
+                    sensitivity is highest
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Convergence - Consistent teal theme */}
+          {/* Convergence and Accuracy */}
           <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-2 border-teal-200 p-6 rounded-xl">
             <h4 className="font-bold text-teal-800 text-xl mb-6 text-center">
-              📈 Convergence to Black-Scholes
+              📈 Convergence and Accuracy Analysis
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-5 rounded-lg border border-teal-200">
                 <h5 className="font-bold text-teal-700 mb-4 text-center">
-                  🎯 Accuracy vs Speed
+                  📊 Convergence Rate
                 </h5>
                 <div className="space-y-3 text-sm">
                   <div className="bg-teal-50 p-3 rounded">
                     <div className="font-semibold text-teal-700 mb-2">
-                      As N increases:
+                      Law of Large Numbers:
                     </div>
-                    <div className="space-y-1 text-xs">
-                      <div>N = 10: Fast but rough (~5% error)</div>
-                      <div>N = 100: Good balance (~0.5% error)</div>
-                      <div>N = 1000: Very accurate (~0.05% error)</div>
-                      <div>N → ∞: Exactly Black-Scholes</div>
+                    <div className="text-center mb-2">
+                      <InlineMath math="\bar{X}_N \xrightarrow{N \to \infty} E[X]" />
+                    </div>
+                    <div className="text-teal-600 text-xs">
+                      Sample average converges to true expected value as N
+                      increases
                     </div>
                   </div>
 
-                  <div className="bg-slate-50 p-3 rounded text-xs">
-                    <div className="font-semibold text-slate-700 mb-1">
-                      Convergence Pattern:
+                  <div className="bg-teal-50 p-3 rounded">
+                    <div className="font-semibold text-teal-700 mb-2">
+                      Central Limit Theorem:
                     </div>
-                    <div className="text-slate-600">
-                      Binomial results oscillate around the true value, with
-                      even N often more accurate than odd N
+                    <div className="text-center mb-2">
+                      <InlineMath math="\sqrt{N}(\bar{X}_N - \mu) \xrightarrow{d} N(0, \sigma^2)" />
+                    </div>
+                    <div className="text-teal-600 text-xs">
+                      Error decreases as 1/√N - need 100x simulations for 10x
+                      accuracy
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Practical Convergence:
+                    </div>
+                    <div className="text-gray-600">
+                      • N = 1,000: ±3% accuracy (95% confidence)
+                      <br />• N = 10,000: ±1% accuracy
+                      <br />• N = 100,000: ±0.3% accuracy
+                      <br />• N = 1,000,000: ±0.1% accuracy
                     </div>
                   </div>
                 </div>
@@ -1897,38 +1781,484 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-teal-200">
                 <h5 className="font-bold text-teal-700 mb-4 text-center">
-                  ⚡ When to Use Each
+                  ⚡ Variance Reduction Techniques
                 </h5>
                 <div className="space-y-3 text-sm">
-                  <div className="bg-emerald-50 p-3 rounded">
-                    <div className="font-semibold text-emerald-700 mb-1">
-                      Use Binomial for:
+                  <div className="bg-teal-50 p-3 rounded">
+                    <div className="font-semibold text-teal-700 mb-2">
+                      Antithetic Variates:
                     </div>
-                    <ul className="text-emerald-600 text-xs space-y-1">
-                      <li>• American options</li>
-                      <li>• Discrete dividends</li>
-                      <li>• Learning/teaching</li>
-                      <li>• Custom features</li>
-                    </ul>
+                    <div className="text-teal-600 text-xs mb-2">
+                      Use both Z and -Z random numbers to reduce variance
+                    </div>
+                    <div className="text-center">
+                      <InlineMath math="V = \frac{1}{2}[\text{Payoff}(Z) + \text{Payoff}(-Z)]" />
+                    </div>
                   </div>
 
-                  <div className="bg-blue-50 p-3 rounded">
-                    <div className="font-semibold text-blue-700 mb-1">
-                      Use Black-Scholes for:
+                  <div className="bg-teal-50 p-3 rounded">
+                    <div className="font-semibold text-teal-700 mb-2">
+                      Control Variates:
                     </div>
-                    <ul className="text-blue-600 text-xs space-y-1">
-                      <li>• European options</li>
-                      <li>• Real-time pricing</li>
-                      <li>• Portfolio analysis</li>
-                      <li>• High-frequency trading</li>
-                    </ul>
+                    <div className="text-teal-600 text-xs mb-2">
+                      Use Black-Scholes as control to reduce simulation variance
+                    </div>
+                    <div className="text-center">
+                      <InlineMath math="V_{adj} = V_{MC} + \beta(V_{BS} - \bar{V}_{BS})" />
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Variance Reduction Impact:
+                    </div>
+                    <div className="text-gray-600">
+                      • Antithetic: 20-50% variance reduction
+                      <br />• Control variates: 50-90% reduction
+                      <br />• Stratified sampling: 30-70% reduction
+                      <br />• Combined methods: Up to 95% reduction
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-white p-5 rounded-lg border border-teal-200">
+              <h5 className="font-bold text-teal-700 mb-4 text-center">
+                🎯 Confidence Intervals and Error Estimation
+              </h5>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3 text-sm">
+                  <div className="bg-teal-50 p-3 rounded">
+                    <div className="font-semibold text-teal-700 mb-2">
+                      Standard Error Formula:
+                    </div>
+                    <div className="text-center space-y-2">
+                      <div>
+                        <InlineMath math="SE = \frac{s}{\sqrt{N}}" />
+                      </div>
+                      <div>
+                        <InlineMath math="s = \sqrt{\frac{1}{N-1}\sum_{i=1}^{N}(X_i - \bar{X})^2}" />
+                      </div>
+                    </div>
+                    <div className="text-teal-600 text-xs mt-2">
+                      Where s is sample standard deviation of payoffs
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="bg-teal-50 p-3 rounded">
+                    <div className="font-semibold text-teal-700 mb-2">
+                      95% Confidence Interval:
+                    </div>
+                    <div className="text-center space-y-2">
+                      <div>
+                        <InlineMath math="CI = \bar{X} \pm 1.96 \times SE" />
+                      </div>
+                      <div className="text-xs">For our example:</div>
+                      <div>
+                        <InlineMath math="CI = 2.45 \pm 1.96 \times 0.01 = [2.43, 2.47]" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Implementation Tips - Consistent orange theme */}
+          {/* Path-Dependent Options */}
+          <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 p-6 rounded-xl">
+            <h4 className="font-bold text-purple-800 text-xl mb-6 text-center">
+              🛤️ Path-Dependent Options: Where Monte Carlo Shines
+            </h4>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    📊 Asian Options Example
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-purple-50 p-3 rounded">
+                      <div className="font-semibold text-purple-700 mb-2">
+                        Arithmetic Average Call:
+                      </div>
+                      <div className="text-center mb-2">
+                        <InlineMath math="\text{Payoff} = \max\left(\frac{1}{M}\sum_{i=1}^{M} S_i - K, 0\right)" />
+                      </div>
+                      <div className="text-purple-600 text-xs">
+                        Average stock price over option life versus strike
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Implementation Steps:
+                      </div>
+                      <ul className="text-gray-600 space-y-1">
+                        <li>
+                          1. Generate full stock price path S₀, S₁, ..., S_M
+                        </li>
+                        <li>2. Calculate arithmetic average: Ā = (1/M)ΣS_i</li>
+                        <li>3. Compute payoff: max(Ā - K, 0)</li>
+                        <li>4. Repeat for N simulations and average</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    🚧 Barrier Options Example
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-purple-50 p-3 rounded">
+                      <div className="font-semibold text-purple-700 mb-2">
+                        Knock-Out Call:
+                      </div>
+                      <div className="text-center mb-2">
+                        <InlineMath math="\text{Payoff} = \begin{cases} \max(S_T - K, 0) & \text{if } S_t \leq B \text{ for all } t \\ 0 & \text{otherwise} \end{cases}" />
+                      </div>
+                      <div className="text-purple-600 text-xs">
+                        Option becomes worthless if stock hits barrier B
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Implementation Notes:
+                      </div>
+                      <ul className="text-gray-600 space-y-1">
+                        <li>• Check barrier condition at each time step</li>
+                        <li>• Use fine time discretization near barriers</li>
+                        <li>• Consider continuous monitoring adjustments</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    👁️ Lookback Options Example
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-purple-50 p-3 rounded">
+                      <div className="font-semibold text-purple-700 mb-2">
+                        Floating Strike Call:
+                      </div>
+                      <div className="text-center mb-2">
+                        <InlineMath math="\text{Payoff} = S_T - \min_{0 \leq t \leq T} S_t" />
+                      </div>
+                      <div className="text-purple-600 text-xs">
+                        Strike equals minimum stock price during option life
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Algorithm:
+                      </div>
+                      <ul className="text-gray-600 space-y-1">
+                        <li>1. Track running minimum: min_so_far</li>
+                        <li>
+                          2. Update at each time step: min_so_far =
+                          min(min_so_far, S_t)
+                        </li>
+                        <li>3. Final payoff: S_T - min_so_far</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <h5 className="font-semibold text-purple-700 mb-3">
+                    🌈 Multi-Asset Options
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-purple-50 p-3 rounded">
+                      <div className="font-semibold text-purple-700 mb-2">
+                        Basket Call Option:
+                      </div>
+                      <div className="text-center mb-2">
+                        <InlineMath math="\text{Payoff} = \max\left(\sum_{i=1}^{n} w_i S_i(T) - K, 0\right)" />
+                      </div>
+                      <div className="text-purple-600 text-xs">
+                        Weighted average of multiple stock prices
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Correlation Handling:
+                      </div>
+                      <div className="text-gray-600">
+                        • Generate correlated random vectors
+                        <br />• Use Cholesky decomposition of correlation matrix
+                        <br />• Simulate all assets simultaneously
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Stochastic Processes */}
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 p-6 rounded-xl">
+            <h4 className="font-bold text-indigo-800 text-xl mb-6 text-center">
+              🌊 Advanced Stochastic Processes
+            </h4>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                  <h5 className="font-semibold text-indigo-700 mb-3">
+                    🦘 Jump-Diffusion Process (Merton)
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-2">
+                        Process Definition:
+                      </div>
+                      <div className="text-center space-y-1 text-xs">
+                        <div>
+                          <InlineMath math="dS = rS dt + \sigma S dW + S dJ" />
+                        </div>
+                        <div>where J is a compound Poisson process</div>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-2">
+                        Simulation Steps:
+                      </div>
+                      <ul className="text-indigo-600 text-xs space-y-1">
+                        <li>1. Generate normal diffusion: σ√Δt × Z</li>
+                        <li>2. Check for jumps: Poisson(λΔt)</li>
+                        <li>3. If jump occurs, add log-normal jump size</li>
+                        <li>
+                          4. Update: {"S_{t+1}"} = S_t × exp(drift + diffusion +
+                          jumps)
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Market Applications:
+                      </div>
+                      <div className="text-gray-600">
+                        Better captures market crashes, earnings surprises, and
+                        other discontinuous events
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                  <h5 className="font-semibold text-indigo-700 mb-3">
+                    🌪️ Stochastic Volatility (Heston)
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-2">
+                        Coupled System:
+                      </div>
+                      <div className="text-center space-y-1 text-xs">
+                        <div>
+                          <InlineMath math="dS = rS dt + \sqrt{v} S dW_1" />
+                        </div>
+                        <div>
+                          <InlineMath math="dv = \kappa(\theta - v) dt + \xi\sqrt{v} dW_2" />
+                        </div>
+                        <div>
+                          <InlineMath math="dW_1 dW_2 = \rho dt" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Implementation Challenges:
+                      </div>
+                      <div className="text-gray-600">
+                        • Ensure variance stays positive
+                        <br />• Handle correlation between price and volatility
+                        <br />• More complex but captures volatility clustering
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                  <h5 className="font-semibold text-indigo-700 mb-3">
+                    🔄 Mean-Reverting Processes
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-2">
+                        Ornstein-Uhlenbeck Process:
+                      </div>
+                      <div className="text-center space-y-1 text-xs">
+                        <div>
+                          <InlineMath math="dx = \kappa(\mu - x) dt + \sigma dW" />
+                        </div>
+                        <div>Discrete form:</div>
+                        <div>
+                          <InlineMath math="x_{t+1} = x_t e^{-\kappa\Delta t} + \mu(1-e^{-\kappa\Delta t}) + \sigma\sqrt{\frac{1-e^{-2\kappa\Delta t}}{2\kappa}} Z" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Applications:
+                      </div>
+                      <div className="text-gray-600">
+                        • Interest rate models (Vasicek)
+                        <br />• Commodity prices (oil, gas)
+                        <br />• Volatility modeling (log-volatility)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                  <h5 className="font-semibold text-indigo-700 mb-3">
+                    ⚡ Implementation Efficiency
+                  </h5>
+                  <div className="space-y-2 text-sm">
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-2">
+                        Optimization Techniques:
+                      </div>
+                      <ul className="text-indigo-600 text-xs space-y-1">
+                        <li>• Vectorize operations with NumPy/Pandas</li>
+                        <li>• Use compiled code (Numba, Cython)</li>
+                        <li>• GPU acceleration with CuPy/TensorFlow</li>
+                        <li>• Parallel processing across CPU cores</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Performance Scaling:
+                      </div>
+                      <div className="text-gray-600">
+                        • Single-threaded Python: ~1K simulations/sec
+                        <br />• Vectorized NumPy: ~100K simulations/sec
+                        <br />• GPU acceleration: ~10M simulations/sec
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Greeks Calculation */}
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 p-6 rounded-xl">
+            <h4 className="font-bold text-emerald-800 text-xl mb-6">
+              📊 Greeks Calculation via Monte Carlo
+            </h4>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white p-5 rounded-lg border border-emerald-200">
+                <h5 className="font-bold text-emerald-700 mb-4">
+                  🔢 Finite Difference Methods
+                </h5>
+                <div className="space-y-3">
+                  <div className="bg-emerald-50 p-3 rounded">
+                    <div className="font-semibold text-emerald-700 text-sm mb-2">
+                      Delta (Price Sensitivity):
+                    </div>
+                    <div className="text-center space-y-1 text-xs">
+                      <div>
+                        <InlineMath math="\Delta = \frac{V(S_0 + h) - V(S_0 - h)}{2h}" />
+                      </div>
+                      <div>
+                        Central difference with small h (e.g., 1% of S₀)
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 p-3 rounded">
+                    <div className="font-semibold text-emerald-700 text-sm mb-2">
+                      Gamma (Delta Sensitivity):
+                    </div>
+                    <div className="text-center space-y-1 text-xs">
+                      <div>
+                        <InlineMath math="\Gamma = \frac{V(S_0 + h) - 2V(S_0) + V(S_0 - h)}{h^2}" />
+                      </div>
+                      <div>Second derivative approximation</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 p-3 rounded">
+                    <div className="font-semibold text-emerald-700 text-sm mb-2">
+                      Vega (Volatility Sensitivity):
+                    </div>
+                    <div className="text-center space-y-1 text-xs">
+                      <div>
+                        <InlineMath math="\nu = \frac{V(\sigma + h) - V(\sigma - h)}{2h}" />
+                      </div>
+                      <div>Typically use h = 1% absolute volatility change</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-5 rounded-lg border border-emerald-200">
+                <h5 className="font-bold text-emerald-700 mb-4">
+                  📈 Pathwise Derivatives Method
+                </h5>
+                <div className="space-y-3">
+                  <div className="bg-emerald-50 p-3 rounded">
+                    <div className="font-semibold text-emerald-700 text-sm mb-2">
+                      Concept:
+                    </div>
+                    <div className="text-emerald-600 text-xs mb-2">
+                      Calculate sensitivity along each simulated path, then
+                      average
+                    </div>
+                    <div className="text-center">
+                      <InlineMath math="\Delta = e^{-rT} \cdot \frac{1}{N} \sum_{i=1}^{N} \frac{\partial}{\partial S_0} \text{Payoff}_i" />
+                    </div>
+                  </div>
+
+                  <div className="bg-emerald-50 p-3 rounded">
+                    <div className="font-semibold text-emerald-700 text-sm mb-2">
+                      Advantages:
+                    </div>
+                    <ul className="text-emerald-600 text-xs space-y-1">
+                      <li>• Same random numbers for option and Greek</li>
+                      <li>• No additional simulations needed</li>
+                      <li>• Lower variance than finite differences</li>
+                      <li>• Automatic common random numbers</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Implementation Notes:
+                    </div>
+                    <div className="text-gray-600">
+                      Works well for vanilla options but requires careful
+                      handling for path-dependent and barrier options
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Implementation Best Practices */}
           <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 p-6 rounded-xl">
             <h4 className="font-bold text-orange-800 text-xl mb-6">
               💡 Implementation Best Practices
@@ -1937,62 +2267,108 @@ const BinomialOptions = () => {
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-4 rounded-lg border border-orange-200">
                 <h5 className="font-semibold text-orange-700 mb-3 text-center">
-                  ⚡ Performance
+                  🎯 Accuracy Guidelines
                 </h5>
                 <ul className="text-orange-600 text-sm space-y-2">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-orange-500 mt-1">•</span>
-                    <span>Use N = 100-500 for most applications</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-orange-500 mt-1">•</span>
-                    <span>Implement rolling arrays to save memory</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-orange-500 mt-1">•</span>
-                    <span>Vectorize calculations with NumPy</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border border-orange-200">
-                <h5 className="font-semibold text-orange-700 mb-3 text-center">
-                  🔍 Validation
-                </h5>
-                <ul className="text-orange-600 text-sm space-y-2">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-orange-500 mt-1">•</span>
-                    <span>Verify ud = 1 (recombining tree)</span>
-                  </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-orange-500 mt-1">•</span>
                     <span>
-                      Check 0 {"<"} p {"<"} 1 (valid probability)
+                      <strong>Sample Size:</strong> Start with N=10,000,
+                      increase until stable
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-orange-500 mt-1">•</span>
-                    <span>Compare European result with Black-Scholes</span>
+                    <span>
+                      <strong>Time Steps:</strong> Use M=252 (daily) for
+                      standard options
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Convergence:</strong> Monitor running average,
+                      stop when stable
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Validation:</strong> Compare simple cases with
+                      Black-Scholes
+                    </span>
                   </li>
                 </ul>
               </div>
 
               <div className="bg-white p-4 rounded-lg border border-orange-200">
                 <h5 className="font-semibold text-orange-700 mb-3 text-center">
-                  🎯 Accuracy
+                  ⚡ Performance Optimization
                 </h5>
                 <ul className="text-orange-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-orange-500 mt-1">•</span>
-                    <span>Test convergence with increasing N</span>
+                    <span>
+                      <strong>Vectorization:</strong> Use NumPy arrays, avoid
+                      Python loops
+                    </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-orange-500 mt-1">•</span>
-                    <span>Use Richardson extrapolation for speed</span>
+                    <span>
+                      <strong>Memory:</strong> Pre-allocate arrays, avoid
+                      dynamic resizing
+                    </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-orange-500 mt-1">•</span>
-                    <span>Handle dividends with discrete adjustments</span>
+                    <span>
+                      <strong>Random Numbers:</strong> Generate in batches,
+                      reuse when possible
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Parallelization:</strong> Split simulations across
+                      CPU cores
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-orange-200">
+                <h5 className="font-semibold text-orange-700 mb-3 text-center">
+                  🔍 Quality Control
+                </h5>
+                <ul className="text-orange-600 text-sm space-y-2">
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Random Seed:</strong> Use fixed seeds for
+                      reproducible results
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Outlier Detection:</strong> Check for extreme
+                      payoff values
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Statistical Tests:</strong> Verify normality of
+                      price increments
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-orange-500 mt-1">•</span>
+                    <span>
+                      <strong>Confidence Intervals:</strong> Always report error
+                      bounds
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -2007,11 +2383,11 @@ const BinomialOptions = () => {
         <div className="space-y-8">
           <div>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              The Binomial Model combines intuitive visualization with
-              mathematical rigor, making it incredibly versatile for both
-              education and practical trading. While it excels in certain areas
-              where other models struggle, it also faces unique computational
-              and accuracy trade-offs that traders must understand and manage.
+              Monte Carlo simulation offers unmatched flexibility for complex
+              derivatives pricing, capable of handling virtually any payoff
+              structure or market complexity. However, this power comes with
+              significant computational costs and convergence challenges that
+              traders must understand and manage.
             </p>
 
             <div className="bg-amber-100 border-2 border-amber-300 text-amber-900 p-6 rounded-xl mb-6">
@@ -2028,13 +2404,15 @@ const BinomialOptions = () => {
                   />
                 </svg>
                 <div>
-                  <h4 className="font-bold mb-2">The Educational Powerhouse</h4>
+                  <h4 className="font-bold mb-2">
+                    The Flexibility vs Speed Trade-off
+                  </h4>
                   <p>
-                    Binomial trees excel at bridging the gap between intuition
-                    and mathematics. Students can see every possible outcome and
-                    understand exactly why options have value, making complex
-                    concepts accessible. Yet this same transparency comes with
-                    computational costs that other models avoid entirely.
+                    Monte Carlo can price anything you can program, from simple
+                    vanilla options to the most complex path-dependent exotics.
+                    But this flexibility comes at the cost of computation time
+                    and the need for sophisticated variance reduction techniques
+                    to achieve acceptable accuracy.
                   </p>
                 </div>
               </div>
@@ -2066,15 +2444,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-green-700 mb-2">
-                        American Options Excellence
+                        Unlimited Flexibility
                       </h5>
                       <p className="text-green-600 text-sm mb-2">
-                        Natural handling of early exercise decisions by
-                        comparing intrinsic vs continuation value at each node
+                        Can handle any payoff structure, path dependency, or
+                        market complexity that can be programmed
                       </p>
                       <div className="bg-green-50 p-2 rounded text-xs">
-                        <strong>Advantage:</strong> Black-Scholes can't handle
-                        American options directly
+                        <strong>Capability:</strong> Asian options, barriers,
+                        lookbacks, multi-asset derivatives, custom exotics
                       </div>
                     </div>
                   </div>
@@ -2097,15 +2475,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-green-700 mb-2">
-                        Intuitive Visualization
+                        Realistic Market Modeling
                       </h5>
                       <p className="text-green-600 text-sm mb-2">
-                        Tree structure makes all possible price paths visible,
-                        building deep understanding of option behavior
+                        Easily incorporates jumps, stochastic volatility,
+                        time-varying parameters, and empirical distributions
                       </p>
                       <div className="bg-green-50 p-2 rounded text-xs">
-                        <strong>Educational:</strong> Best model for learning
-                        options pricing concepts
+                        <strong>Reality:</strong> Market crashes, volatility
+                        clustering, correlation changes all modeled naturally
                       </div>
                     </div>
                   </div>
@@ -2128,15 +2506,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-green-700 mb-2">
-                        Flexible Framework
+                        Multi-Dimensional Capability
                       </h5>
                       <p className="text-green-600 text-sm mb-2">
-                        Easily modified for time-varying parameters, discrete
-                        dividends, and complex payoff structures
+                        Naturally handles multiple assets, currencies, and risk
+                        factors without exponential complexity growth
                       </p>
                       <div className="bg-green-50 p-2 rounded text-xs">
-                        <strong>Adaptability:</strong> Can incorporate
-                        path-dependent features naturally
+                        <strong>Scale:</strong> 10 assets = same computational
+                        complexity as 1 asset
                       </div>
                     </div>
                   </div>
@@ -2159,15 +2537,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-green-700 mb-2">
-                        Convergence Guarantee
+                        Statistical Robustness
                       </h5>
                       <p className="text-green-600 text-sm mb-2">
-                        Mathematically proven to converge to Black-Scholes as
-                        number of steps increases
+                        Provides confidence intervals, convergence diagnostics,
+                        and error estimates automatically
                       </p>
                       <div className="bg-green-50 p-2 rounded text-xs">
-                        <strong>Reliability:</strong> Can achieve any desired
-                        accuracy level
+                        <strong>Quality:</strong> Know exactly how accurate your
+                        results are
                       </div>
                     </div>
                   </div>
@@ -2190,15 +2568,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-green-700 mb-2">
-                        Programming Simplicity
+                        Model Validation Power
                       </h5>
                       <p className="text-green-600 text-sm mb-2">
-                        Straightforward implementation with loops and arrays,
-                        easy to debug and modify
+                        Perfect for cross-checking analytical models and testing
+                        exotic pricing against simpler benchmarks
                       </p>
                       <div className="bg-green-50 p-2 rounded text-xs">
-                        <strong>Implementation:</strong> No complex mathematical
-                        libraries required
+                        <strong>Use:</strong> Gold standard for validating other
+                        pricing methods
                       </div>
                     </div>
                   </div>
@@ -2229,15 +2607,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Computational Intensity
+                        Slow Convergence Rate
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Memory usage grows as O(N²) and computation time as
-                        O(N²), becoming prohibitive for large portfolios
+                        Error decreases only as 1/√N, requiring 100x more
+                        simulations for 10x better accuracy
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Reality:</strong> 1000-step tree needs 500,000
-                        calculations vs instant Black-Scholes
+                        <strong>Reality:</strong> Going from 10K to 1M
+                        simulations improves accuracy by only 10x
                       </div>
                     </div>
                   </div>
@@ -2260,15 +2638,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Oscillatory Convergence
+                        Computational Intensity
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Results oscillate around true value as N increases,
-                        making convergence assessment difficult
+                        Requires massive computational resources for high
+                        accuracy, making real-time applications challenging
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Effect:</strong> Even N often more accurate than
-                        odd N for same computation cost
+                        <strong>Scale:</strong> 1M simulations can take minutes
+                        vs microseconds for Black-Scholes
                       </div>
                     </div>
                   </div>
@@ -2291,15 +2669,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Slow Accuracy Improvement
+                        Random Number Quality Dependence
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Error decreases only as O(1/N), requiring 100x more
-                        steps for 10x better accuracy
+                        Results heavily dependent on random number generator
+                        quality and can show bias with poor generators
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Example:</strong> Going from N=100 to N=1000
-                        gives only 3x better accuracy
+                        <strong>Risk:</strong> Bad RNG can systematically bias
+                        option prices
                       </div>
                     </div>
                   </div>
@@ -2322,16 +2700,15 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Parameter Sensitivity
+                        Poor Greeks Accuracy
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Small changes in volatility or time steps can
-                        significantly affect results, requiring careful
-                        calibration
+                        Risk sensitivities calculated via finite differences are
+                        noisy and require massive sample sizes for precision
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Risk:</strong> Numerical instability with
-                        extreme parameters
+                        <strong>Problem:</strong> Greeks often have 10x larger
+                        error than option prices
                       </div>
                     </div>
                   </div>
@@ -2354,15 +2731,16 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Poor Real-Time Performance
+                        Memory and Storage Requirements
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Too slow for high-frequency trading, market making, or
-                        large portfolio analysis requiring instant updates
+                        Large simulations require substantial RAM and storage,
+                        especially for path-dependent options with many time
+                        steps
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Limitation:</strong> Millisecond calculations vs
-                        microsecond needs
+                        <strong>Scale:</strong> 1M paths × 252 steps × 8 bytes =
+                        2GB per asset
                       </div>
                     </div>
                   </div>
@@ -2385,15 +2763,16 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <h5 className="font-semibold text-red-700 mb-2">
-                        Limited Volatility Modeling
+                        Implementation Complexity
                       </h5>
                       <p className="text-red-600 text-sm mb-2">
-                        Assumes constant volatility within each period; can't
-                        naturally handle volatility smiles or term structure
+                        Requires sophisticated programming, variance reduction
+                        techniques, and statistical expertise for optimal
+                        results
                       </p>
                       <div className="bg-red-50 p-2 rounded text-xs">
-                        <strong>Workaround:</strong> Requires manual adjustments
-                        for market-observed vol patterns
+                        <strong>Barrier:</strong> Much harder to implement
+                        correctly than Black-Scholes
                       </div>
                     </div>
                   </div>
@@ -2405,13 +2784,13 @@ const BinomialOptions = () => {
           {/* When to Use vs When to Avoid */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6 rounded-xl">
             <h4 className="font-bold text-blue-800 text-xl mb-6 text-center">
-              When to Use Binomial vs When to Look for Alternatives
+              When to Use Monte Carlo vs When to Look for Alternatives
             </h4>
 
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white p-6 rounded-lg border border-blue-200">
                 <h5 className="font-bold text-green-700 mb-4 text-center">
-                  ✅ Use Binomial When:
+                  ✅ Use Monte Carlo When:
                 </h5>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
@@ -2420,11 +2799,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-green-700 text-sm">
-                        American Exercise Features
+                        Path-Dependent Payoffs
                       </div>
                       <p className="text-green-600 text-xs">
-                        Any option that can be exercised early, especially with
-                        dividend considerations
+                        Asian options, barriers, lookbacks, or any payoff
+                        depending on the entire price path
                       </p>
                     </div>
                   </div>
@@ -2435,11 +2814,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-green-700 text-sm">
-                        Educational Purposes
+                        Multi-Asset Derivatives
                       </div>
                       <p className="text-green-600 text-xs">
-                        Learning options pricing, demonstrating risk-neutral
-                        valuation, or building intuition
+                        Basket options, rainbow options, or products with
+                        complex correlation structures
                       </p>
                     </div>
                   </div>
@@ -2450,11 +2829,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-green-700 text-sm">
-                        Discrete Events
+                        Complex Market Models
                       </div>
                       <p className="text-green-600 text-xs">
-                        Known dividend dates, earnings announcements, or other
-                        scheduled events
+                        Jump-diffusion, stochastic volatility, or
+                        regime-switching models without closed-form solutions
                       </p>
                     </div>
                   </div>
@@ -2465,11 +2844,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-green-700 text-sm">
-                        Custom Modifications
+                        Custom Exotic Structures
                       </div>
                       <p className="text-green-600 text-xs">
-                        Need to adjust parameters over time or incorporate
-                        special features
+                        Bespoke derivatives with unique features that standard
+                        models can't handle
                       </p>
                     </div>
                   </div>
@@ -2483,8 +2862,8 @@ const BinomialOptions = () => {
                         Model Validation
                       </div>
                       <p className="text-green-600 text-xs">
-                        Cross-checking Black-Scholes results or testing
-                        convergence
+                        Cross-checking analytical results or benchmarking new
+                        pricing methods
                       </p>
                     </div>
                   </div>
@@ -2502,11 +2881,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-red-700 text-sm">
-                        High-Frequency Trading
+                        Real-Time Pricing Needs
                       </div>
                       <p className="text-red-600 text-xs">
-                        Need microsecond pricing updates for algorithmic trading
-                        or market making
+                        High-frequency trading, market making, or any
+                        application requiring sub-second response times
                       </p>
                     </div>
                   </div>
@@ -2517,11 +2896,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-red-700 text-sm">
-                        Large Portfolio Analysis
+                        Simple European Options
                       </div>
                       <p className="text-red-600 text-xs">
-                        Pricing hundreds or thousands of options simultaneously
-                        for risk management
+                        Vanilla calls and puts where Black-Scholes provides
+                        instant, exact results
                       </p>
                     </div>
                   </div>
@@ -2532,11 +2911,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-red-700 text-sm">
-                        Simple European Options
+                        High-Precision Greeks
                       </div>
                       <p className="text-red-600 text-xs">
-                        Standard calls/puts where Black-Scholes provides instant
-                        accurate results
+                        When accurate risk sensitivities are critical and
+                        computational time is limited
                       </p>
                     </div>
                   </div>
@@ -2547,11 +2926,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-red-700 text-sm">
-                        Extreme Accuracy Requirements
+                        Large Portfolio Analysis
                       </div>
                       <p className="text-red-600 text-xs">
-                        When need 6+ decimal place precision and willing to use
-                        Monte Carlo methods
+                        Thousands of positions requiring simultaneous repricing
+                        for risk management
                       </p>
                     </div>
                   </div>
@@ -2562,11 +2941,11 @@ const BinomialOptions = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-red-700 text-sm">
-                        Volatility Surface Modeling
+                        Limited Computational Resources
                       </div>
                       <p className="text-red-600 text-xs">
-                        Complex volatility patterns requiring local volatility
-                        or stochastic volatility models
+                        Mobile applications, embedded systems, or environments
+                        without access to parallel processing
                       </p>
                     </div>
                   </div>
@@ -2575,141 +2954,128 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Model Enhancement Opportunities */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 p-6 rounded-xl">
-            <h4 className="font-bold text-indigo-800 text-xl mb-6">
-              Enhancement Opportunities & Advanced Techniques
+          {/* Variance Reduction Impact */}
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border-2 border-teal-200 p-6 rounded-xl">
+            <h4 className="font-bold text-teal-800 text-xl mb-6 text-center">
+              Overcoming Monte Carlo Limitations: Variance Reduction Techniques
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h5 className="font-semibold text-indigo-700 mb-3">
-                    🚀 Performance Optimizations
+                <div className="bg-white p-4 rounded-lg border border-teal-200">
+                  <h5 className="font-semibold text-teal-700 mb-3">
+                    🎯 Antithetic Variates Impact
                   </h5>
                   <div className="space-y-2 text-sm">
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Vectorization:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Use NumPy arrays instead of Python loops for 10-100x
-                        speedup
-                      </span>
+                    <div className="bg-teal-50 p-3 rounded">
+                      <div className="font-semibold text-teal-700 mb-2">
+                        Variance Reduction:
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>Standard MC: σ² = 0.100</div>
+                        <div>With Antithetic: σ² = 0.062</div>
+                        <div>Reduction: 38%</div>
+                        <div>Effective 2.6x speedup</div>
+                      </div>
                     </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Memory Efficiency:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Rolling arrays reduce memory from O(N²) to O(N)
-                      </span>
-                    </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Richardson Extrapolation:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Combine N and 2N results for higher-order accuracy
-                      </span>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Implementation Cost:
+                      </div>
+                      <div className="text-gray-600">
+                        Zero additional computational cost - uses negated random
+                        numbers
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h5 className="font-semibold text-indigo-700 mb-3">
-                    🎛️ Advanced Features
+                <div className="bg-white p-4 rounded-lg border border-teal-200">
+                  <h5 className="font-semibold text-teal-700 mb-3">
+                    🎛️ Control Variates Power
                   </h5>
                   <div className="space-y-2 text-sm">
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Trinomial Trees:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Add middle branch for better convergence properties
-                      </span>
+                    <div className="bg-teal-50 p-3 rounded">
+                      <div className="font-semibold text-teal-700 mb-2">
+                        Using Black-Scholes as Control:
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>Raw MC Error: ±0.05</div>
+                        <div>With Control: ±0.01</div>
+                        <div>Reduction: 80%</div>
+                        <div>Effective 25x speedup</div>
+                      </div>
                     </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Time-Varying Parameters:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Different σ and r at each time step
-                      </span>
-                    </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Barrier Options:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Check knockout/knockin conditions at each node
-                      </span>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Best Applications:
+                      </div>
+                      <div className="text-gray-600">
+                        Exotic options similar to vanilla structures (Asian
+                        calls, barrier options)
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h5 className="font-semibold text-indigo-700 mb-3">
-                    🛠️ Practical Adjustments
+                <div className="bg-white p-4 rounded-lg border border-teal-200">
+                  <h5 className="font-semibold text-teal-700 mb-3">
+                    📊 Importance Sampling
                   </h5>
                   <div className="space-y-2 text-sm">
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Implied Volatility:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Use market-derived vol instead of historical estimates
-                      </span>
+                    <div className="bg-teal-50 p-3 rounded">
+                      <div className="font-semibold text-teal-700 mb-2">
+                        Deep OTM Options:
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>Standard MC: 90% paths = $0</div>
+                        <div>Importance Sampling: 70% useful</div>
+                        <div>Variance Reduction: 60%</div>
+                        <div>Critical for rare events</div>
+                      </div>
                     </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Discrete Dividends:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Adjust stock price tree at known dividend dates
-                      </span>
-                    </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Transaction Costs:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Widen bid-ask spreads or adjust volatility upward
-                      </span>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Implementation:
+                      </div>
+                      <div className="text-gray-600">
+                        Shift probability distribution toward regions where
+                        payoff is non-zero
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h5 className="font-semibold text-indigo-700 mb-3">
-                    📊 Validation Techniques
+                <div className="bg-white p-4 rounded-lg border border-teal-200">
+                  <h5 className="font-semibold text-teal-700 mb-3">
+                    🎲 Quasi-Random Sequences
                   </h5>
                   <div className="space-y-2 text-sm">
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        European Cross-Check:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Compare with Black-Scholes for European options
-                      </span>
+                    <div className="bg-teal-50 p-3 rounded">
+                      <div className="font-semibold text-teal-700 mb-2">
+                        Sobol Sequences:
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>Convergence: O(log N / N)</div>
+                        <div>vs Random: O(1 / √N)</div>
+                        <div>Better space filling</div>
+                        <div>5-10x faster convergence</div>
+                      </div>
                     </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Convergence Testing:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Plot price vs N to verify stabilization
-                      </span>
-                    </div>
-                    <div className="bg-indigo-50 p-2 rounded">
-                      <strong className="text-indigo-700">
-                        Greeks Stability:
-                      </strong>
-                      <span className="text-indigo-600 text-xs ml-1">
-                        Ensure delta and gamma don't oscillate wildly
-                      </span>
+
+                    <div className="bg-gray-50 p-3 rounded text-xs">
+                      <div className="font-semibold text-gray-700 mb-1">
+                        Trade-off:
+                      </div>
+                      <div className="text-gray-600">
+                        Better convergence but less suitable for certain types
+                        of payoffs
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2717,44 +3083,145 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Final Practical Advice */}
+          {/* Modern Acceleration Techniques */}
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 p-6 rounded-xl">
+            <h4 className="font-bold text-indigo-800 text-xl mb-6">
+              Modern Acceleration: GPU Computing & Parallel Processing
+            </h4>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                <h5 className="font-semibold text-indigo-700 mb-3 text-center">
+                  💻 CPU Optimization
+                </h5>
+                <div className="space-y-3 text-sm">
+                  <div className="bg-indigo-50 p-3 rounded">
+                    <div className="font-semibold text-indigo-700 mb-2">
+                      Vectorization Benefits:
+                    </div>
+                    <ul className="text-indigo-600 text-xs space-y-1">
+                      <li>• NumPy: 10-100x speedup over pure Python</li>
+                      <li>
+                        • SIMD instructions: Process 4-8 numbers simultaneously
+                      </li>
+                      <li>• Memory efficiency: Contiguous array access</li>
+                      <li>• JIT compilation: Numba adds 10-50x more speed</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Performance Scale:
+                    </div>
+                    <div className="text-gray-600">
+                      • Pure Python: 1K sims/sec
+                      <br />• NumPy: 100K sims/sec
+                      <br />• Numba: 1M sims/sec
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                <h5 className="font-semibold text-indigo-700 mb-3 text-center">
+                  🚀 GPU Acceleration
+                </h5>
+                <div className="space-y-3 text-sm">
+                  <div className="bg-indigo-50 p-3 rounded">
+                    <div className="font-semibold text-indigo-700 mb-2">
+                      Massive Parallelism:
+                    </div>
+                    <ul className="text-indigo-600 text-xs space-y-1">
+                      <li>• 1000+ cores vs 4-16 CPU cores</li>
+                      <li>• Perfect for embarrassingly parallel MC</li>
+                      <li>• CuPy/CUDA: Drop-in NumPy replacement</li>
+                      <li>• 100-1000x speedup for large simulations</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Performance Scale:
+                    </div>
+                    <div className="text-gray-600">
+                      • High-end GPU: 10-100M sims/sec
+                      <br />• Multiple GPUs: 1B+ sims/sec
+                      <br />• Memory bandwidth critical
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-indigo-200">
+                <h5 className="font-semibold text-indigo-700 mb-3 text-center">
+                  ☁️ Cloud Computing
+                </h5>
+                <div className="space-y-3 text-sm">
+                  <div className="bg-indigo-50 p-3 rounded">
+                    <div className="font-semibold text-indigo-700 mb-2">
+                      Elastic Scaling:
+                    </div>
+                    <ul className="text-indigo-600 text-xs space-y-1">
+                      <li>• Auto-scale based on computation needs</li>
+                      <li>• Spot instances: 70% cost reduction</li>
+                      <li>• Distributed computing frameworks</li>
+                      <li>• Container orchestration (Kubernetes)</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded text-xs">
+                    <div className="font-semibold text-gray-700 mb-1">
+                      Cost Efficiency:
+                    </div>
+                    <div className="text-gray-600">
+                      • Pay per simulation rather than fixed hardware
+                      <br />• Scale to millions of cores for large jobs
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Final Assessment */}
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 p-6 rounded-xl">
             <h4 className="font-bold text-emerald-800 text-xl mb-4">
-              Bottom Line: When and How to Use Binomial Trees Effectively
+              Strategic Assessment: Monte Carlo's Role in Modern Finance
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-4 rounded-lg border border-emerald-200">
                 <h5 className="font-semibold text-emerald-700 mb-3">
-                  ✅ Binomial's Sweet Spot
+                  🎯 Where Monte Carlo Dominates
                 </h5>
                 <ul className="text-emerald-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>American Options:</strong> The only practical
-                      choice for most equity options with early exercise
+                      <strong>Complex Exotics:</strong> The only practical
+                      method for many structured products and bespoke
+                      derivatives
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Educational Tool:</strong> Unmatched for building
-                      intuition about option behavior
+                      <strong>Risk Management:</strong> Stress testing and
+                      scenario analysis across thousands of risk factors
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Custom Features:</strong> Easy to modify for
-                      special payoffs or market conditions
+                      <strong>Model Validation:</strong> Gold standard for
+                      checking analytical models and providing confidence bounds
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Model Development:</strong> Perfect for
-                      prototyping new pricing approaches
+                      <strong>Research & Development:</strong> Prototyping new
+                      products and testing market scenarios
                     </span>
                   </li>
                 </ul>
@@ -2762,35 +3229,35 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-4 rounded-lg border border-emerald-200">
                 <h5 className="font-semibold text-emerald-700 mb-3">
-                  ⚡ Optimization Guidelines
+                  ⚡ Optimization Reality Check
                 </h5>
                 <ul className="text-emerald-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Start Small:</strong> Begin with N=50-100 to test
-                      logic, then increase for production
+                      <strong>Hardware Evolution:</strong> GPU acceleration and
+                      cloud computing have largely solved speed concerns
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Test Convergence:</strong> Check if N=200 vs N=400
-                      gives acceptable differences before going higher
+                      <strong>Variance Reduction:</strong> Modern techniques
+                      achieve 10-100x efficiency improvements
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Memory Management:</strong> Use rolling arrays for
-                      production systems to avoid memory issues
+                      <strong>Hybrid Approaches:</strong> Combine MC with
+                      analytical methods for best of both worlds
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Validate Results:</strong> Always cross-check
-                      European options against Black-Scholes
+                      <strong>Cost vs Benefit:</strong> Computational costs have
+                      plummeted while model sophistication has soared
                     </span>
                   </li>
                 </ul>
@@ -2799,45 +3266,20 @@ const BinomialOptions = () => {
 
             <div className="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-200">
               <h5 className="font-semibold text-emerald-700 mb-2">
-                The Strategic Decision Framework
+                Bottom Line for Traders and Risk Managers
               </h5>
-              <p className="text-emerald-600 text-sm mb-3">
-                Choose binomial trees when you need the flexibility they provide
-                and can afford the computational cost. They're not the fastest
-                or most accurate method in all cases, but they're often the most
-                practical choice for American options and complex scenarios. The
-                key is understanding the trade-offs and optimizing appropriately
-                for your specific use case.
+              <p className="text-emerald-600 text-sm">
+                Monte Carlo simulation has evolved from an academic curiosity to
+                an indispensable tool for modern derivatives trading. While it
+                will never match Black-Scholes for speed on simple options, its
+                unmatched flexibility and improving computational efficiency
+                make it the method of choice for complex derivatives, risk
+                management, and model validation. The key is understanding when
+                the additional complexity is justified and how to implement
+                variance reduction techniques effectively. In today's markets,
+                Monte Carlo isn't just an alternative—it's often the only viable
+                solution for sophisticated financial products.
               </p>
-              <div className="grid md:grid-cols-3 gap-4 text-xs">
-                <div className="bg-white p-3 rounded border">
-                  <div className="font-semibold text-emerald-700 mb-1">
-                    For Trading:
-                  </div>
-                  <div className="text-emerald-600">
-                    N=100-300 provides good balance of speed and accuracy for
-                    real-time pricing
-                  </div>
-                </div>
-                <div className="bg-white p-3 rounded border">
-                  <div className="font-semibold text-emerald-700 mb-1">
-                    For Research:
-                  </div>
-                  <div className="text-emerald-600">
-                    N=500-2000 gives high precision for model validation and
-                    academic work
-                  </div>
-                </div>
-                <div className="bg-white p-3 rounded border">
-                  <div className="font-semibold text-emerald-700 mb-1">
-                    For Learning:
-                  </div>
-                  <div className="text-emerald-600">
-                    N=5-20 shows clear tree structure and builds intuitive
-                    understanding
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -2849,12 +3291,12 @@ const BinomialOptions = () => {
         <div className="space-y-8">
           <div>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              Binomial trees transform from academic concept to practical
-              trading tool through their unique ability to handle American
-              exercise and complex market features. Understanding how to
-              implement the model effectively—and when to choose it over
-              alternatives—separates successful options traders from those who
-              rely on purely theoretical calculations.
+              Monte Carlo simulation transforms from academic concept to
+              practical trading tool through its unique ability to handle exotic
+              options and complex market scenarios. Understanding how to
+              implement the method effectively—and when to choose it over
+              alternatives—separates sophisticated quantitative traders from
+              those limited to standard models.
             </p>
 
             <div className="bg-green-100 border-2 border-green-300 text-green-900 p-6 rounded-xl mb-6">
@@ -2872,15 +3314,15 @@ const BinomialOptions = () => {
                 </svg>
                 <div>
                   <h4 className="font-bold mb-2">
-                    From Educational Tool to Trading Floor
+                    From Research Lab to Trading Floor
                   </h4>
                   <p>
-                    Professional traders don't use binomial trees in isolation.
-                    They combine them with market intuition, real-time parameter
-                    adjustments, and sophisticated risk management to create
-                    profitable strategies. The model provides essential American
-                    option capability while maintaining computational
-                    practicality.
+                    Professional traders use Monte Carlo for complex derivatives
+                    that can't be priced analytically. They combine simulation
+                    with sophisticated variance reduction techniques and
+                    parallel computing to achieve both accuracy and speed in
+                    real-world applications where Black-Scholes and binomial
+                    models fall short.
                   </p>
                 </div>
               </div>
@@ -2890,7 +3332,7 @@ const BinomialOptions = () => {
           {/* Software & Tools */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 p-6 rounded-xl">
             <h4 className="font-bold text-blue-800 text-xl mb-6 text-center">
-              Software & Tools That Use Binomial Trees
+              Software & Tools That Use Monte Carlo Methods
             </h4>
 
             <div className="grid md:grid-cols-3 gap-6">
@@ -2901,43 +3343,43 @@ const BinomialOptions = () => {
                 <div className="space-y-3">
                   <div className="bg-blue-50 p-3 rounded">
                     <div className="font-semibold text-blue-700 text-sm mb-1">
-                      Bloomberg Terminal (OVDV)
+                      Bloomberg Terminal (MARS)
                     </div>
                     <p className="text-blue-600 text-xs">
-                      American option pricing with customizable tree parameters
-                      and dividend handling
+                      Monte Carlo Analytics & Risk System for complex
+                      derivatives pricing and portfolio risk
                     </p>
                   </div>
 
                   <div className="bg-blue-50 p-3 rounded">
                     <div className="font-semibold text-blue-700 text-sm mb-1">
-                      FactSet Options Analytics
+                      Murex MX.3
                     </div>
                     <p className="text-blue-600 text-xs">
-                      Multi-model comparison including binomial trees for
-                      portfolio analysis
+                      Enterprise trading platform with distributed Monte Carlo
+                      engines for exotic derivatives
                     </p>
                   </div>
 
                   <div className="bg-blue-50 p-3 rounded">
                     <div className="font-semibold text-blue-700 text-sm mb-1">
-                      Murex Risk Management
+                      Numerix CrossAsset
                     </div>
                     <p className="text-blue-600 text-xs">
-                      Enterprise-grade binomial implementation for derivatives
-                      books
+                      Specialized in Monte Carlo pricing for structured products
+                      and credit derivatives
                     </p>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded text-xs">
                     <div className="font-semibold text-gray-700 mb-1">
-                      Key Features:
+                      Enterprise Features:
                     </div>
                     <ul className="text-gray-600 space-y-1">
-                      <li>• Variable step sizing</li>
-                      <li>• Dividend adjustment tools</li>
-                      <li>• Early exercise analysis</li>
-                      <li>• Convergence diagnostics</li>
+                      <li>• GPU acceleration clusters</li>
+                      <li>• Real-time variance reduction</li>
+                      <li>• Parallel processing management</li>
+                      <li>• Risk scenario generation</li>
                     </ul>
                   </div>
                 </div>
@@ -2945,34 +3387,36 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-5 rounded-lg border border-blue-200">
                 <h5 className="font-bold text-green-700 mb-4 text-center">
-                  📱 Retail Platforms
+                  📱 Mid-Market Solutions
                 </h5>
                 <div className="space-y-3">
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      Interactive Brokers TWS
+                      FINCAD Analytics Suite
                     </div>
                     <p className="text-green-600 text-xs">
-                      Built-in binomial calculator for American option analysis
+                      Monte Carlo capabilities for structured notes and
+                      convertible bonds
                     </p>
                   </div>
 
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      TD Ameritrade thinkorswim
+                      SuperDerivatives (ICE)
                     </div>
                     <p className="text-green-600 text-xs">
-                      Educational binomial trees with visual step-through
-                      capability
+                      Cloud-based Monte Carlo pricing for FX and commodity
+                      derivatives
                     </p>
                   </div>
 
                   <div className="bg-green-50 p-3 rounded">
                     <div className="font-semibold text-green-700 text-sm mb-1">
-                      Charles Schwab StreetSmart
+                      Quantifi Risk Platform
                     </div>
                     <p className="text-green-600 text-xs">
-                      Simplified binomial pricing for retail options strategies
+                      Integrated Monte Carlo for trading and risk management
+                      workflows
                     </p>
                   </div>
 
@@ -2981,10 +3425,10 @@ const BinomialOptions = () => {
                       Typical Features:
                     </div>
                     <ul className="text-gray-600 space-y-1">
-                      <li>• American vs European comparison</li>
-                      <li>• Early exercise boundaries</li>
-                      <li>• Sensitivity analysis</li>
-                      <li>• Educational tree visualization</li>
+                      <li>• Pre-built exotic option templates</li>
+                      <li>• Scenario analysis tools</li>
+                      <li>• Greeks via finite differences</li>
+                      <li>• Custom payoff designers</li>
                     </ul>
                   </div>
                 </div>
@@ -2997,20 +3441,10 @@ const BinomialOptions = () => {
                 <div className="space-y-3">
                   <div className="bg-purple-50 p-3 rounded">
                     <div className="font-semibold text-purple-700 text-sm mb-1">
-                      Python: QuantLib
+                      Python: QuantLib + NumPy
                     </div>
                     <p className="text-purple-600 text-xs">
-                      Professional binomial tree implementation with American
-                      exercise
-                    </p>
-                  </div>
-
-                  <div className="bg-purple-50 p-3 rounded">
-                    <div className="font-semibold text-purple-700 text-sm mb-1">
-                      R: RQuantLib & fOptions
-                    </div>
-                    <p className="text-purple-600 text-xs">
-                      Statistical analysis with customizable tree parameters
+                      Open-source Monte Carlo with GPU acceleration via CuPy
                     </p>
                   </div>
 
@@ -3019,19 +3453,30 @@ const BinomialOptions = () => {
                       MATLAB Financial Toolbox
                     </div>
                     <p className="text-purple-600 text-xs">
-                      Built-in binprice() function for American options
+                      Built-in Monte Carlo functions with Parallel Computing
+                      Toolbox
+                    </p>
+                  </div>
+
+                  <div className="bg-purple-50 p-3 rounded">
+                    <div className="font-semibold text-purple-700 text-sm mb-1">
+                      R: RQuantLib + parallel
+                    </div>
+                    <p className="text-purple-600 text-xs">
+                      Statistical analysis focus with distributed computing
+                      capabilities
                     </p>
                   </div>
 
                   <div className="bg-gray-50 p-3 rounded text-xs">
                     <div className="font-semibold text-gray-700 mb-1">
-                      Use Cases:
+                      Development Use Cases:
                     </div>
                     <ul className="text-gray-600 space-y-1">
-                      <li>• American option backtesting</li>
-                      <li>• Model comparison studies</li>
-                      <li>• Custom payoff structures</li>
-                      <li>• Academic research</li>
+                      <li>• Custom exotic derivative pricing</li>
+                      <li>• Research and model validation</li>
+                      <li>• Backtesting trading strategies</li>
+                      <li>• Regulatory stress testing</li>
                     </ul>
                   </div>
                 </div>
@@ -3039,51 +3484,51 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Real-World Implementation Steps */}
+          {/* Implementation Guide */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-6 rounded-xl">
             <h4 className="font-bold text-green-800 text-xl mb-6 text-center">
-              Step-by-Step Implementation Guide
+              Step-by-Step Production Implementation Guide
             </h4>
 
             <div className="space-y-6">
               <div className="bg-white p-5 rounded-lg border border-green-200">
                 <h5 className="font-bold text-green-700 mb-4">
-                  🚀 Getting Started: Your First Binomial Implementation
+                  🚀 Enterprise-Grade Monte Carlo Implementation
                 </h5>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="bg-green-50 p-3 rounded">
                       <div className="font-semibold text-green-700 text-sm mb-2">
-                        Step 1: Parameter Setup
+                        Phase 1: Architecture Design
                       </div>
                       <ul className="text-green-600 text-xs space-y-1">
                         <li>
-                          • Choose number of steps: N = 100 for production
+                          • Choose distributed computing framework (Ray, Dask,
+                          Spark)
                         </li>
-                        <li>• Calculate Δt = T/N (time per step in years)</li>
-                        <li>• Compute up factor: u = e^(σ√Δt)</li>
-                        <li>• Compute down factor: d = 1/u</li>
+                        <li>• Design fault-tolerant simulation management</li>
+                        <li>• Implement result caching and checkpointing</li>
+                        <li>• Set up monitoring and logging infrastructure</li>
                         <li>
-                          • Calculate risk-neutral probability: p = (e^(rΔt) -
-                          d)/(u - d)
+                          • Plan for horizontal scaling (cloud auto-scaling)
                         </li>
                       </ul>
                     </div>
 
                     <div className="bg-green-50 p-3 rounded">
                       <div className="font-semibold text-green-700 text-sm mb-2">
-                        Step 2: Build Stock Price Tree
+                        Phase 2: Core Engine Development
                       </div>
                       <div className="text-green-600 text-xs space-y-1">
-                        <div>• Start with S₀ at period 0</div>
                         <div>
-                          • For each period i, node j: S[i][j] = S₀ × u^(i-j) ×
-                          d^j
+                          • Implement high-quality RNG (Mersenne Twister, Sobol)
                         </div>
+                        <div>• Build modular stochastic process library</div>
+                        <div>• Create payoff function framework</div>
+                        <div>• Implement variance reduction techniques</div>
                         <div>
-                          • Verify recombining property: up then down equals
-                          down then up
+                          • Add convergence monitoring and error estimation
                         </div>
                       </div>
                     </div>
@@ -3092,37 +3537,30 @@ const BinomialOptions = () => {
                   <div className="space-y-4">
                     <div className="bg-green-50 p-3 rounded">
                       <div className="font-semibold text-green-700 text-sm mb-2">
-                        Step 3: Calculate Option Values
+                        Phase 3: Performance Optimization
                       </div>
                       <ul className="text-green-600 text-xs space-y-1">
+                        <li>• Vectorize operations with NumPy/CuPy</li>
+                        <li>• Implement JIT compilation (Numba)</li>
                         <li>
-                          • At expiration (period N): intrinsic value only
+                          • Add GPU acceleration for embarrassingly parallel
+                          tasks
                         </li>
-                        <li>
-                          • Work backward through tree using: V = e^(-rΔt) × [p
-                          × V_up + (1-p) × V_down]
-                        </li>
-                        <li>
-                          • For American options: max(intrinsic, continuation)
-                          at each node
-                        </li>
-                        <li>• Result at S₀ node is option's fair value</li>
+                        <li>• Optimize memory usage and data locality</li>
+                        <li>• Profile and eliminate bottlenecks</li>
                       </ul>
                     </div>
 
                     <div className="bg-green-50 p-3 rounded">
                       <div className="font-semibold text-green-700 text-sm mb-2">
-                        Step 4: Validation & Greeks
+                        Phase 4: Production Integration
                       </div>
                       <ul className="text-green-600 text-xs space-y-1">
-                        <li>
-                          • Cross-check European options with Black-Scholes
-                        </li>
-                        <li>
-                          • Calculate delta: (V_up - V_down) / (S_up - S_down)
-                        </li>
-                        <li>• Test convergence by doubling N</li>
-                        <li>• Document early exercise boundaries</li>
+                        <li>• Build REST API for pricing requests</li>
+                        <li>• Implement result validation and sanity checks</li>
+                        <li>• Add circuit breakers and timeout handling</li>
+                        <li>• Create comprehensive test suite</li>
+                        <li>• Document parameter choices and assumptions</li>
                       </ul>
                     </div>
                   </div>
@@ -3131,10 +3569,10 @@ const BinomialOptions = () => {
             </div>
           </div>
 
-          {/* Comparison with Other Models */}
+          {/* Method Comparison */}
           <div className="bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 p-6 rounded-xl">
             <h4 className="font-bold text-purple-800 text-xl mb-6 text-center">
-              Binomial vs Other Pricing Methods: Practical Comparison
+              Monte Carlo vs Other Methods: Real-World Performance Comparison
             </h4>
 
             <div className="overflow-x-auto">
@@ -3142,113 +3580,159 @@ const BinomialOptions = () => {
                 <thead className="bg-gradient-to-r from-purple-100 to-violet-100">
                   <tr>
                     <th className="border border-gray-300 p-4 text-left font-bold text-gray-800">
-                      Method
+                      Option Type
                     </th>
                     <th className="border border-gray-300 p-4 text-center font-bold text-blue-600">
-                      American Options
+                      Monte Carlo
                     </th>
                     <th className="border border-gray-300 p-4 text-center font-bold text-green-600">
-                      Implementation
+                      Black-Scholes
                     </th>
                     <th className="border border-gray-300 p-4 text-center font-bold text-orange-600">
-                      Speed
+                      Binomial
                     </th>
                     <th className="border border-gray-300 p-4 text-center font-bold text-purple-600">
-                      Best Use Case
+                      Best Choice
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="hover:bg-gray-50 bg-purple-25">
-                    <td className="border border-gray-300 p-4 font-semibold">
-                      Binomial Tree
-                    </td>
-                    <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                        Native
-                      </span>
-                    </td>
-                    <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                        Simple
-                      </span>
-                    </td>
-                    <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm font-semibold">
-                        Medium
-                      </span>
-                    </td>
-                    <td className="border border-gray-300 p-4 text-center text-sm">
-                      American equity options
-                    </td>
-                  </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="border border-gray-300 p-4 font-semibold">
-                      Black-Scholes
+                      European Call/Put
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
-                        None
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Overkill
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                        Trivial
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Perfect
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                        Instant
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Good
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center text-sm">
-                      European index options
+                      Black-Scholes
                     </td>
                   </tr>
                   <tr className="hover:bg-gray-50 bg-gray-25">
                     <td className="border border-gray-300 p-4 font-semibold">
-                      Monte Carlo
+                      American Options
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm font-semibold">
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
                         Complex
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
-                        Advanced
+                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                        N/A
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
-                        Slow
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Excellent
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center text-sm">
-                      Exotic/path-dependent
+                      Binomial
                     </td>
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="border border-gray-300 p-4 font-semibold">
-                      Finite Difference
+                      Asian Options
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                        Good
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Ideal
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
-                        Complex
+                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                        N/A
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center">
-                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm font-semibold">
-                        Medium
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Possible
                       </span>
                     </td>
                     <td className="border border-gray-300 p-4 text-center text-sm">
-                      Multi-factor models
+                      Monte Carlo
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 bg-gray-25">
+                    <td className="border border-gray-300 p-4 font-semibold">
+                      Barrier Options
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Excellent
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Limited
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Good
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center text-sm">
+                      Monte Carlo
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="border border-gray-300 p-4 font-semibold">
+                      Multi-Asset Basket
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Only Option
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                        N/A
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                        Impractical
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center text-sm">
+                      Monte Carlo
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 bg-gray-25">
+                    <td className="border border-gray-300 p-4 font-semibold">
+                      Custom Exotics
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
+                        Universal
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                        Rare
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center">
+                      <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Limited
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-4 text-center text-sm">
+                      Monte Carlo
                     </td>
                   </tr>
                 </tbody>
@@ -3257,57 +3741,81 @@ const BinomialOptions = () => {
 
             <div className="mt-6 bg-purple-50 p-4 rounded-lg border border-purple-200">
               <h5 className="font-semibold text-purple-700 mb-2">
-                Binomial's Unique Position
+                Method Selection Strategy
               </h5>
-              <p className="text-purple-600 text-sm">
-                Binomial trees occupy the crucial middle ground in options
-                pricing: sophisticated enough to handle American exercise
-                features that Black-Scholes cannot address, yet simple enough to
-                implement and understand without the complexity of Monte Carlo
-                or finite difference methods. This makes them the practical
-                choice for most equity options work.
-              </p>
+              <div className="grid md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <div className="font-semibold text-purple-700 mb-1">
+                    Start Simple:
+                  </div>
+                  <div className="text-purple-600">
+                    Use Black-Scholes for vanilla options, upgrade only when
+                    necessary for complex features
+                  </div>
+                </div>
+                <div>
+                  <div className="font-semibold text-purple-700 mb-1">
+                    American Features:
+                  </div>
+                  <div className="text-purple-600">
+                    Binomial trees are optimal for early exercise, Monte Carlo
+                    adds unnecessary complexity
+                  </div>
+                </div>
+                <div>
+                  <div className="font-semibold text-purple-700 mb-1">
+                    Path Dependence:
+                  </div>
+                  <div className="text-purple-600">
+                    Monte Carlo becomes the only practical choice for complex
+                    path-dependent payoffs
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Trading Strategy Examples */}
+          {/* Real Trading Applications */}
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 p-6 rounded-xl">
             <h4 className="font-bold text-amber-800 text-xl mb-6 text-center">
-              Practical Trading Applications
+              Real-World Trading Applications
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="bg-white p-5 rounded-lg border border-amber-200">
                   <h5 className="font-bold text-amber-700 mb-3">
-                    📈 American Option Analysis
+                    🏗️ Structured Products Trading
                   </h5>
                   <div className="space-y-3 text-sm">
                     <div className="bg-amber-50 p-3 rounded">
                       <div className="font-semibold text-amber-700 mb-2">
-                        Scenario: Dividend-Paying Stock
+                        Auto-Callable Notes:
                       </div>
                       <ul className="text-amber-600 text-xs space-y-1">
                         <li>
-                          • Stock: $50, Strike: $45, 60 days to expiration
+                          • Path-dependent barrier monitoring for early
+                          redemption
                         </li>
-                        <li>• Ex-dividend date in 30 days: $2.00 dividend</li>
-                        <li>• American put shows early exercise value</li>
                         <li>
-                          • Binomial tree identifies optimal exercise timing
+                          • Multi-asset baskets with complex correlation
+                          structures
+                        </li>
+                        <li>• Monte Carlo essential for accurate pricing</li>
+                        <li>
+                          • Typical simulation: 1M+ paths, variance reduction
+                          critical
                         </li>
                       </ul>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded">
                       <div className="font-semibold text-gray-700 mb-1">
-                        Key Insight:
+                        Implementation Challenge:
                       </div>
                       <p className="text-gray-600 text-xs">
-                        Binomial model reveals that American put should be
-                        exercised early if stock price drops below $42 before
-                        ex-dividend date, capturing time value before dividend
-                        impact
+                        Real-time pricing during client negotiations requires
+                        sub-minute Monte Carlo results for complex payoffs
                       </p>
                     </div>
                   </div>
@@ -3315,32 +3823,34 @@ const BinomialOptions = () => {
 
                 <div className="bg-white p-5 rounded-lg border border-amber-200">
                   <h5 className="font-bold text-amber-700 mb-3">
-                    🎯 Earnings Strategy Optimization
+                    🌐 FX and Commodity Exotics
                   </h5>
                   <div className="space-y-3 text-sm">
                     <div className="bg-amber-50 p-3 rounded">
                       <div className="font-semibold text-amber-700 mb-2">
-                        Application:
+                        Application Examples:
                       </div>
                       <ul className="text-amber-600 text-xs space-y-1">
-                        <li>• Compare American vs European option values</li>
-                        <li>• Model early exercise around earnings dates</li>
                         <li>
-                          • Optimize strike selection for max early exercise
-                          premium
+                          • Asian FX options for corporate hedging programs
                         </li>
-                        <li>• Time entry/exit around key corporate events</li>
+                        <li>
+                          • Commodity basket options for energy portfolios
+                        </li>
+                        <li>
+                          • Weather derivatives for agricultural exposures
+                        </li>
+                        <li>• Multi-currency quanto structures</li>
                       </ul>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded">
                       <div className="font-semibold text-gray-700 mb-1">
-                        Implementation:
+                        Market Reality:
                       </div>
                       <p className="text-gray-600 text-xs">
-                        Use binomial trees to identify ITM calls that should be
-                        exercised before ex-dividend dates and puts that benefit
-                        from early exercise in declining markets
+                        Corporate clients often need custom hedging solutions
+                        that don't fit standard option templates
                       </p>
                     </div>
                   </div>
@@ -3350,31 +3860,36 @@ const BinomialOptions = () => {
               <div className="space-y-4">
                 <div className="bg-white p-5 rounded-lg border border-amber-200">
                   <h5 className="font-bold text-amber-700 mb-3">
-                    🛡️ Portfolio Hedging
+                    📊 Risk Management & Stress Testing
                   </h5>
                   <div className="space-y-3 text-sm">
                     <div className="bg-amber-50 p-3 rounded">
                       <div className="font-semibold text-amber-700 mb-2">
-                        Scenario: Equity Portfolio Protection
+                        Regulatory Requirements:
                       </div>
                       <ul className="text-amber-600 text-xs space-y-1">
-                        <li>• $5M portfolio needs downside protection</li>
-                        <li>• Consider American vs European puts</li>
                         <li>
-                          • Model optimal hedge ratios using binomial delta
+                          • FRTB (Fundamental Review of Trading Book) stress
+                          scenarios
                         </li>
-                        <li>• Factor in early exercise flexibility value</li>
+                        <li>
+                          • CCAR (Comprehensive Capital Analysis) for large
+                          banks
+                        </li>
+                        <li>• Solvency II capital requirements for insurers</li>
+                        <li>
+                          • Monte Carlo essential for non-linear portfolios
+                        </li>
                       </ul>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded">
                       <div className="font-semibold text-gray-700 mb-1">
-                        Value Analysis:
+                        Implementation Scale:
                       </div>
                       <p className="text-gray-600 text-xs">
-                        American puts worth 5-15% more than European equivalents
-                        for same strikes, providing better protection per dollar
-                        spent on premium
+                        Major banks run millions of scenarios across thousands
+                        of risk factors daily for regulatory reporting
                       </p>
                     </div>
                   </div>
@@ -3382,35 +3897,33 @@ const BinomialOptions = () => {
 
                 <div className="bg-white p-5 rounded-lg border border-amber-200">
                   <h5 className="font-bold text-amber-700 mb-3">
-                    📊 Risk Management
+                    🔬 Model Validation & Research
                   </h5>
                   <div className="space-y-3 text-sm">
                     <div className="bg-amber-50 p-3 rounded">
                       <div className="font-semibold text-amber-700 mb-2">
-                        Daily Process:
+                        Validation Process:
                       </div>
                       <ul className="text-amber-600 text-xs space-y-1">
-                        <li>• Calculate American option Greeks using trees</li>
-                        <li>• Monitor early exercise boundaries</li>
                         <li>
-                          • Stress test with different volatility scenarios
+                          • Cross-check analytical models against Monte Carlo
                         </li>
+                        <li>• Test new stochastic volatility models</li>
+                        <li>• Validate exotic option pricing engines</li>
                         <li>
-                          • Update hedge ratios based on tree calculations
+                          • Research alternative variance reduction techniques
                         </li>
                       </ul>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded">
                       <div className="font-semibold text-gray-700 mb-1">
-                        Key Metrics:
+                        Quality Assurance:
                       </div>
-                      <ul className="text-gray-600 text-xs space-y-1">
-                        <li>• Delta exposure from American features</li>
-                        <li>• Early exercise probability curves</li>
-                        <li>• Dividend-adjusted sensitivities</li>
-                        <li>• Model validation against market prices</li>
-                      </ul>
+                      <p className="text-gray-600 text-xs">
+                        Monte Carlo serves as the "gold standard" for checking
+                        other pricing methods and identifying model bugs
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -3421,41 +3934,48 @@ const BinomialOptions = () => {
           {/* Best Practices */}
           <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border-2 border-cyan-200 p-6 rounded-xl">
             <h4 className="font-bold text-cyan-800 text-xl mb-6">
-              Best Practices for Professional Implementation
+              Production Best Practices for Professional Implementation
             </h4>
 
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-4 rounded-lg border border-cyan-200">
                 <h5 className="font-semibold text-cyan-700 mb-3 text-center">
-                  🎯 Model Calibration
+                  🎯 Accuracy & Reliability
                 </h5>
                 <ul className="text-cyan-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Step Count:</strong> Use N=100-300 for production
-                      systems, test convergence
+                      <strong>Sample Size Strategy:</strong> Start with 10K
+                      simulations, scale up until convergence stabilizes
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Volatility Input:</strong> Use implied volatility
-                      from liquid ATM options
+                      <strong>Random Number Quality:</strong> Use Mersenne
+                      Twister or better, avoid linear congruential generators
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Dividend Modeling:</strong> Incorporate exact
-                      ex-dividend dates and amounts
+                      <strong>Variance Reduction:</strong> Implement antithetic
+                      variates and control variates as standard
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Validation:</strong> Cross-check European options
-                      with Black-Scholes
+                      <strong>Confidence Intervals:</strong> Always report error
+                      bounds, aim for ±0.1% for production pricing
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-cyan-500 mt-1">•</span>
+                    <span>
+                      <strong>Cross-Validation:</strong> Compare simple cases
+                      with Black-Scholes to verify implementation
                     </span>
                   </li>
                 </ul>
@@ -3463,35 +3983,42 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-4 rounded-lg border border-cyan-200">
                 <h5 className="font-semibold text-cyan-700 mb-3 text-center">
-                  ⚡ Performance Optimization
+                  ⚡ Performance & Scalability
                 </h5>
                 <ul className="text-cyan-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Memory Management:</strong> Use rolling arrays for
-                      large step counts
+                      <strong>GPU Acceleration:</strong> Use CuPy or similar for
+                      100x+ speedup on large simulations
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Vectorization:</strong> Implement with NumPy for
-                      10x+ speed improvement
+                      <strong>Distributed Computing:</strong> Implement with Ray
+                      or Dask for horizontal scaling
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Caching:</strong> Store tree calculations for
-                      Greek computation
+                      <strong>Memory Management:</strong> Stream results to
+                      avoid memory overflow on large jobs
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Parallel Processing:</strong> Calculate multiple
-                      options simultaneously
+                      <strong>Caching Strategy:</strong> Cache intermediate
+                      results for similar parameter sets
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <span className="text-cyan-500 mt-1">•</span>
+                    <span>
+                      <strong>Load Balancing:</strong> Distribute simulations
+                      across available compute resources dynamically
                     </span>
                   </li>
                 </ul>
@@ -3499,42 +4026,42 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-4 rounded-lg border border-cyan-200">
                 <h5 className="font-semibold text-cyan-700 mb-3 text-center">
-                  🔧 Quality Control
+                  🛡️ Production Operations
                 </h5>
                 <ul className="text-cyan-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Parameter Bounds:</strong> Ensure 0 {"<"} p {"<"}{" "}
-                      1 and reasonable u, d values
+                      <strong>Error Handling:</strong> Implement circuit
+                      breakers and graceful degradation for failed simulations
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Convergence Testing:</strong> Plot option value vs
-                      N to verify stabilization
+                      <strong>Monitoring:</strong> Track simulation performance,
+                      convergence rates, and resource utilization
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Greeks Validation:</strong> Check that delta is
-                      between 0-1 for calls
+                      <strong>Version Control:</strong> Track model parameters
+                      and random seeds for reproducible results
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Market Comparison:</strong> Monitor differences
-                      from observed market prices
+                      <strong>Testing Framework:</strong> Automated testing for
+                      regression detection and performance benchmarks
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-cyan-500 mt-1">•</span>
                     <span>
-                      <strong>Documentation:</strong> Record all parameter
-                      choices and assumptions
+                      <strong>Documentation:</strong> Maintain clear records of
+                      assumptions, parameters, and validation results
                     </span>
                   </li>
                 </ul>
@@ -3545,45 +4072,44 @@ const BinomialOptions = () => {
           {/* Modern Evolution */}
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-200 p-6 rounded-xl">
             <h4 className="font-bold text-indigo-800 text-xl mb-6">
-              Modern Evolution & Future Applications
+              Modern Evolution & Cutting-Edge Applications
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg border border-indigo-200">
                   <h5 className="font-semibold text-indigo-700 mb-3">
-                    🤖 Technology Integration
+                    🤖 AI & Machine Learning Integration
                   </h5>
                   <div className="space-y-2 text-sm">
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Machine Learning Enhancement
+                        Neural Network Acceleration
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        AI algorithms optimize step counts and parameter
-                        selection automatically based on market conditions and
-                        accuracy requirements
+                        Deep learning models learn to approximate Monte Carlo
+                        results with 1000x speedup for repeated similar
+                        calculations
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        GPU Acceleration
+                        Adaptive Sampling
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Parallel processing enables real-time calculation of
-                        thousands of American options simultaneously for
-                        portfolio analysis
+                        ML algorithms dynamically adjust simulation parameters
+                        based on convergence patterns and importance sampling
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Cloud Computing
+                        Automated Variance Reduction
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Distributed binomial calculations across cloud
-                        infrastructure for enterprise-scale risk management
+                        AI selects optimal control variates and importance
+                        sampling distributions automatically
                       </p>
                     </div>
                   </div>
@@ -3591,27 +4117,36 @@ const BinomialOptions = () => {
 
                 <div className="bg-white p-4 rounded-lg border border-indigo-200">
                   <h5 className="font-semibold text-indigo-700 mb-3">
-                    🌐 New Applications
+                    ☁️ Cloud-Native Architecture
                   </h5>
                   <div className="space-y-2 text-sm">
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Cryptocurrency Options
+                        Serverless Computing
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        24/7 trading environments where American exercise
-                        features become more valuable due to continuous
-                        opportunity
+                        AWS Lambda, Google Cloud Functions enable
+                        pay-per-simulation pricing with automatic scaling
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        ESG Derivatives
+                        Container Orchestration
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Environmental credit options and sustainability-linked
-                        derivatives requiring custom payoff structures
+                        Kubernetes enables fault-tolerant distributed Monte
+                        Carlo with automatic resource management
+                      </p>
+                    </div>
+
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-1">
+                        Edge Computing
+                      </div>
+                      <p className="text-indigo-600 text-xs">
+                        Regional compute nodes reduce latency for real-time
+                        exotic option pricing in global markets
                       </p>
                     </div>
                   </div>
@@ -3621,37 +4156,37 @@ const BinomialOptions = () => {
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg border border-indigo-200">
                   <h5 className="font-semibold text-indigo-700 mb-3">
-                    📈 Educational Evolution
+                    🌐 Emerging Asset Classes
                   </h5>
                   <div className="space-y-2 text-sm">
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Interactive Visualization
+                        Cryptocurrency Derivatives
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        3D tree visualizations and virtual reality environments
-                        make complex option behavior more intuitive for students
+                        24/7 markets with extreme volatility require
+                        sophisticated Monte Carlo models with jump-diffusion
+                        processes
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Gamification
+                        ESG and Carbon Derivatives
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Trading simulations using binomial models help retail
-                        investors understand American option behavior
+                        Environmental credit options and sustainability-linked
+                        derivatives with complex regulatory dependencies
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Regulatory Applications
+                        Alternative Data Integration
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Stress testing frameworks mandated by regulators
-                        increasingly rely on binomial methods for American
-                        option portfolios
+                        Satellite imagery, social media sentiment, and IoT data
+                        feeds incorporated into stochastic models
                       </p>
                     </div>
                   </div>
@@ -3659,26 +4194,36 @@ const BinomialOptions = () => {
 
                 <div className="bg-white p-4 rounded-lg border border-indigo-200">
                   <h5 className="font-semibold text-indigo-700 mb-3">
-                    🔮 Future Directions
+                    🔮 Future Technologies
                   </h5>
                   <div className="space-y-2 text-sm">
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Quantum Enhancement
+                        Quantum Computing
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Quantum computing may enable massive binomial trees with
-                        millions of steps for unprecedented accuracy
+                        Quantum advantage for certain types of Monte Carlo
+                        simulations, particularly in optimization and sampling
                       </p>
                     </div>
 
                     <div className="bg-indigo-50 p-3 rounded">
                       <div className="font-semibold text-indigo-700 mb-1">
-                        Real-Time Adaptation
+                        Neuromorphic Chips
                       </div>
                       <p className="text-indigo-600 text-xs">
-                        Dynamic step adjustment based on market volatility and
-                        time decay for optimal accuracy-speed balance
+                        Specialized hardware designed for stochastic computing
+                        with ultra-low power consumption
+                      </p>
+                    </div>
+
+                    <div className="bg-indigo-50 p-3 rounded">
+                      <div className="font-semibold text-indigo-700 mb-1">
+                        Real-Time Adaptive Models
+                      </div>
+                      <p className="text-indigo-600 text-xs">
+                        Models that automatically adjust parameters based on
+                        streaming market data and regime changes
                       </p>
                     </div>
                   </div>
@@ -3690,41 +4235,41 @@ const BinomialOptions = () => {
           {/* Final Takeaways */}
           <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 p-6 rounded-xl">
             <h4 className="font-bold text-emerald-800 text-xl mb-4">
-              Key Takeaways for Practical Implementation
+              Key Takeaways for Professional Implementation
             </h4>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white p-4 rounded-lg border border-emerald-200">
                 <h5 className="font-semibold text-emerald-700 mb-3">
-                  ✅ When Binomial Trees Excel
+                  ✅ Monte Carlo's Indispensable Role
                 </h5>
                 <ul className="text-emerald-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>American Options:</strong> The only practical
-                      method for most equity options trading
+                      <strong>Complex Derivatives:</strong> The only practical
+                      method for many exotic options and structured products
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Dividend Situations:</strong> Superior handling of
-                      discrete dividend payments and ex-dates
+                      <strong>Risk Management:</strong> Essential for regulatory
+                      stress testing and portfolio scenario analysis
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Custom Payoffs:</strong> Easy modification for
-                      non-standard option structures
+                      <strong>Model Validation:</strong> Gold standard for
+                      cross-checking analytical models and measuring confidence
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Educational Use:</strong> Unmatched for building
-                      deep understanding of option mechanics
+                      <strong>Innovation:</strong> Enables pricing of previously
+                      impossible derivative structures
                     </span>
                   </li>
                 </ul>
@@ -3732,35 +4277,36 @@ const BinomialOptions = () => {
 
               <div className="bg-white p-4 rounded-lg border border-emerald-200">
                 <h5 className="font-semibold text-emerald-700 mb-3">
-                  ⚡ Implementation Success Factors
+                  🚀 Implementation Success Factors
                 </h5>
                 <ul className="text-emerald-600 text-sm space-y-2">
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Right-Size Steps:</strong> N=100-300 balances
-                      accuracy with computational speed
+                      <strong>Start with Quality:</strong> Invest in proper
+                      random number generators and variance reduction from day
+                      one
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Validate Results:</strong> Always cross-check
-                      European options with Black-Scholes
+                      <strong>Scale Strategically:</strong> Use GPU acceleration
+                      and cloud computing to overcome speed limitations
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Monitor Convergence:</strong> Test different step
-                      counts to ensure stable results
+                      <strong>Validate Rigorously:</strong> Always cross-check
+                      results with simpler models and market observations
                     </span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-500 mt-1">•</span>
                     <span>
-                      <strong>Document Assumptions:</strong> Track parameter
-                      choices for consistency and debugging
+                      <strong>Document Everything:</strong> Track assumptions,
+                      parameters, and convergence for reproducible results
                     </span>
                   </li>
                 </ul>
@@ -3769,17 +4315,21 @@ const BinomialOptions = () => {
 
             <div className="mt-6 bg-emerald-50 p-4 rounded-lg border border-emerald-200">
               <h5 className="font-semibold text-emerald-700 mb-2">
-                Bottom Line for Traders
+                The Future of Monte Carlo in Finance
               </h5>
               <p className="text-emerald-600 text-sm">
-                Binomial trees remain indispensable for American options
-                analysis despite being slower than Black-Scholes. Their
-                intuitive structure and natural handling of early exercise make
-                them the practical choice for equity options trading, portfolio
-                hedging, and risk management. Modern implementations with
-                optimized algorithms and parallel processing have largely
-                addressed speed concerns, making binomial trees faster and more
-                accessible than ever before.
+                Monte Carlo simulation has evolved from a computationally
+                expensive last resort to an efficient, scalable solution for
+                complex derivatives pricing. Modern implementations with GPU
+                acceleration, machine learning optimization, and cloud-native
+                architecture have largely solved the traditional speed and cost
+                concerns. As financial markets continue to innovate with
+                increasingly complex products—from crypto derivatives to
+                ESG-linked structures—Monte Carlo remains the most flexible and
+                reliable pricing method available. The key to success is not
+                avoiding Monte Carlo due to historical limitations, but
+                embracing modern implementation techniques that unlock its full
+                potential.
               </p>
             </div>
           </div>
@@ -3826,17 +4376,16 @@ const BinomialOptions = () => {
                 Options Trading
               </button>
               <span className="mx-2 text-gray-500">/</span>
-              <span className="text-gray-700">Binomial Model</span>
+              <span className="text-gray-700">Monte Carlo Model</span>
             </nav>
 
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Binomial Model
+                  Monte Carlo Model
                 </h1>
                 <p className="text-xl text-gray-600">
-                  Intuitive tree-based approach to option pricing with American
-                  exercise
+                  Simulation-based approach for complex derivatives pricing
                 </p>
               </div>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -3851,10 +4400,10 @@ const BinomialOptions = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
-                  Intermediate
+                <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full font-medium">
+                  Advanced
                 </span>
-                <span>40 min read</span>
+                <span>50 min read</span>
               </div>
             </div>
           </div>
@@ -3863,35 +4412,35 @@ const BinomialOptions = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4 mb-8">
             <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
               <span>Lesson Progress</span>
-              <span>6 of 7 lessons</span>
+              <span>7 of 7 lessons</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full"
-                style={{ width: "86%" }}
+                style={{ width: "100%" }}
               ></div>
             </div>
           </div>
 
           {/* CTA Banner */}
-          <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6 rounded-xl mb-8">
+          <div className="bg-gradient-to-r from-purple-600 to-violet-600 text-white p-6 rounded-xl mb-8">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold mb-2 pr-4">
-                  Explore Binomial Trees with OptiPrice
+                  Experience Monte Carlo with OptiPrice
                 </h3>
-                <p className="text-emerald-100">
-                  Build interactive binomial trees step-by-step and see how
-                  American options differ from European.
+                <p className="text-purple-100">
+                  Run thousands of simulations and see convergence in action for
+                  complex options.
                 </p>
-                <p className="text-emerald-100 pr-4">
-                  Visualize convergence to Black-Scholes as you increase time
-                  steps.
+                <p className="text-purple-100 pr-4">
+                  Compare simulation results with analytical Black-Scholes and
+                  binomial models.
                 </p>
               </div>
               <button
                 onClick={() => navigate("/toolbox/optiprice")}
-                className="!bg-white !text-emerald-600 px-6 py-3 !rounded-lg !font-semibold !hover:bg-emerald-50 !transition-colors flex-shrink-0"
+                className="!bg-white !text-purple-600 px-6 py-3 !rounded-lg !font-semibold !hover:bg-purple-50 !transition-colors flex-shrink-0"
               >
                 Open Calculator →
               </button>
@@ -3962,7 +4511,7 @@ const BinomialOptions = () => {
           {/* Navigation */}
           <div className="flex justify-between items-center">
             <button
-              onClick={() => navigate("/learning/options/black-scholes")}
+              onClick={() => navigate("/learning/options/binomial")}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <svg
@@ -3978,28 +4527,21 @@ const BinomialOptions = () => {
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              <span>Back: Black-Scholes Model</span>
+              <span>Back: Binomial Model</span>
             </button>
 
-            <button
-              onClick={() => navigate("/learning/options/monte-carlo")}
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              <span>Next: Monte Carlo Model</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+            <div className="flex items-center space-x-2 text-gray-600">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
                 />
               </svg>
-            </button>
+              <span className="text-green-600 font-medium">
+                Course Complete!
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -4007,4 +4549,4 @@ const BinomialOptions = () => {
   );
 };
 
-export default BinomialOptions;
+export default MonteCarloOptions;

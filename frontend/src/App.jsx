@@ -12,6 +12,7 @@ import EuropeanOptions from './pages/EuropeanOptions';
 import AsianOptions from './pages/AsianOptions';
 import BlackScholes from './pages/BlackScholes';
 import BinomialOptions from './pages/BinomialOptions';
+import MonteCarloOptions from './pages/MonteCarloOptions';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/learning/options/asian" element={<AsianOptions />} />
           <Route path="/learning/options/black-scholes" element={<BlackScholes />} />
           <Route path="/learning/options/binomial" element={<BinomialOptions />} />
+          <Route path="/learning/options/monte-carlo" element={<MonteCarloOptions />} />
           {/* Redirect root path to login */}
           <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
